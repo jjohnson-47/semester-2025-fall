@@ -11,11 +11,6 @@ from typing import Dict, List, Tuple, Optional
 import argparse
 
 from jsonschema import validate, ValidationError, Draft7Validator
-from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
-
-console = Console()
 
 
 class JSONValidator:
@@ -32,14 +27,14 @@ class JSONValidator:
         schemas = {}
         
         if not self.schema_dir.exists():
-            console.print(f"[yellow]Warning: Schema directory not found: {self.schema_dir}[/yellow]")
+            print(f"Warning: Schema directory not found: {self.schema_dir}")
             return schemas
         
         for schema_file in self.schema_dir.glob("*.schema.json"):
             with open(schema_file, 'r', encoding='utf-8') as f:
                 key = schema_file.stem.replace('.schema', '')
                 schemas[key] = json.load(f)
-                console.print(f"[dim]Loaded schema: {key}[/dim]")
+                print(f"  Loaded schema: {key}")
         
         return schemas
     
@@ -82,7 +77,7 @@ class JSONValidator:
     
     def validate_project(self) -> bool:
         """Validate all JSON files in the project."""
-        console.print(Panel("[bold blue]JSON Validation[/bold blue]", expand=False))
+        print("\n=== JSON Validation ===\n")
         
         validations = [
             ("variables", "variables"),
@@ -106,9 +101,9 @@ class JSONValidator:
                 total_valid += valid_count
                 
                 if valid_count == file_count:
-                    console.print(f"✓ {directory}: [green]{valid_count}/{file_count} valid[/green]")
+                    print(f"✓ {directory}: {valid_count}/{file_count} valid")
                 else:
-                    console.print(f"✗ {directory}: [red]{valid_count}/{file_count} valid[/red]")
+                    print(f"✗ {directory}: {valid_count}/{file_count} valid")
         
         # Print summary
         self._print_summary(total_valid, total_files)
@@ -117,38 +112,33 @@ class JSONValidator:
     
     def _print_summary(self, valid: int, total: int) -> None:
         """Print validation summary."""
-        console.print("\n" + "="*50)
+        print("\n" + "="*50)
         
         if self.errors:
-            console.print(f"[bold red]Validation Failed[/bold red]")
-            console.print(f"\n[red]Errors ({len(self.errors)}):[/red]")
+            print("Validation Failed")
+            print(f"\nErrors ({len(self.errors)}):")
             for file, error in self.errors[:10]:  # Show first 10 errors
-                console.print(f"  • {file}")
-                console.print(f"    {error}")
+                print(f"  • {file}")
+                print(f"    {error}")
             if len(self.errors) > 10:
-                console.print(f"  ... and {len(self.errors) - 10} more")
+                print(f"  ... and {len(self.errors) - 10} more")
         
         if self.warnings:
-            console.print(f"\n[yellow]Warnings ({len(self.warnings)}):[/yellow]")
+            print(f"\nWarnings ({len(self.warnings)}):")
             for file, warning in self.warnings:
-                console.print(f"  • {file}: {warning}")
+                print(f"  • {file}: {warning}")
         
-        # Summary table
-        table = Table(title="Validation Summary", show_header=True)
-        table.add_column("Metric", style="cyan")
-        table.add_column("Value", style="white")
-        
-        table.add_row("Total Files", str(total))
-        table.add_row("Valid Files", f"[green]{valid}[/green]" if valid == total else f"[yellow]{valid}[/yellow]")
-        table.add_row("Errors", f"[red]{len(self.errors)}[/red]" if self.errors else "[green]0[/green]")
-        table.add_row("Warnings", f"[yellow]{len(self.warnings)}[/yellow]" if self.warnings else "[green]0[/green]")
-        
-        console.print(table)
+        # Summary
+        print("\nValidation Summary:")
+        print(f"  Total Files: {total}")
+        print(f"  Valid Files: {valid}")
+        print(f"  Errors: {len(self.errors)}")
+        print(f"  Warnings: {len(self.warnings)}")
         
         if not self.errors:
-            console.print("\n[bold green]✓ All JSON files are valid![/bold green]")
+            print("\n✓ All JSON files are valid!")
         else:
-            console.print("\n[bold red]✗ Validation failed. Fix errors before building.[/bold red]")
+            print("\n✗ Validation failed. Fix errors before building.")
 
 
 def main():
@@ -159,9 +149,6 @@ def main():
     parser.add_argument('--quiet', action='store_true', help='Quiet mode')
     
     args = parser.parse_args()
-    
-    if args.quiet:
-        console.quiet = True
     
     validator = JSONValidator(schema_dir=args.schema_dir)
     

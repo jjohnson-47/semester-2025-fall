@@ -13,7 +13,6 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from dotenv import load_dotenv
 import markdown
 import yaml
 
@@ -22,7 +21,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from scripts.utils.jinja_env import create_jinja_env
 from scripts.utils.calendar import SemesterCalendar
 
-load_dotenv()
+# Load environment variables from .env if it exists
+env_file = Path(__file__).parent.parent / '.env'
+if env_file.exists():
+    with open(env_file) as f:
+        for line in f:
+            if line.strip() and not line.startswith('#'):
+                key, value = line.strip().split('=', 1)
+                os.environ[key] = value.strip('"')
 
 class SyllabusBuilder:
     """Builds course syllabi from templates and data."""
