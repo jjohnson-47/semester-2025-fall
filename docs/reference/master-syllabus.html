@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="KPC Master Syllabus Template - Academic Year 2025-2026">
+    <meta name="author" content="Kenai Peninsula College">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <title>KPC Course Syllabus - [Course Number]</title>
+    
+    <!-- Modern Font Stack -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- MathJax for Mathematical Content -->
+    <script>
+        MathJax = {
+            loader: {
+                load: ["[mml]/mml3"]
+            },
+            options: {
+                enableMenu: true
+            },
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+    
+    <style>
+        /* CSS Custom Properties for Theming */
+        :root {
+            --color-primary: #003366;
+            --color-secondary: #0066cc;
+            --color-accent: #ff6b35;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --color-text: #1f2937;
+            --color-text-light: #6b7280;
+            --color-bg: #ffffff;
+            --color-bg-secondary: #f9fafb;
+            --color-border: #e5e7eb;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            --font-mono: 'JetBrains Mono', 'SF Mono', Monaco, Consolas, monospace;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --radius: 0.5rem;
+            --max-width: 900px;
+            --spacing-unit: 1rem;
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-text: #f3f4f6;
+                --color-text-light: #9ca3af;
+                --color-bg: #111827;
+                --color-bg-secondary: #1f2937;
+                --color-border: #374151;
+            }
+        }
+
+        /* Reset and Base Styles */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--color-text);
+            background-color: var(--color-bg);
+            padding: 2rem 1rem;
+            min-height: 100vh;
+        }
+
+        /* Container */
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            line-height: 1.25;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--color-primary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            border-bottom: 3px solid var(--color-accent);
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 1.875rem;
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--color-secondary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--color-secondary);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            transition: color 0.2s ease;
+        }
+
+        a:hover, a:focus {
+            color: var(--color-accent);
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+        }
+
+        a:focus-visible {
+            outline: 2px solid var(--color-secondary);
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 2rem 0;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        th {
+            background-color: var(--color-primary);
+            color: white;
+            font-weight: 600;
+            text-align: left;
+            padding: 1rem 1.5rem;
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+            background-color: var(--color-bg);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: var(--color-bg-secondary);
+        }
+
+        /* Info Box */
+        .info-box {
+            background-color: var(--color-bg-secondary);
+            border-left: 4px solid var(--color-accent);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: var(--radius);
+        }
+
+        .info-box h3 {
+            margin-top: 0;
+        }
+
+        /* Course Header */
+        .course-header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: var(--radius);
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .course-header h1 {
+            color: white;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .course-header p {
+            font-size: 1.125rem;
+            opacity: 0.95;
+        }
+
+        /* Instructor Card */
+        .instructor-card {
+            background-color: var(--color-bg-secondary);
+            padding: 2rem;
+            border-radius: var(--radius);
+            margin: 2rem 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .instructor-card h2 {
+            border-top: none;
+            margin-top: 0;
+        }
+
+        /* Grade Table Specific Styling */
+        .grade-table th {
+            background-color: var(--color-secondary);
+        }
+
+        .grade-table tr:nth-child(even) td {
+            background-color: var(--color-bg-secondary);
+        }
+
+        /* Policy Guide Box */
+        .policy-guide {
+            background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
+            border: 2px solid var(--color-warning);
+            padding: 2rem;
+            border-radius: var(--radius);
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .policy-guide h3 {
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+        }
+
+        .policy-guide a {
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                padding: 0;
+                color: black;
+                background: white;
+            }
+
+            .course-header {
+                background: none;
+                color: black;
+                border: 2px solid black;
+                page-break-after: avoid;
+            }
+
+            .course-header h1 {
+                color: black;
+            }
+
+            h2 {
+                page-break-after: avoid;
+            }
+
+            table {
+                page-break-inside: avoid;
+            }
+
+            a {
+                color: black;
+                text-decoration: underline;
+            }
+
+            .policy-guide {
+                background: white;
+                border: 2px solid black;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.25rem;
+            }
+
+            table {
+                font-size: 0.875rem;
+            }
+
+            th, td {
+                padding: 0.75rem;
+            }
+
+            .course-header {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        /* Accessibility: High Contrast Mode Support */
+        @media (prefers-contrast: high) {
+            :root {
+                --color-primary: #000000;
+                --color-secondary: #0000ff;
+                --color-text: #000000;
+                --color-bg: #ffffff;
+                --color-border: #000000;
+            }
+        }
+
+        /* Skip to main content link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--color-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            z-index: 100;
+            text-decoration: none;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Loading indicator for async content */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--color-border);
+            border-radius: 50%;
+            border-top-color: var(--color-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <div class="container">
+        <header class="course-header">
+            <h1>Syllabus</h1>
+            <p><strong>KPC Course Department, Number, Section, Title</strong></p>
+            <p>Semester Year - CRN (XXXXX)</p>
+            <p>List Location (BLDG/Room) Information or distance delivery notation</p>
+        </header>
+
+        <main id="main-content">
+            <section class="instructor-card" aria-labelledby="instructor-heading">
+                <h2 id="instructor-heading">Instructor</h2>
+                <p><strong>Name:</strong> [Instructor Name]</p>
+                <p><strong>Office (Virtual) Hours:</strong> [Time and location/zoom link]</p>
+                <div>
+                    <p><strong>Contact Information:</strong></p>
+                    <ul>
+                        <li>Email: [Email Address]</li>
+                        <li>Office: [Office Location]</li>
+                        <li>Zoom link: [Zoom URL]</li>
+                        <li>Phone: [Phone Number]</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section aria-labelledby="course-heading">
+                <h2 id="course-heading">Course</h2>
+
+                <h3>Class Cancellation</h3>
+                <p>In the event of a class cancellation, the instructor will notify students and the Student Services Department. Cancellation Notices will be posted on the classroom door for cancelled face-to-face classes.</p>
+
+                <h3>Course Description</h3>
+                <p><strong>IMPORTANT!</strong> The Course Description section must match the official Course Content Guide (CCG) verbatim. The official CCG can be found in the <a href="#">Course Inventory Management (CIM)</a> system. (Use the <a href="#">Curriculum Files Directory (CFD)</a> to find CCGs for courses that were not found in CIM). For more information about course curriculum visit <a href="#">UAA | Curriculum</a>. Please see your department chair for the CCG if necessary.</p>
+
+                <h3>Course Prerequisites</h3>
+                <p>As stated in the CCG (found in <a href="#">CIM</a> or <a href="#">CFD</a>) and the <a href="#">UAA Course Catalog</a>.</p>
+
+                <h3>Course Fees</h3>
+                <p>Communicate the existence and purpose of any course fees including a sentence informing students of how to address any questions or concerns. Find your verbiage here: <a href="https://docs.google.com/spreadsheets/d/1yz1Br90OigCacJI-tPZaj3cpxVlGUSNw2NnMDwiT3go/edit?usp=sharing">Syllabus Verbiage by Course</a>.</p>
+
+                <h3>Instructional Goals</h3>
+                <p>As stated in the CCG.</p>
+
+                <h3>Student Outcomes</h3>
+                <p>List the Learning outcomes students can expect to achieve upon successful completion of the course. <strong>IMPORTANT!</strong> The Student Outcomes section of your syllabus must match the official CCG verbatim, though you may add additional outcomes. These are listed in <a href="#">CIM</a> in the "Other Course Specific Learning Outcomes and Assessment Measures" section.</p>
+
+                <h3>Required Text(s) and Technology</h3>
+                <p>Complete publication information for all materials, including ISBN. List any technology required for the course such as remote proctoring services software like Honorlock, math software such as Equatio, and remote desktop software to access specialized applications installed on KPC lab computers.</p>
+
+                <h3>Instructor Response Time</h3>
+                <div class="info-box">
+                    <p><strong>Feedback:</strong> Timely feedback on student work corresponds directly to student success, and the KPC Faculty Forum encourages all KPC instructors to include details about the timeline in which you will make grades and feedback available to students for each type of assignment. Best practices suggest that assignment responses from the instructor should be given within two weeks of the due date.</p>
+                    
+                    <p><em>Example:</em> You work hard to submit your best work in this class so I aim to provide feedback within two weeks for papers submitted on time, so you can reflect and apply that feedback to future work. Assignments turned in late will be graded after on-time submissions are returned. As a result, feedback on late work may be significantly delayed and may arrive too late to apply to upcoming papers.</p>
+
+                    <p><strong>Communication:</strong> The KPC Faculty Forum encourages all KPC instructors to respond to all student communication in a consistent and timely fashion. Please include language in your syllabus that details the best way for students to get in touch with you and the timeline in which you will respond to students when they contact you.</p>
+                    
+                    <p><em>Example:</em> Email is the best way to get in touch with me. I will respond within [24 hours, except on the weekends]. If you don't hear from me within [24 hours on a weekday], try emailing me again. Please be professional in your email correspondence. Be sure that you include your full name, the course, and an appropriate subject line. My office phone number is available on the course syllabus and on Blackboard; if I don't answer, please leave a voice message.</p>
+                </div>
+
+                <div class="info-box">
+                    <p><strong>IMPORTANT! For fully asynchronous classes:</strong></p>
+                    <p>If you teach a fully asynchronous class you are required to include an additional <a href="#">Regular and Substantive Interaction (RSI)</a> statement in your syllabus. Here's a sample statement to adapt for your course specifics:</p>
+                    <p>This course is fully asynchronous and has no set meeting times; you will have course activities and due dates throughout the term. I will substantively interact with you through regular [class discussion boards, announcements that provide class feedback and direction, individual feedback on your projects, and optional study sessions]. Update the section in brackets based on your course design.</p>
+                </div>
+
+                <h3>Class Participation and Attendance</h3>
+                <p>Student's role in class processes. Expectations and relationship to grading (note: attendance alone cannot be the basis for an academic grade).</p>
+
+                <h3>Class Atmosphere and Safety</h3>
+                <p>Include here your rules about intolerance, ridicule, physical violence, classroom behaviors (such as use of cell phones), field trips, or lab work.</p>
+                <p>Any lab, studio, or hands-on experimental course must include a list of safety rules and procedures. Students must also acknowledge that they understand those risks and safety procedures; therefore, you should have them sign a Safety Form appropriate to your space. Examples for lab, shop, and studio are included in the KPC Faculty Orientation Bb Course and online at the KPC website.</p>
+
+                <h3>Audit Policy</h3>
+                <p>Attendance and activities required to receive an audit.</p>
+
+                <h3>Required Written Work</h3>
+                <p>Major written assignments and projects.</p>
+
+                <h3>Grading Scale</h3>
+                <p>Letter grade or Pass/No Pass. State standards for each grade.</p>
+
+                <h3>Evaluation Tools</h3>
+                <table class="grade-table" role="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Assignment</th>
+                            <th scope="col">Percentage of Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Quizzes</td>
+                            <td>__% of grade</td>
+                        </tr>
+                        <tr>
+                            <td>Participation</td>
+                            <td>__% of grade</td>
+                        </tr>
+                        <tr>
+                            <td>Midterm</td>
+                            <td>__% of grade</td>
+                        </tr>
+                        <tr>
+                            <td>Projects</td>
+                            <td>__% of grade</td>
+                        </tr>
+                        <tr>
+                            <td>Final Exam</td>
+                            <td>__% of grade</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Chronological/Topical Outline</h3>
+                <p>Include objectives, topics or activities, and assignments for each week or day. Include dates for major events such as quizzes, tests, written assignments, or projects. Include the final exam day, time, and location as provided on the <a href="https://www.uaa.alaska.edu/students/finals/">UAA Finals schedule</a>. This will likely be a different time and day from the regularly scheduled class period.</p>
+            </section>
+
+            <section class="policy-guide" aria-labelledby="policy-heading">
+                <h3 id="policy-heading">KPC Support & Policy Guide</h3>
+                <p>It is important for all KPC students to review the <a href="https://drive.google.com/file/d/1lEn0osdkkN9BakEa8QjMpNd_o3RrQeww/view?usp=sharing">KPC Support & Policy Guide</a> which contains important information about Academic Services available to you as a KPC student, KPC Policies and Processes, and Campus Safety.</p>
+                <p><a href="https://drive.google.com/file/d/1lEn0osdkkN9BakEa8QjMpNd_o3RrQeww/view?usp=sharing">https://drive.google.com/file/d/1lEn0osdkkN9BakEa8QjMpNd_o3RrQeww/view?usp=sharing</a></p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

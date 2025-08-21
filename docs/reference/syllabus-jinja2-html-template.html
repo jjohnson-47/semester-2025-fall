@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ course.title }} - {{ course.number }} Syllabus">
+    <meta name="author" content="{{ instructor.name }}">
+    <meta name="generator" content="KPC Syllabus Generator v2025">
+    <title>{{ course.number }} - {{ course.title }} Syllabus</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --color-primary: #003366;
+            --color-secondary: #0066cc;
+            --color-accent: #ff6b35;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --color-text: #1f2937;
+            --color-text-light: #6b7280;
+            --color-bg: #ffffff;
+            --color-bg-secondary: #f9fafb;
+            --color-border: #e5e7eb;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --radius: 0.5rem;
+            --max-width: 900px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            color: var(--color-text);
+            background-color: var(--color-bg);
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 {
+            font-weight: 600;
+            line-height: 1.25;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--color-primary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            border-bottom: 3px solid var(--color-accent);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.875rem;
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--color-secondary);
+        }
+
+        p { margin-bottom: 1rem; }
+
+        a {
+            color: var(--color-secondary);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        a:hover { color: var(--color-accent); }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li { margin-bottom: 0.5rem; }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 2rem 0;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        th {
+            background-color: var(--color-primary);
+            color: white;
+            font-weight: 600;
+            text-align: left;
+            padding: 1rem 1.5rem;
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: var(--color-bg-secondary); }
+
+        .course-header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: var(--radius);
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .course-header h1 {
+            color: white;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .course-header p {
+            font-size: 1.125rem;
+            opacity: 0.95;
+        }
+
+        .instructor-card {
+            background-color: var(--color-bg-secondary);
+            padding: 2rem;
+            border-radius: var(--radius);
+            margin: 2rem 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .instructor-card h2 {
+            border-top: none;
+            margin-top: 0;
+        }
+
+        .info-box {
+            background-color: var(--color-bg-secondary);
+            border-left: 4px solid var(--color-accent);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: var(--radius);
+        }
+
+        .policy-guide {
+            background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
+            border: 2px solid var(--color-warning);
+            padding: 2rem;
+            border-radius: var(--radius);
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        @media print {
+            body { padding: 0; }
+            .course-header { 
+                background: none; 
+                color: black; 
+                border: 2px solid black;
+            }
+            .course-header h1 { color: black; }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+            h3 { font-size: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="course-header">
+            <h1>Syllabus</h1>
+            <p><strong>{{ course.department }} {{ course.number }} Section {{ course.section }}: {{ course.title }}</strong></p>
+            <p>{{ course.semester }} {{ course.year }} - CRN {{ course.crn }}</p>
+            <p>{{ course.location }}</p>
+        </header>
+
+        <main>
+            <section class="instructor-card">
+                <h2>Instructor</h2>
+                <p><strong>Name:</strong> {{ instructor.name }}</p>
+                <p><strong>Office Hours:</strong> {{ instructor.office_hours }}</p>
+                <p><strong>Contact Information:</strong></p>
+                <ul>
+                    <li>Email: <a href="mailto:{{ instructor.email }}">{{ instructor.email }}</a></li>
+                    <li>Office: {{ instructor.office }}</li>
+                    {% if instructor.zoom_link %}
+                    <li>Zoom: <a href="{{ instructor.zoom_link }}">{{ instructor.zoom_link }}</a></li>
+                    {% endif %}
+                    <li>Phone: {{ instructor.phone }}</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Course</h2>
+
+                <h3>Course Description</h3>
+                <p>{{ course_info.description }}</p>
+
+                <h3>Course Prerequisites</h3>
+                <p>{{ course_info.prerequisites }}</p>
+
+                {% if course_info.fees %}
+                <h3>Course Fees</h3>
+                <p>{{ course_info.fees }}</p>
+                {% endif %}
+
+                <h3>Instructional Goals</h3>
+                <ul>
+                {% for goal in course_info.goals %}
+                    <li>{{ goal }}</li>
+                {% endfor %}
+                </ul>
+
+                <h3>Student Outcomes</h3>
+                <ul>
+                {% for outcome in course_info.outcomes %}
+                    <li>{{ outcome }}</li>
+                {% endfor %}
+                </ul>
+
+                <h3>Required Text(s) and Technology</h3>
+                <p><strong>Required Texts:</strong></p>
+                <ul>
+                {% for text in course_info.required_texts %}
+                    <li>{{ text.title }} by {{ text.author }}, {{ text.edition }} Edition (ISBN: {{ text.isbn }})</li>
+                {% endfor %}
+                </ul>
+                
+                <p><strong>Required Technology:</strong></p>
+                <ul>
+                {% for tech in course_info.required_technology %}
+                    <li>{{ tech }}</li>
+                {% endfor %}
+                </ul>
+
+                <h3>Instructor Response Time</h3>
+                <div class="info-box">
+                    <p><strong>Feedback:</strong> {{ policies.response_time.feedback }}</p>
+                    <p><strong>Communication:</strong> {{ policies.response_time.communication }}</p>
+                </div>
+
+                {% if policies.async_statement %}
+                <div class="info-box">
+                    <p><strong>Asynchronous Course Information:</strong></p>
+                    <p>{{ policies.async_statement }}</p>
+                </div>
+                {% endif %}
+
+                <h3>Class Participation and Attendance</h3>
+                <p>{{ policies.attendance }}</p>
+
+                <h3>Class Atmosphere and Safety</h3>
+                <p>{{ policies.atmosphere }}</p>
+
+                <h3>Audit Policy</h3>
+                <p>{{ policies.audit }}</p>
+
+                <h3>Grading Scale</h3>
+                <ul>
+                {% for grade, range in grading.scale.items() %}
+                    <li><strong>{{ grade }}:</strong> {{ range }}</li>
+                {% endfor %}
+                </ul>
+
+                <h3>Evaluation Tools</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Assignment</th>
+                            <th>Percentage of Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for component in grading.components %}
+                        <tr>
+                            <td>{{ component.name }}</td>
+                            <td>{{ component.weight }}%</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <h3>Course Schedule</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Week</th>
+                            <th>Dates</th>
+                            <th>Topic</th>
+                            <th>Assignments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for week in schedule %}
+                        <tr>
+                            <td>{{ week.week }}</td>
+                            <td>{{ week.dates }}</td>
+                            <td>{{ week.topic }}</td>
+                            <td>{{ week.assignments }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                {% if final_exam %}
+                <h3>Final Exam</h3>
+                <p><strong>Date:</strong> {{ final_exam.date }}<br>
+                <strong>Time:</strong> {{ final_exam.time }}<br>
+                <strong>Location:</strong> {{ final_exam.location }}</p>
+                {% endif %}
+            </section>
+
+            <section class="policy-guide">
+                <h3>KPC Support & Policy Guide</h3>
+                <p>It is important for all KPC students to review the <a href="https://drive.google.com/file/d/1lEn0osdkkN9BakEa8QjMpNd_o3RrQeww/view?usp=sharing">KPC Support & Policy Guide</a> which contains important information about Academic Services, KPC Policies and Processes, and Campus Safety.</p>
+            </section>
+        </main>
+
+        <footer style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--color-border); text-align: center; color: var(--color-text-light);">
+            <p>Generated on {{ generation.date }} at {{ generation.time }}</p>
+        </footer>
+    </div>
+</body>
+</html>
