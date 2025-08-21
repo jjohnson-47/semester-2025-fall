@@ -1,0 +1,73 @@
+template: syllabus_preparation
+applies_to: ["MATH221", "MATH251", "STAT253"]
+defaults:
+  category: "Syllabus & Documentation"
+  weight: 3
+  tags: ["syllabus", "documentation"]
+
+tasks:
+  - key: SYLL-UPDATE-CONTENT
+    title: "Update course content JSON files"
+    description: "Update all course-specific JSON data in content/courses/{{course.code}}/"
+    due_offset: { days: -12, from: "semester.first_day" }
+    checklist:
+      - "Update course_description.json"
+      - "Update instructional_goals.json"
+      - "Update student_outcomes.json"
+      - "Update evaluation_tools.json"
+      - "Update grading_policy.json"
+      - "Update required_textbook.json"
+  
+  - key: SYLL-UPDATE-DATES
+    title: "Update syllabus dates and schedule"
+    description: "Update all dates in syllabus for Fall 2025 ({{semester.first_day}} - {{semester.last_day}})"
+    due_offset: { days: -10, from: "semester.first_day" }
+    blocked_by: ["{{course.code}}-SYLL-UPDATE-CONTENT"]
+    checklist:
+      - "Update semester dates"
+      - "Update exam dates (midterm/final)"
+      - "Update drop deadline: {{semester.drop_deadline}}"
+      - "Update withdrawal deadline: {{semester.withdrawal_deadline}}"
+      - "Verify holiday schedule"
+      - "Update office hours"
+  
+  - key: SYLL-GENERATE
+    title: "Generate syllabus from templates"
+    description: "Run make course COURSE={{course.code}} to generate syllabus"
+    due_offset: { days: -7, from: "semester.first_day" }
+    blocked_by: ["{{course.code}}-SYLL-UPDATE-DATES"]
+    checklist:
+      - "Run make course COURSE={{course.code}}"
+      - "Review generated HTML syllabus"
+      - "Review generated PDF syllabus"
+      - "Check all links are working"
+      - "Verify formatting is correct"
+    links:
+      - name: "Syllabus Template"
+        url: "file://./templates/syllabus.html.j2"
+      - name: "Generated Syllabus"
+        url: "file://./build/syllabi/{{course.code}}.html"
+  
+  - key: SYLL-UPLOAD-BB
+    title: "Upload syllabus to Blackboard"
+    description: "Upload generated syllabus to Blackboard course shell"
+    due_offset: { days: -3, from: "semester.first_day" }
+    blocked_by: ["{{course.code}}-SYLL-GENERATE", "{{course.code}}-BB-WELCOME"]
+    checklist:
+      - "Upload PDF syllabus to Course Information"
+      - "Upload HTML syllabus as alternate format"
+      - "Add syllabus link to Start Here"
+      - "Add syllabus to Week 1 module"
+      - "Create syllabus acknowledgment assignment"
+  
+  - key: SYLL-SCHEDULE
+    title: "Generate and post course schedule"
+    description: "Create detailed course schedule with weekly topics"
+    due_offset: { days: -3, from: "semester.first_day" }
+    blocked_by: ["{{course.code}}-SYLL-UPDATE-DATES"]
+    checklist:
+      - "Run make schedules COURSE={{course.code}}"
+      - "Review generated schedule"
+      - "Add specific topics for each week"
+      - "Include exam dates prominently"
+      - "Upload to Blackboard"

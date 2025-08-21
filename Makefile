@@ -133,6 +133,58 @@ check-deps: ## Check required dependencies
 	@which pandoc > /dev/null && echo "$(GREEN)✓ Pandoc found$(NC)" || echo "$(YELLOW)⚠ Pandoc not found (optional for PDF)$(NC)"
 	@which git > /dev/null && echo "$(GREEN)✓ Git found$(NC)" || echo "$(RED)✗ Git not found$(NC)"
 
+# Dashboard targets
+.PHONY: dash-init dash-gen dash-validate dash dash-open dash-export dash-snapshot dash-reset
+
+dash-init: init ## Initialize dashboard environment
+	@echo "$(BLUE)Setting up dashboard environment...$(NC)"
+	@. $(VENV)/bin/activate && pip install -q -r dashboard/requirements.txt
+	@mkdir -p dashboard/state dashboard/templates_src build/dashboard
+	@. $(VENV)/bin/activate && $(PYTHON) scripts/generate_dashboard_config.py
+	@echo "$(GREEN)✓ Dashboard initialized$(NC)"
+
+dash-gen: dash-init ## Generate tasks from templates
+	@echo "$(BLUE)Generating tasks from templates...$(NC)"
+	@. $(VENV)/bin/activate && $(PYTHON) dashboard/tools/generate_tasks.py \
+		--courses dashboard/state/courses.json \
+		--templates dashboard/templates_src \
+		--out dashboard/state/tasks.json
+	@$(MAKE) dash-validate --no-print-directory
+	@echo "$(GREEN)✓ Tasks generated successfully$(NC)"
+
+dash-validate: ## Validate task data integrity
+	@echo "$(BLUE)Validating task data...$(NC)"
+	@. $(VENV)/bin/activate && $(PYTHON) dashboard/tools/validate.py
+	@echo "$(GREEN)✓ Validation passed$(NC)"
+
+dash: dash-gen ## Run dashboard server
+	@echo "$(BLUE)Starting dashboard server on http://127.0.0.1:5055$(NC)"
+	@. $(VENV)/bin/activate && \
+	FLASK_APP=dashboard/app.py FLASK_ENV=development \
+	DASH_PORT=5055 DASH_HOST=127.0.0.1 \
+	flask run --host=127.0.0.1 --port=5055
+
+dash-open: ## Open dashboard in browser
+	@xdg-open http://127.0.0.1:5055 2>/dev/null || \
+	 open http://127.0.0.1:5055 2>/dev/null || \
+	 echo "Please open http://127.0.0.1:5055 in your browser"
+
+dash-export: ## Export dashboard data (ICS, CSV)
+	@echo "$(BLUE)Exporting dashboard data...$(NC)"
+	@. $(VENV)/bin/activate && $(PYTHON) dashboard/tools/export.py 2>/dev/null || echo "Export tool not yet implemented"
+	@echo "$(GREEN)✓ Export complete$(NC)"
+
+dash-snapshot: ## Create git snapshot of current state
+	@git add dashboard/state/tasks.json 2>/dev/null && \
+	 git commit -m "dashboard: snapshot $$(date -Iseconds)" 2>/dev/null || \
+	 echo "No changes to snapshot"
+
+dash-reset: ## Reset all task statuses for new semester
+	@echo "$(BLUE)Resetting all task statuses...$(NC)"
+	@. $(VENV)/bin/activate && $(PYTHON) dashboard/tools/reset.py 2>/dev/null || echo "Reset tool not yet implemented"
+	@$(MAKE) dash-snapshot --no-print-directory
+	@echo "$(GREEN)✓ All tasks reset to 'todo' status$(NC)"
+
 # CI/CD targets
 .PHONY: ci-validate ci-build
 

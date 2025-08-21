@@ -1,0 +1,69 @@
+template: blackboard_setup
+applies_to: ["MATH221", "MATH251", "STAT253"]
+defaults:
+  category: "Blackboard Setup"
+  weight: 2
+  tags: ["setup", "blackboard"]
+
+tasks:
+  - key: BB-REQUEST-SHELL
+    title: "Request Blackboard Ultra shell creation"
+    description: "Submit IT ticket for Ultra course shell: {{course.blackboard.course_id}}"
+    due_offset: { days: -14, from: "semester.first_day" }
+    checklist:
+      - "Submit ticket with CRN {{course.crn}}"
+      - "Include course title and section"
+      - "Verify instructor access granted"
+      - "Confirm shell URL is active"
+    
+  - key: BB-COPY-CONTENT
+    title: "Copy content from previous semester"
+    description: "Use Ultra Copy Content from {{course.blackboard.copy_from_id}}"
+    due_offset: { days: -7, from: "semester.first_day" }
+    blocked_by: ["{{course.code}}-BB-REQUEST-SHELL"]
+    checklist:
+      - "Navigate to Course Content → Copy Content"
+      - "Select source: {{course.blackboard.copy_from_id}}"
+      - "Exclude: Old announcements"
+      - "Exclude: Grade columns marked 'legacy'"
+      - "Include: All course content and assessments"
+      - "Verify all modules copied correctly"
+  
+  - key: BB-UPDATE-DATES
+    title: "Update all Blackboard dates and deadlines"
+    description: "Update assignment, test, and discussion due dates for Fall 2025"
+    due_offset: { days: -5, from: "semester.first_day" }
+    blocked_by: ["{{course.code}}-BB-COPY-CONTENT"]
+    weight: 3
+    checklist:
+      - "Update all assignment due dates"
+      - "Update test availability windows"
+      - "Update discussion board dates"
+      - "Set grade center date management"
+      - "Configure late submission policies"
+  
+  - key: BB-GRADE-CENTER
+    title: "Configure Grade Center categories and weights"
+    description: "Set up Grade Center with proper categories and weighting"
+    due_offset: { days: -4, from: "semester.first_day" }
+    blocked_by: ["{{course.code}}-BB-COPY-CONTENT"]
+    checklist:
+      - "Create/verify grade categories"
+      - "Set category weights per syllabus"
+      - "Configure total points (1000)"
+      - "Set up weighted total column"
+      - "Hide unnecessary columns"
+      - "Configure grade schema (A/B/C/D/F)"
+  
+  - key: BB-WELCOME
+    title: "Create welcome announcement and Start Here"
+    description: "Post welcome message and update Start Here page"
+    due_offset: { days: -2, from: "semester.first_day" }
+    blocked_by: ["{{course.code}}-BB-UPDATE-DATES"]
+    checklist:
+      - "Write welcome announcement"
+      - "Update Start Here page with current info"
+      - "Add instructor contact information"
+      - "Include technology requirements"
+      - "Link to syllabus and schedule"
+      - "Schedule announcement for first day 8 AM"

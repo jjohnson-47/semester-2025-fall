@@ -1,0 +1,90 @@
+template: weekly_module_setup
+applies_to: ["MATH221", "MATH251", "STAT253"]
+defaults:
+  category: "Weekly Content"
+  weight: 1
+  tags: ["weekly", "content"]
+
+tasks:
+  - key: WEEK-01-PREP
+    title: "Week 1: Introduction & Course Overview"
+    description: "Prepare Week 1 module with syllabus review and introductions"
+    due_offset: { days: -3, from: "semester.first_day" }
+    checklist:
+      - "Upload syllabus to Week 1 module"
+      - "Create welcome video or message"
+      - "Set up introduction discussion board"
+      - "Post technology check assignment"
+      - "Create getting started checklist"
+      - "Schedule Week 1 announcement for Monday 8 AM"
+  
+  - key: WEEK-01-INTRO-DISC
+    title: "Week 1: Set up introduction discussion"
+    description: "Create and configure student introduction discussion board"
+    due_offset: { days: -2, from: "semester.first_day" }
+    blocked_by: ["{{course.code}}-WEEK-01-PREP"]
+    checklist:
+      - "Create discussion forum"
+      - "Write discussion prompt"
+      - "Set participation requirements"
+      - "Configure grading rubric"
+      - "Set due date for Friday of Week 1"
+  
+  - key: WEEK-02-PREP
+    title: "Week 2: First Content Module"
+    description: "Prepare Week 2 content and assessments"
+    due_offset: { days: 4, from: "semester.first_day" }
+    checklist:
+      - "Upload lecture materials"
+      - "Create/update homework assignment"
+      - "Post reading assignments"
+      - "Set up discussion if applicable"
+      - "Schedule announcement"
+  
+  - key: WEEK-03-PREP
+    title: "Week 3: Content Module"
+    description: "Prepare Week 3 content and assessments"
+    due_offset: { days: 11, from: "semester.first_day" }
+    checklist:
+      - "Upload lecture materials"
+      - "Create/update homework assignment"
+      - "Post reading assignments"
+      - "Review Week 1 submissions"
+      - "Schedule announcement"
+  
+  - key: WEEK-04-PREP
+    title: "Week 4: Content Module"
+    description: "Prepare Week 4 content and assessments"
+    due_offset: { days: 18, from: "semester.first_day" }
+    checklist:
+      - "Upload lecture materials"
+      - "Create/update homework assignment"
+      - "Post reading assignments"
+      - "Prepare for first exam/quiz"
+      - "Schedule announcement"
+  
+  - key: MIDTERM-PREP
+    title: "Midterm Exam Preparation"
+    description: "Set up and configure midterm exam (Week 8)"
+    due_offset: { days: 45, from: "semester.first_day" }
+    weight: 3
+    checklist:
+      - "Create/update midterm exam in test bank"
+      - "Configure test settings and availability"
+      - "Set up accommodations for DSS students"
+      - "Create study guide"
+      - "Post exam instructions"
+      - "Schedule reminder announcement"
+  
+  - key: FINAL-PREP
+    title: "Final Exam Preparation"
+    description: "Set up and configure final exam"
+    due_offset: { days: -7, from: "semester.finals_window" }
+    weight: 3
+    checklist:
+      - "Create/update final exam in test bank"
+      - "Configure test settings for finals week"
+      - "Set up accommodations for DSS students"
+      - "Create comprehensive study guide"
+      - "Post exam schedule and instructions"
+      - "Remind students of exam policies"

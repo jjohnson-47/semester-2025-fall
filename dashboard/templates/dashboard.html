@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Setup Dashboard - Fall 2025</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .task-card {
+            border-left: 4px solid;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        .task-card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .status-blocked { border-left-color: #6c757d; }
+        .status-todo { border-left-color: #0d6efd; }
+        .status-doing { border-left-color: #ffc107; }
+        .status-review { border-left-color: #0dcaf0; }
+        .status-done { border-left-color: #198754; opacity: 0.7; }
+        
+        .due-overdue { background-color: #fff5f5; }
+        .due-today { background-color: #fff9e6; }
+        .due-soon { background-color: #f0f8ff; }
+        
+        .checklist-item {
+            padding: 2px 0;
+        }
+        .checklist-item input {
+            margin-right: 8px;
+        }
+        
+        .stats-card {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .filter-pills .badge {
+            cursor: pointer;
+            margin: 2px;
+        }
+        
+        .task-meta {
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        #search-box {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: white;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">📚 Course Setup Dashboard</span>
+            <span class="navbar-text">Fall 2025 | Last updated: {{ updated }}</span>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <!-- Stats sidebar -->
+            <div class="col-md-2">
+                <div class="stats-card bg-light">
+                    <h3>{{ stats.total }}</h3>
+                    <small>Total Tasks</small>
+                </div>
+                
+                <div class="stats-card bg-danger text-white">
+                    <h3>{{ stats.overdue }}</h3>
+                    <small>Overdue</small>
+                </div>
+                
+                <div class="stats-card bg-warning">
+                    <h3>{{ stats.doing }}</h3>
+                    <small>In Progress</small>
+                </div>
+                
+                <div class="stats-card bg-primary text-white">
+                    <h3>{{ stats.todo }}</h3>
+                    <small>To Do</small>
+                </div>
+                
+                <div class="stats-card bg-success text-white">
+                    <h3>{{ stats.done }}</h3>
+                    <small>Complete</small>
+                </div>
+                
+                <hr>
+                
+                <div class="filter-pills">
+                    <h6>Quick Filters</h6>
+                    <a href="/view/today" class="badge bg-warning text-dark">Today</a>
+                    <a href="/view/week" class="badge bg-info">This Week</a>
+                    <a href="/view/overdue" class="badge bg-danger">Overdue</a>
+                    <a href="/view/blocked" class="badge bg-secondary">Blocked</a>
+                    <a href="/view/doing" class="badge bg-warning">In Progress</a>
+                    <a href="/" class="badge bg-dark">All Tasks</a>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-10">
+                <div id="search-box">
+                    <input type="text" class="form-control" id="task-search" 
+                           placeholder="🔍 Search tasks... (/ to focus)">
+                </div>
+
+                {% for course, course_tasks in by_course.items() %}
+                <div class="course-section mb-4">
+                    <h4 class="border-bottom pb-2">{{ course }}</h4>
+                    
+                    {% for task in course_tasks %}
+                    <div class="card task-card status-{{ task.status|default('todo') }} 
+                                {% if task.due_color == 'danger' %}due-overdue{% endif %}
+                                {% if task.due_color == 'warning' %}due-today{% endif %}
+                                {% if task.due_color == 'info' %}due-soon{% endif %}"
+                         data-task-id="{{ task.id }}">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6 class="card-title">
+                                        <span class="status-icon">{{ task.status|status_icon }}</span>
+                                        {{ task.title }}
+                                    </h6>
+                                    <p class="card-text text-muted small">{{ task.description }}</p>
+                                    
+                                    {% if task.checklist %}
+                                    <div class="checklist">
+                                        {% for item in task.checklist %}
+                                        <div class="checklist-item">
+                                            <input type="checkbox" 
+                                                   id="check-{{ task.id }}-{{ loop.index }}"
+                                                   {% if item.done %}checked{% endif %}>
+                                            <label for="check-{{ task.id }}-{{ loop.index }}">
+                                                {{ item.text|default(item) }}
+                                            </label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if task.links %}
+                                    <div class="task-links mt-2">
+                                        {% for link in task.links %}
+                                        <a href="{{ link.url }}" class="badge bg-light text-dark" 
+                                           target="_blank">🔗 {{ link.name }}</a>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-4 text-end">
+                                    <div class="task-meta">
+                                        {% if task.due %}
+                                        <div class="mb-2">
+                                            <span class="badge bg-{{ task.due_color|default('secondary') }}">
+                                                📅 {{ task.due_display }}
+                                            </span>
+                                            <br>
+                                            <small>{{ task.due_relative }}</small>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button class="btn btn-outline-secondary" 
+                                                    onclick="updateStatus('{{ task.id }}', 'blocked')">🚫</button>
+                                            <button class="btn btn-outline-primary" 
+                                                    onclick="updateStatus('{{ task.id }}', 'todo')">📋</button>
+                                            <button class="btn btn-outline-warning" 
+                                                    onclick="updateStatus('{{ task.id }}', 'doing')">⚡</button>
+                                            <button class="btn btn-outline-info" 
+                                                    onclick="updateStatus('{{ task.id }}', 'review')">👀</button>
+                                            <button class="btn btn-outline-success" 
+                                                    onclick="updateStatus('{{ task.id }}', 'done')">✅</button>
+                                        </div>
+                                        
+                                        {% if task.blocked_by %}
+                                        <div class="mt-2">
+                                            <small class="text-danger">
+                                                Blocked by: {{ task.blocked_by|join(', ') }}
+                                            </small>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if task.tags %}
+                                        <div class="mt-2">
+                                            {% for tag in task.tags %}
+                                            <span class="badge bg-light text-dark">{{ tag }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update task status
+        function updateStatus(taskId, status) {
+            fetch(`/api/task/${taskId}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({status: status})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            });
+        }
+
+        // Search functionality
+        document.getElementById('task-search').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            document.querySelectorAll('.task-card').forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(searchTerm) ? 'block' : 'none';
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === '/') {
+                e.preventDefault();
+                document.getElementById('task-search').focus();
+            }
+        });
+
+        // Checklist handling
+        document.querySelectorAll('.checklist input').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const taskCard = this.closest('.task-card');
+                const taskId = taskCard.dataset.taskId;
+                
+                // Collect all checklist states
+                const checklistItems = [];
+                taskCard.querySelectorAll('.checklist-item').forEach(item => {
+                    const input = item.querySelector('input');
+                    const label = item.querySelector('label');
+                    checklistItems.push({
+                        text: label.textContent.trim(),
+                        done: input.checked
+                    });
+                });
+                
+                // Update task
+                fetch(`/api/task/${taskId}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({checklist: checklistItems})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Checklist updated', data);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
