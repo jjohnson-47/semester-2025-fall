@@ -1,0 +1,24 @@
+{
+  "term": "Fall 2025",
+  "term_code": "202503",
+  "start_date": "2025-08-25",
+  "end_date": "2025-12-13",
+  "add_drop_deadline": "2025-09-05",
+  "withdrawal_deadline": "2025-10-31",
+  "finals_start": "2025-12-08",
+  "finals_end": "2025-12-13",
+  "holidays": [
+    {
+      "name": "Labor Day",
+      "date": "2025-09-01",
+      "classes_held": false
+    },
+    {
+      "name": "Fall Break",
+      "start": "2025-11-27",
+      "end": "2025-11-28",
+      "classes_held": false
+    }
+  ],
+  "timezone": "America/Anchorage"
+}

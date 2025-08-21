@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course_code }} - {{ course_name_full }} Syllabus</title>
+    <link rel="stylesheet" href="../css/course.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .syllabus-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+        h1 {
+            color: #003366;
+            border-bottom: 3px solid #ffc424;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #003366;
+            margin-top: 30px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #555;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #003366;
+            color: white;
+        }
+        .header-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .important-dates {
+            background: #fff9e6;
+            padding: 15px;
+            border-left: 4px solid #ffc424;
+            margin: 20px 0;
+        }
+        @media print {
+            body {
+                background: white;
+            }
+            .syllabus-container {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="syllabus-container">
+        <h1>{{ course_code }} - {{ course_name_full }}</h1>
+        
+        <div class="header-info">
+            <strong>Section:</strong> 901 (Online)<br>
+            <strong>Term:</strong> {{ semester }} {{ year }}<br>
+            <strong>CRN:</strong> {{ course_crn | default('TBD') }}<br>
+            <strong>Credits:</strong> {{ course_credits | default(3) }}<br>
+            <strong>Format:</strong> Online Asynchronous
+        </div>
+
+        <h2>Instructor Information</h2>
+        <table>
+            <tr>
+                <td><strong>Name</strong></td>
+                <td>{{ instructor.name }}</td>
+            </tr>
+            <tr>
+                <td><strong>Email</strong></td>
+                <td><a href="mailto:{{ instructor.email }}">{{ instructor.email }}</a></td>
+            </tr>
+            <tr>
+                <td><strong>Office</strong></td>
+                <td>{{ instructor.office }}</td>
+            </tr>
+            {% if instructor.phone %}
+            <tr>
+                <td><strong>Phone</strong></td>
+                <td>{{ instructor.phone | phone }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td><strong>Office Hours</strong></td>
+                <td>{{ instructor.office_hours | default('By appointment') }}</td>
+            </tr>
+            {% if instructor.zoom_link %}
+            <tr>
+                <td><strong>Virtual Office</strong></td>
+                <td><a href="{{ instructor.zoom_link }}" target="_blank">Zoom Meeting Room</a></td>
+            </tr>
+            {% endif %}
+        </table>
+
+        <h2>Course Description</h2>
+        <p>{{ course_description.text | default('Course description to be provided.') }}</p>
+
+        {% if course_prerequisites %}
+        <h2>Prerequisites</h2>
+        <p>{{ course_prerequisites.text }}</p>
+        {% endif %}
+
+        <h2>Instructional Goals</h2>
+        {% if instructional_goals %}
+        <ol>
+            {% for goal in instructional_goals.goals %}
+            <li>{{ goal }}</li>
+            {% endfor %}
+        </ol>
+        {% else %}
+        <p>Instructional goals will be provided in Blackboard.</p>
+        {% endif %}
+
+        <h2>Student Learning Outcomes</h2>
+        <p>Upon successful completion of this course, students will be able to:</p>
+        {% if student_outcomes %}
+        <ul>
+            {% for outcome in student_outcomes.outcomes %}
+            <li>{{ outcome }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Student learning outcomes will be provided in Blackboard.</p>
+        {% endif %}
+
+        <h2>Required Materials</h2>
+        
+        <h3>Textbook</h3>
+        {% if required_textbook %}
+        <table>
+            <tr>
+                <td><strong>Title</strong></td>
+                <td>{{ required_textbook.title }}</td>
+            </tr>
+            <tr>
+                <td><strong>Author(s)</strong></td>
+                <td>{{ required_textbook.author }}</td>
+            </tr>
+            <tr>
+                <td><strong>Edition</strong></td>
+                <td>{{ required_textbook.edition }}</td>
+            </tr>
+            <tr>
+                <td><strong>ISBN</strong></td>
+                <td>{{ required_textbook.isbn }}</td>
+            </tr>
+            {% if required_textbook.notes %}
+            <tr>
+                <td><strong>Notes</strong></td>
+                <td>{{ required_textbook.notes }}</td>
+            </tr>
+            {% endif %}
+        </table>
+        {% else %}
+        <p>Textbook information will be provided in Blackboard.</p>
+        {% endif %}
+
+        <h3>Technology Requirements</h3>
+        <ul>
+            <li>Reliable internet connection</li>
+            <li>Computer capable of running modern web browsers</li>
+            <li>Webcam and microphone for proctored exams</li>
+            {% if calculators_and_technology %}
+            <li>{{ calculators_and_technology.requirements }}</li>
+            {% endif %}
+        </ul>
+
+        <h2>Grading</h2>
+        
+        <h3>Grade Distribution</h3>
+        {% if evaluation_tools %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Weight</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in evaluation_tools.categories %}
+                <tr>
+                    <td>{{ category.name }}</td>
+                    <td>{{ category.weight }}%</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td><strong>Total</strong></td>
+                    <td><strong>100%</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        {% else %}
+        <p>Grade distribution will be provided in Blackboard.</p>
+        {% endif %}
+
+        <h3>Grading Scale</h3>
+        {% if grading_policy %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Grade</th>
+                    <th>Percentage</th>
+                    <th>Points (1000 total)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for grade in grading_policy.scale %}
+                <tr>
+                    <td>{{ grade.letter }}</td>
+                    <td>{{ grade.range }}</td>
+                    <td>{{ grade.points }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Grade</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>A</td><td>90-100%</td></tr>
+                <tr><td>B</td><td>80-89%</td></tr>
+                <tr><td>C</td><td>70-79%</td></tr>
+                <tr><td>D</td><td>60-69%</td></tr>
+                <tr><td>F</td><td>Below 60%</td></tr>
+            </tbody>
+        </table>
+        {% endif %}
+
+        <h2>Course Schedule</h2>
+        
+        <div class="important-dates">
+            <h3>Important Dates</h3>
+            <ul>
+                <li><strong>First Day of Classes:</strong> {{ calendar.dates.start | date }}</li>
+                <li><strong>Add/Drop Deadline:</strong> {{ calendar.dates.add_drop | date }}</li>
+                <li><strong>Withdrawal Deadline:</strong> {{ calendar.dates.withdrawal | date }}</li>
+                <li><strong>Finals Week:</strong> {{ calendar.dates.finals_start | date }} - {{ calendar.dates.finals_end | date }}</li>
+                <li><strong>Last Day of Classes:</strong> {{ calendar.dates.end | date }}</li>
+            </ul>
+        </div>
+
+        <h3>Weekly Schedule</h3>
+        <p>The course follows a weekly module structure. Each week begins on Monday and ends on Sunday at 11:59 PM Alaska Time.</p>
+        
+        {% if calendar.weeks %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Week</th>
+                    <th>Dates</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for week in calendar.weeks[:8] %}
+                <tr>
+                    <td>Week {{ week.number }}</td>
+                    <td>{{ week.start | date("%b %d") }} - {{ week.end | date("%b %d") }}</td>
+                    <td>{% if week.holidays %}{{ week.holidays | join(', ') }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p><em>Full schedule available in Blackboard</em></p>
+        {% endif %}
+
+        <h2>Course Policies</h2>
+        
+        <h3>Communication</h3>
+        <ul>
+            <li><strong>Email Response Time:</strong> Within 24-48 hours on weekdays</li>
+            <li><strong>Assignment Feedback:</strong> Within one week of submission</li>
+            <li><strong>Preferred Contact:</strong> Email through Blackboard or {{ instructor.email }}</li>
+        </ul>
+
+        <h3>Late Work Policy</h3>
+        {% if class_policies %}
+        <p>{{ class_policies.late_work | default('Late work policy will be provided in Blackboard.') }}</p>
+        {% else %}
+        <p>Late assignments may be accepted with penalty. Contact instructor for specific circumstances.</p>
+        {% endif %}
+
+        <h3>Academic Integrity</h3>
+        <p>All work submitted must be your own. Plagiarism, cheating, or any form of academic dishonesty will result in failure of the assignment and may result in failure of the course.</p>
+
+        <h2>University Policies</h2>
+        
+        <h3>Disability Services</h3>
+        <p>Students with disabilities who may need accommodations should make an appointment with Disability Support Services (DSS) at 907-786-4530 or 907-262-4719.</p>
+
+        <h3>Title IX</h3>
+        <p>The University of Alaska is committed to providing an environment free from discrimination, including sexual harassment and sexual violence.</p>
+
+        <h3>Student Support Resources</h3>
+        <ul>
+            <li><strong>KPC Tutoring Center:</strong> 907-262-0332</li>
+            <li><strong>UAA Writing Center:</strong> Online support available</li>
+            <li><strong>Technical Support:</strong> 907-786-4646</li>
+        </ul>
+
+        {% if safety %}
+        <h2>Safety Information</h2>
+        <p>{{ safety.text }}</p>
+        {% endif %}
+
+        {% if rsi %}
+        <h2>Repetitive Strain Injury (RSI)</h2>
+        <p>{{ rsi.text }}</p>
+        {% endif %}
+
+        <hr>
+        <p><em>This syllabus is subject to change. Any changes will be announced in Blackboard.</em></p>
+        <p><strong>Last Updated:</strong> {{ now().strftime('%B %d, %Y') }}</p>
+    </div>
+</body>
+</html>

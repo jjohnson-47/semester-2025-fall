@@ -1,0 +1,95 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv
+
+# Build outputs
+build/
+dist/
+output/
+*.egg-info/
+.eggs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+*.pid
+
+# Testing
+.coverage
+.pytest_cache/
+.tox/
+htmlcov/
+.hypothesis/
+
+# Documentation builds
+docs/_build/
+site/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+.cache/
+tmp/
+temp/
+
+# Generated content
+*.pdf
+*.docx
+build/syllabi/*
+build/schedules/*
+build/blackboard/*
+build/weekly/*
+
+# Blackboard packages
+*.zip
+*.imscc
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Backup files
+*.backup
+*.old
+
+# Node (if frontend tools added)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Security
+*.key
+*.pem
+*.cert
+secrets/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Local development
+local/
+scratch/

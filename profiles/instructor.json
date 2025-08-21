@@ -1,0 +1,14 @@
+{
+  "name": "Jeffrey Johnson",
+  "title": "Instructor",
+  "email": "jjohnson47@alaska.edu",
+  "office": "Ward Building, Kenai Peninsula College",
+  "phone": "(907) 262-0300",
+  "office_hours": "By appointment - Please email to schedule",
+  "zoom_link": "https://alaska.zoom.us/my/jeffrey.johnson",
+  "bio": "Jeffrey Johnson is an instructor in the Mathematics and Statistics department at Kenai Peninsula College.",
+  "response_time": {
+    "email": "24-48 hours on weekdays",
+    "assignment_feedback": "Within one week of submission"
+  }
+}

@@ -1,0 +1,207 @@
+# {{ course_code }} - {{ course_name_full }}
+
+**{{ course_code }} Section 901**  
+**{{ semester }} {{ year }}**  
+**CRN: {{ course_crn | default('TBD') }}**  
+**Credits: {{ course_credits | default(3) }}**  
+**Format: Online Asynchronous**
+
+---
+
+## Instructor Information
+
+**Name:** {{ instructor.name }}  
+**Title:** {{ instructor.title }}  
+**Email:** {{ instructor.email }}  
+**Office:** {{ instructor.office }}  
+{% if instructor.phone -%}
+**Phone:** {{ instructor.phone | phone }}  
+{% endif -%}
+**Office Hours:** {{ instructor.office_hours | default('By appointment') }}  
+{% if instructor.zoom_link -%}
+**Virtual Office:** [Zoom Meeting Room]({{ instructor.zoom_link }})  
+{% endif %}
+
+---
+
+## Course Description
+
+{{ course_description.text | default('Course description to be provided.') }}
+
+{% if course_prerequisites -%}
+## Prerequisites
+
+{{ course_prerequisites.text }}
+{% endif %}
+
+## Instructional Goals
+
+{% if instructional_goals -%}
+{% for goal in instructional_goals.goals -%}
+{{ loop.index }}. {{ goal }}
+{% endfor -%}
+{% else -%}
+Instructional goals will be provided in Blackboard.
+{% endif %}
+
+## Student Learning Outcomes
+
+Upon successful completion of this course, students will be able to:
+
+{% if student_outcomes -%}
+{% for outcome in student_outcomes.outcomes -%}
+- {{ outcome }}
+{% endfor -%}
+{% else -%}
+Student learning outcomes will be provided in Blackboard.
+{% endif %}
+
+---
+
+## Required Materials
+
+### Textbook
+
+{% if required_textbook -%}
+**Title:** {{ required_textbook.title }}  
+**Author(s):** {{ required_textbook.author }}  
+**Edition:** {{ required_textbook.edition }}  
+**ISBN:** {{ required_textbook.isbn }}  
+{% if required_textbook.notes -%}
+**Notes:** {{ required_textbook.notes }}  
+{% endif -%}
+{% else -%}
+Textbook information will be provided in Blackboard.
+{% endif %}
+
+### Technology Requirements
+
+- Reliable internet connection
+- Computer capable of running modern web browsers
+- Webcam and microphone for proctored exams
+{% if calculators_and_technology -%}
+{{ calculators_and_technology.requirements | markdown }}
+{% endif %}
+
+---
+
+## Grading
+
+### Grade Distribution
+
+{% if evaluation_tools -%}
+| Category | Weight |
+|----------|--------|
+{% for category in evaluation_tools.categories -%}
+| {{ category.name }} | {{ category.weight }}% |
+{% endfor -%}
+| **Total** | **100%** |
+{% else -%}
+Grade distribution will be provided in Blackboard.
+{% endif %}
+
+### Grading Scale
+
+{% if grading_policy -%}
+| Grade | Percentage | Points (1000 total) |
+|-------|------------|-------------------|
+{% for grade in grading_policy.scale -%}
+| {{ grade.letter }} | {{ grade.range }} | {{ grade.points }} |
+{% endfor -%}
+{% else -%}
+| Grade | Percentage |
+|-------|------------|
+| A | 90-100% |
+| B | 80-89% |
+| C | 70-79% |
+| D | 60-69% |
+| F | Below 60% |
+{% endif %}
+
+---
+
+## Course Schedule
+
+### Important Dates
+
+- **First Day of Classes:** {{ calendar.dates.start | date }}
+- **Add/Drop Deadline:** {{ calendar.dates.add_drop | date }}
+- **Withdrawal Deadline:** {{ calendar.dates.withdrawal | date }}
+- **Finals Week:** {{ calendar.dates.finals_start | date }} - {{ calendar.dates.finals_end | date }}
+- **Last Day of Classes:** {{ calendar.dates.end | date }}
+
+### Weekly Schedule
+
+The course follows a weekly module structure. Each week begins on Monday and ends on Sunday at 11:59 PM Alaska Time.
+
+{% if calendar.weeks -%}
+{% for week in calendar.weeks[:5] -%}
+**Week {{ week.number }}** ({{ week.start | date("%b %d") }} - {{ week.end | date("%b %d") }})
+{% if week.holidays -%}
+*Note: {{ week.holidays | join(', ') }}*
+{% endif %}
+
+{% endfor -%}
+
+*Full schedule available in Blackboard*
+{% endif %}
+
+---
+
+## Course Policies
+
+### Communication
+
+- **Email Response Time:** Within 24-48 hours on weekdays
+- **Assignment Feedback:** Within one week of submission
+- **Preferred Contact:** Email through Blackboard or {{ instructor.email }}
+
+### Late Work Policy
+
+{% if class_policies -%}
+{{ class_policies.late_work | default('Late work policy will be provided in Blackboard.') }}
+{% else -%}
+Late assignments may be accepted with penalty. Contact instructor for specific circumstances.
+{% endif %}
+
+### Academic Integrity
+
+All work submitted must be your own. Plagiarism, cheating, or any form of academic dishonesty will result in failure of the assignment and may result in failure of the course.
+
+---
+
+## University Policies
+
+### Disability Services
+
+Students with disabilities who may need accommodations should make an appointment with Disability Support Services (DSS) at 907-786-4530 or 907-262-4719.
+
+### Title IX
+
+The University of Alaska is committed to providing an environment free from discrimination, including sexual harassment and sexual violence.
+
+### Student Support Resources
+
+- **KPC Tutoring Center:** 907-262-0332
+- **UAA Writing Center:** Online support available
+- **Technical Support:** 907-786-4646
+
+---
+
+## Additional Information
+
+{% if safety -%}
+### Safety Information
+{{ safety.text }}
+{% endif %}
+
+{% if rsi -%}
+### Repetitive Strain Injury (RSI)
+{{ rsi.text }}
+{% endif %}
+
+---
+
+*This syllabus is subject to change. Any changes will be announced in Blackboard.*
+
+**Last Updated:** {{ now().strftime('%B %d, %Y') }}

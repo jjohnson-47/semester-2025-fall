@@ -1,0 +1,450 @@
+{
+  "metadata": {
+    "institution": "Kenai Peninsula College / University of Alaska Anchorage",
+    "academic_year": "2025-2026",
+    "timezone": "America/Anchorage",
+    "created": "2025-08-21",
+    "version": "1.0"
+  },
+  
+  "semesters": {
+    "fall_2025": {
+      "term_code": "202503",
+      "start_date": "2025-08-25",
+      "end_date": "2025-12-13",
+      "finals_start": "2025-12-08",
+      "finals_end": "2025-12-13",
+      
+      "registration": {
+        "schedule_viewable": "2025-03-31",
+        "veteran_priority": "2025-04-04",
+        "senior_priority": "2025-04-07",
+        "junior_priority": "2025-04-08",
+        "sophomore_priority": "2025-04-09",
+        "freshman_priority": "2025-04-10",
+        "open_registration": "2025-04-14"
+      },
+      
+      "critical_deadlines": {
+        "admission_application": {
+          "date": "2025-08-25",
+          "time": "17:00:00",
+          "timezone": "America/Anchorage"
+        },
+        "add_drop": {
+          "date": "2025-09-05",
+          "time_in_person": "17:00:00",
+          "time_online": "23:59:59",
+          "timezone": "America/Anchorage"
+        },
+        "100_percent_refund": {
+          "date": "2025-09-05",
+          "time_in_person": "17:00:00",
+          "time_online": "23:59:59",
+          "timezone": "America/Anchorage"
+        },
+        "credit_audit_change": {
+          "date": "2025-09-05",
+          "time_in_person": "17:00:00",
+          "time_online": "23:59:59",
+          "timezone": "America/Anchorage"
+        },
+        "jumpstart_homeschool_discount": {
+          "date": "2025-09-05",
+          "time_in_person": "17:00:00",
+          "time_online": "23:59:59",
+          "timezone": "America/Anchorage"
+        },
+        "payment_deadline_125_fee": {
+          "date": "2025-09-15",
+          "time": "17:00:00",
+          "timezone": "America/Anchorage",
+          "late_fee": 125
+        },
+        "withdrawal_deadline": {
+          "date": "2025-10-31",
+          "time": "17:00:00",
+          "timezone": "America/Anchorage",
+          "note": "No refund"
+        },
+        "payment_deadline_175_fee": {
+          "date": "2025-11-03",
+          "time": "17:00:00",
+          "timezone": "America/Anchorage",
+          "late_fee": 175
+        },
+        "graduation_application": {
+          "date": "2025-11-07"
+        }
+      },
+      
+      "instruction_periods": {
+        "late_registration": {
+          "start": "2025-09-02",
+          "end": "2025-09-05",
+          "requires": "instructor_approval"
+        },
+        "withdrawal_period": {
+          "start": "2025-09-06",
+          "end": "2025-10-31",
+          "note": "No refund"
+        },
+        "faculty_approval_add": {
+          "start": "2025-09-02"
+        }
+      },
+      
+      "holidays": [
+        {
+          "name": "Labor Day",
+          "date": "2025-09-01",
+          "campus_closed": true,
+          "classes_held": false
+        },
+        {
+          "name": "Non-Teaching Day",
+          "date": "2025-11-26",
+          "campus_closed": false,
+          "classes_held": false
+        },
+        {
+          "name": "Fall Break",
+          "start": "2025-11-27",
+          "end": "2025-11-28",
+          "campus_closed": true,
+          "classes_held": false
+        },
+        {
+          "name": "Winter Break",
+          "start": "2025-12-14",
+          "end": "2026-01-02",
+          "campus_closed_start": "2025-12-25",
+          "campus_closed_end": "2026-01-02",
+          "classes_held": false
+        }
+      ],
+      
+      "events": [
+        {
+          "name": "Faculty Contract Begins",
+          "date": "2025-08-10"
+        },
+        {
+          "name": "Fall Convocation",
+          "date": "2025-08-15",
+          "campus_closed": true
+        },
+        {
+          "name": "Strategic Planning Meeting",
+          "date": "2025-08-15",
+          "campus_closed": true
+        },
+        {
+          "name": "Kenai River Campus Open House",
+          "date": "2025-08-19",
+          "time_start": "16:00:00",
+          "time_end": "19:00:00",
+          "location": "Soldotna"
+        },
+        {
+          "name": "New Student Orientation - Kenai River Campus",
+          "date": "2025-08-19",
+          "time_start": "14:00:00",
+          "time_end": "17:00:00"
+        },
+        {
+          "name": "New Student Orientation - Kachemak Bay Campus",
+          "date": "2025-08-27"
+        },
+        {
+          "name": "UAA/KPC Foundation Scholarship Application Opens",
+          "date": "2025-10-01"
+        },
+        {
+          "name": "Grades Entered by Faculty",
+          "date": "2025-12-17"
+        },
+        {
+          "name": "Final Grades Available",
+          "date": "2025-12-18"
+        }
+      ]
+    },
+    
+    "spring_2026": {
+      "term_code": "202601",
+      "start_date": "2026-01-12",
+      "end_date": "2026-04-27",
+      "finals_start": "2026-04-28",
+      "finals_end": "2026-05-02",
+      
+      "registration": {
+        "schedule_viewable": "2025-10-27",
+        "veteran_priority": "2025-10-31",
+        "senior_priority": "2025-11-03",
+        "junior_priority": "2025-11-04",
+        "sophomore_priority": "2025-11-05",
+        "freshman_priority": "2025-11-06",
+        "open_registration": "2025-11-10"
+      },
+      
+      "critical_deadlines": {
+        "admission_application": {
+          "date": "2026-01-12",
+          "time": "17:00:00",
+          "timezone": "America/Anchorage"
+        },
+        "add_drop": {
+          "date": "2026-01-23",
+          "time_in_person": "17:00:00",
+          "time_online": "23:59:59",
+          "timezone": "America/Anchorage"
+        },
+        "100_percent_refund": {
+          "date": "2026-01-23",
+          "time_in_person": "17:00:00",
+          "time_online": "23:59:59",
+          "timezone": "America/Anchorage"
+        },
+        "credit_audit_change": {
+          "date": "2026-01-23",
+          "time_in_person": "17:00:00",
+          "time_online": "23:59:59",
+          "timezone": "America/Anchorage"
+        },
+        "jumpstart_homeschool_discount": {
+          "date": "2026-01-23",
+          "time_in_person": "17:00:00",
+          "time_online": "23:59:59",
+          "timezone": "America/Anchorage"
+        },
+        "payment_deadline_125_fee": {
+          "date": "2026-02-02",
+          "time": "17:00:00",
+          "timezone": "America/Anchorage",
+          "late_fee": 125
+        },
+        "uaa_scholarship_deadline": {
+          "date": "2026-02-15"
+        },
+        "payment_deadline_175_fee": {
+          "date": "2026-03-23",
+          "time": "17:00:00",
+          "timezone": "America/Anchorage",
+          "late_fee": 175
+        },
+        "withdrawal_deadline": {
+          "date": "2026-03-27",
+          "note": "No refund"
+        },
+        "graduation_application": {
+          "date": "2026-03-27"
+        },
+        "kpc_scholarship_deadline": {
+          "date": "2026-04-17"
+        }
+      },
+      
+      "instruction_periods": {
+        "late_registration": {
+          "start": "2026-01-19",
+          "requires": "instructor_approval"
+        },
+        "withdrawal_period": {
+          "start": "2026-01-24",
+          "end": "2026-03-27",
+          "note": "No refund"
+        }
+      },
+      
+      "holidays": [
+        {
+          "name": "Martin Luther King Jr. Day",
+          "date": "2026-01-19",
+          "campus_closed": true,
+          "classes_held": false
+        },
+        {
+          "name": "Spring Break",
+          "start": "2026-03-09",
+          "end": "2026-03-13",
+          "campus_closed_date": "2026-03-13",
+          "classes_held": false
+        }
+      ],
+      
+      "events": [
+        {
+          "name": "New Student Orientation - Kenai River Campus",
+          "date": "TBD"
+        },
+        {
+          "name": "Professional Development Day",
+          "date": "TBD",
+          "campus_closed": true
+        },
+        {
+          "name": "Commencement - Kachemak Bay Campus",
+          "date": "2026-05-06",
+          "location": "Homer"
+        },
+        {
+          "name": "Commencement - Kenai River Campus",
+          "date": "2026-05-07",
+          "location": "Soldotna",
+          "campus_closes": "13:00:00"
+        },
+        {
+          "name": "Final Grades Available",
+          "date": "2026-05-07"
+        },
+        {
+          "name": "Campus Closed - Year End Meetings",
+          "date": "2026-05-08"
+        },
+        {
+          "name": "Faculty Contract Ends",
+          "date": "2026-05-09"
+        }
+      ]
+    },
+    
+    "summer_2026": {
+      "term_code": "202602",
+      "sessions": {
+        "10_week": {
+          "start_date": "2026-05-18",
+          "end_date": "2026-08-01",
+          "add_drop_deadline": "2026-05-26",
+          "withdrawal_deadline": "2026-07-10",
+          "faculty_approval_add": "2026-05-19",
+          "faculty_approval_add_extended": "2026-06-26"
+        },
+        "5_week_first": {
+          "start_date": "2026-05-18",
+          "end_date": "2026-06-22",
+          "add_drop_deadline": "2026-05-26",
+          "withdrawal_deadline": "2026-06-05",
+          "faculty_approval_add": "2026-05-19",
+          "grades_entered": "2026-06-25",
+          "grades_available": "2026-06-26"
+        },
+        "5_week_second": {
+          "start_date": "2026-06-25",
+          "end_date": "2026-08-01",
+          "add_drop_deadline": "2026-07-02",
+          "withdrawal_deadline": "2026-07-10",
+          "faculty_approval_add": "2026-06-26",
+          "grades_entered": "2026-08-05",
+          "grades_available": "2026-08-06"
+        }
+      },
+      
+      "registration": {
+        "schedule_viewable": "2026-02-02",
+        "certificate_degree_seeking": "2026-02-09",
+        "open_registration": "2026-02-16"
+      },
+      
+      "critical_deadlines": {
+        "admission_application": {
+          "date": "2026-05-18"
+        },
+        "refund_100_percent_session1": {
+          "date": "2026-05-26",
+          "time_in_person": "17:00:00",
+          "time_online": "23:59:59",
+          "sessions": ["10_week", "5_week_first"]
+        },
+        "refund_100_percent_session2": {
+          "date": "2026-07-02",
+          "time_in_person": "17:00:00",
+          "time_online": "23:59:59",
+          "sessions": ["5_week_second"]
+        },
+        "payment_deadline_125_fee": {
+          "date": "2026-07-13",
+          "time": "17:00:00",
+          "timezone": "America/Anchorage",
+          "late_fee": 125
+        },
+        "uaa_graduation_application": {
+          "date": "2026-07-24"
+        },
+        "payment_deadline_175_fee": {
+          "date": "2026-07-27",
+          "time": "17:00:00",
+          "timezone": "America/Anchorage",
+          "late_fee": 175
+        },
+        "kpc_graduation_application": {
+          "date": "2026-08-01"
+        }
+      },
+      
+      "holidays": [
+        {
+          "name": "Memorial Day",
+          "date": "2026-05-25",
+          "campus_closed": true,
+          "classes_held": false
+        },
+        {
+          "name": "Fourth of July Holiday",
+          "start": "2026-07-03",
+          "end": "2026-07-06",
+          "campus_closed": true,
+          "classes_held": false
+        }
+      ],
+      
+      "events": [
+        {
+          "name": "10-Week Session Grades Entered",
+          "date": "2026-08-05"
+        },
+        {
+          "name": "10-Week Session Grades Available",
+          "date": "2026-08-06"
+        }
+      ]
+    }
+  },
+  
+  "global_policies": {
+    "refund_policy": "100% refund only available until add/drop deadline",
+    "withdrawal_policy": "Withdrawal does not result in refund",
+    "late_fees": [
+      {
+        "amount": 125,
+        "timing": "Approximately 3 weeks after classes start"
+      },
+      {
+        "amount": 175,
+        "timing": "Approximately 6-8 weeks after first late fee"
+      }
+    ],
+    "deadline_times": {
+      "in_person": "17:00:00",
+      "online": "23:59:59",
+      "timezone": "America/Anchorage"
+    },
+    "credit_thresholds": {
+      "freshman": "0-29",
+      "sophomore": "30-59",
+      "junior": "60-89",
+      "senior": "90+"
+    }
+  },
+  
+  "campuses": [
+    {
+      "name": "Kenai River Campus",
+      "location": "Soldotna"
+    },
+    {
+      "name": "Kachemak Bay Campus",
+      "location": "Homer"
+    }
+  ]
+}
