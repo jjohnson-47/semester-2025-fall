@@ -46,10 +46,13 @@ from datetime import datetime, timedelta
 from typing import Any
 
 import pytz
-
-# Import config from same package
-from config import Config
 from flask import Flask, jsonify, render_template, request
+
+# Import config - try both relative and absolute imports
+try:
+    from config import Config
+except ImportError:
+    from dashboard.config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -457,7 +460,6 @@ def get_relative_time(dt: datetime) -> str:
 @app.route("/syllabi/<course_code>")
 def view_syllabus(course_code: str):
     """Serve generated syllabus for a course."""
-    from config import Config
     from flask import abort, send_from_directory
 
     # Use configured paths
