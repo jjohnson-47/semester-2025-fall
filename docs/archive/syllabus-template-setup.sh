@@ -11,7 +11,7 @@ echo "================================"
 python_version=$(python3 --version 2>&1 | grep -oE '[0-9]+\.[0-9]+')
 required_version="3.9"
 
-if [ "$(printf '%s\n' "$required_version" "$python_version" | sort -V | head -n1)" != "$required_version" ]; then 
+if [ "$(printf '%s\n' "$required_version" "$python_version" | sort -V | head -n1)" != "$required_version" ]; then
     echo "❌ Python 3.9+ is required (found $python_version)"
     exit 1
 fi
@@ -206,27 +206,27 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    
+
     - name: Install system dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y pandoc
-    
+
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    
+
     - name: Run tests
       run: |
         python syllabus_generator.py --init
         python syllabus_generator.py syllabus_data.yaml
-    
+
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -242,7 +242,7 @@ cat > templates/syllabus.html.j2 << 'EOHTML'
 [HTML template content from previous artifact - too long to repeat here]
 EOHTML
 
-# Save Markdown template  
+# Save Markdown template
 cat > templates/syllabus.md.j2 << 'EOMD'
 [Markdown template content from previous artifact - too long to repeat here]
 EOMD

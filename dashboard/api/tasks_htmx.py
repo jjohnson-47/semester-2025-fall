@@ -25,9 +25,10 @@ def update_task_status_htmx(task_id):
     result = DependencyService.update_task_status(task_id, new_status)
 
     if "error" in result:
-        return render_template(
-            "_error.html", message=result["error"], details=result.get("blockers")
-        ), 400
+        return (
+            render_template("_error.html", message=result["error"], details=result.get("blockers")),
+            400,
+        )
 
     # Render the primary task row
     primary_html = render_template("_task_row.html", task=result["updated_task"], oob=False)

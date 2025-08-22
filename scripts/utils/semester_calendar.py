@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""
-Semester calendar builder for Fall 2025.
-Generates course calendars from academic calendar data.
+"""Semester calendar utilities for Fall 2025.
+
+Provides week ranges, holiday awareness, and course calendar snapshots derived
+from ``academic-calendar.json`` (project root). If the file is missing, a
+minimal default calendar is used to keep downstream code functional.
 """
 
 import json
@@ -21,7 +23,16 @@ except Exception:  # pragma: no cover
 
 
 class SemesterCalendar:
-    """Manages semester calendar and course schedules."""
+    """Manage semester calendar and course schedules.
+
+    Parameters
+    - calendar_file: path to the academic calendar JSON (defaults to
+      ``academic-calendar.json`` in the project root).
+
+    Notes
+    - Optional dependencies ``pytz`` and ``dateutil`` are used if available but
+      are not required for basic functionality.
+    """
 
     def __init__(self, calendar_file: str = "academic-calendar.json"):
         self.calendar_file = Path(calendar_file)
@@ -30,7 +41,12 @@ class SemesterCalendar:
         self.semester = "fall_2025"
 
     def _load_calendar(self) -> dict[str, Any]:
-        """Load academic calendar JSON."""
+        """Load academic calendar JSON from the expected locations.
+
+        Returns
+        - dict: parsed calendar structure. Falls back to a minimal calendar
+          if no file is found.
+        """
         # Try project root first
         if self.calendar_file.exists():
             with open(self.calendar_file, encoding="utf-8") as f:
@@ -56,7 +72,7 @@ class SemesterCalendar:
         }
 
     def get_semester_dates(self) -> dict[str, Any]:
-        """Get key dates for the semester."""
+        """Get key dates for the semester as datetime objects."""
         semester = self.calendar_data["semesters"][self.semester]
         return {
             "start": self._parse_date(semester["start_date"]),
@@ -70,13 +86,18 @@ class SemesterCalendar:
         }
 
     def _parse_date(self, date_str: str) -> datetime:
-        """Parse date string to datetime."""
+        """Parse a ``YYYY-MM-DD`` date string into a ``datetime``."""
         if isinstance(date_str, str):
             return datetime.strptime(date_str, "%Y-%m-%d")
         return date_str
 
     def get_holidays(self) -> list[dict[str, Any]]:
-        """Get list of holidays for the semester."""
+        """Get list of holidays for the semester.
+
+        Returns
+        - list[dict]: normalized holiday entries with keys like ``name`` and
+          either ``date`` or ``start``/``end``.
+        """
         semester = self.calendar_data["semesters"][self.semester]
         holidays = []
 
@@ -102,7 +123,11 @@ class SemesterCalendar:
         return holidays
 
     def get_weeks(self) -> list[dict[str, Any]]:
-        """Generate weekly structure for the semester."""
+        """Generate weekly structure for the semester (Mon–Fri buckets).
+
+        Each week entry includes ``start`` (Mon), ``end`` (Fri), ``holidays``,
+        and a boolean ``is_finals`` flag when within finals week.
+        """
         dates = self.get_semester_dates()
         holidays = self.get_holidays()
 
@@ -120,12 +145,13 @@ class SemesterCalendar:
             # Check for holidays this week
             week_holidays = []
             for holiday in holidays:
-                if "date" in holiday:
-                    if current_date <= holiday["date"] <= week_end:
-                        week_holidays.append(holiday["name"])
-                elif "start" in holiday:
-                    if not (holiday["end"] < current_date or holiday["start"] > week_end):
-                        week_holidays.append(holiday["name"])
+                if (
+                    "date" in holiday
+                    and current_date <= holiday["date"] <= week_end
+                    or "start" in holiday
+                    and not (holiday["end"] < current_date or holiday["start"] > week_end)
+                ):
+                    week_holidays.append(holiday["name"])
 
             # Determine if it's finals week
             is_finals = current_date >= dates["finals_start"]
@@ -148,7 +174,7 @@ class SemesterCalendar:
         return weeks
 
     def get_course_calendar(self, course_code: str) -> dict[str, Any]:
-        """Get calendar specific to a course."""
+        """Get a course-specific calendar snapshot for templating."""
         return {
             "semester": self.semester.replace("_", " ").title(),
             "dates": self.get_semester_dates(),
@@ -159,7 +185,15 @@ class SemesterCalendar:
         }
 
     def generate_ics(self, course_code: str, output_file: str | None = None) -> str:
-        """Generate ICS calendar file for a course."""
+        """Generate a minimal ICS calendar string for a course.
+
+        Parameters
+        - course_code: e.g., ``MATH221``.
+        - output_file: optional path to write the ICS content.
+
+        Returns
+        - str: the ICS content.
+        """
         import uuid
 
         dates = self.get_semester_dates()

@@ -45,7 +45,7 @@
                         </h6>
                         <p class="card-text text-muted small">{{ task.description }}</p>
                     </div>
-                    
+
                     <div class="col-md-4 text-end">
                         {% if task.due %}
                         <div class="mb-2">
@@ -56,17 +56,17 @@
                             <small>{{ task.due_relative }}</small>
                         </div>
                         {% endif %}
-                        
+
                         <div class="btn-group btn-group-sm" role="group">
-                            <button class="btn btn-outline-secondary" 
+                            <button class="btn btn-outline-secondary"
                                     onclick="updateStatus('{{ task.id }}', 'blocked')">🚫</button>
-                            <button class="btn btn-outline-primary" 
+                            <button class="btn btn-outline-primary"
                                     onclick="updateStatus('{{ task.id }}', 'todo')">📋</button>
-                            <button class="btn btn-outline-warning" 
+                            <button class="btn btn-outline-warning"
                                     onclick="updateStatus('{{ task.id }}', 'doing')">⚡</button>
-                            <button class="btn btn-outline-info" 
+                            <button class="btn btn-outline-info"
                                     onclick="updateStatus('{{ task.id }}', 'review')">👀</button>
-                            <button class="btn btn-outline-success" 
+                            <button class="btn btn-outline-success"
                                     onclick="updateStatus('{{ task.id }}', 'done')">✅</button>
                         </div>
                     </div>

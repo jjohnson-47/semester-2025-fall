@@ -7,11 +7,11 @@
     <meta name="author" content="{{ instructor.name }}">
     <meta name="generator" content="KPC Syllabus Generator v2025">
     <title>{{ course.number }} - {{ course.title }} Syllabus</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             --color-primary: #003366;
@@ -172,9 +172,9 @@
 
         @media print {
             body { padding: 0; }
-            .course-header { 
-                background: none; 
-                color: black; 
+            .course-header {
+                background: none;
+                color: black;
                 border: 2px solid black;
             }
             .course-header h1 { color: black; }
@@ -247,7 +247,7 @@
                     <li>{{ text.title }} by {{ text.author }}, {{ text.edition }} Edition (ISBN: {{ text.isbn }})</li>
                 {% endfor %}
                 </ul>
-                
+
                 <p><strong>Required Technology:</strong></p>
                 <ul>
                 {% for tech in course_info.required_technology %}

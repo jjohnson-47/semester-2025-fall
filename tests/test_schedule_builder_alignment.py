@@ -11,7 +11,7 @@ import pytest
 
 pytest.importorskip("jsonschema")
 
-from scripts.build_schedules import ScheduleBuilder
+from scripts.build_schedules import ScheduleBuilder  # noqa: E402
 
 
 class FakeCalendar:
@@ -45,9 +45,7 @@ class FakeCalendar:
         }
 
 
-def test_build_schedule_aligns_weeks_and_due_dates(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_build_schedule_aligns_weeks_and_due_dates(tmp_path: Path) -> None:
     # Arrange: course schedule with 2 weeks and finals
     course_dir = tmp_path / "content" / "courses" / "TEST101"
     course_dir.mkdir(parents=True)

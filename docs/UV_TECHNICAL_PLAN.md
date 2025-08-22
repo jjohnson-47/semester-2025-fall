@@ -3,6 +3,7 @@
 ## Objective Analysis
 
 ### What UV Actually Does
+
 - **Package resolver**: Faster dependency resolution using Rust
 - **Environment manager**: Replaces virtualenv with built-in environment handling
 - **Lockfile generator**: Creates reproducible dependency sets
@@ -11,6 +12,7 @@
 ### Relevant Features for This Project
 
 #### 1. Single-File Dependency Management
+
 **Current Problem**: Multiple requirements.txt files (root + dashboard)
 **UV Solution**: All dependencies in pyproject.toml with optional groups
 
@@ -25,6 +27,7 @@ dashboard = ["flask", "watchdog"]
 **Benefit**: Eliminates dependency duplication and sync issues
 
 #### 2. Lockfile for Reproducibility
+
 **Current Problem**: No lockfile, `pip freeze` captures system-wide packages
 **UV Solution**: `uv.lock` automatically maintained
 
@@ -39,6 +42,7 @@ uv sync
 **Benefit**: Guarantees same versions across development machines and CI
 
 #### 3. Script Dependencies
+
 **Current Problem**: Scripts fail if dependencies missing
 **UV Solution**: Scripts declare their own dependencies
 
@@ -54,6 +58,7 @@ uv sync
 ## Implementation Steps
 
 ### Step 1: Install UV
+
 ```bash
 # Linux/macOS
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -65,6 +70,7 @@ echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
 ### Step 2: Convert Project Structure
 
 #### Create pyproject.toml
+
 ```toml
 [project]
 name = "semester-2025-fall"
@@ -96,21 +102,21 @@ Replace virtualenv commands with uv:
 ```makefile
 # Old
 init:
-	python3 -m venv venv
-	. venv/bin/activate && pip install -r requirements.txt
+ python3 -m venv venv
+ . venv/bin/activate && pip install -r requirements.txt
 
 # New
 init:
-	uv sync
-	uv sync --extra dashboard
+ uv sync
+ uv sync --extra dashboard
 
 # Old command execution
 syllabi:
-	. $(VENV)/bin/activate && $(PYTHON) scripts/build_syllabi.py
+ . $(VENV)/bin/activate && $(PYTHON) scripts/build_syllabi.py
 
-# New command execution  
+# New command execution
 syllabi:
-	uv run python scripts/build_syllabi.py
+ uv run python scripts/build_syllabi.py
 ```
 
 ### Step 4: Fix Import Issues
@@ -150,12 +156,14 @@ jobs:
 ## What We're NOT Using
 
 ### Features Not Relevant
+
 - **Publishing**: We're not making a PyPI package
 - **Workspace**: Single project, not monorepo
 - **Python compilation**: Using system Python is fine
 - **Global tools**: Project-specific tools only
 
 ### Overkill Features
+
 - **Universal locks**: Single platform (Linux) for deployment
 - **Build backend**: Not building distributions
 - **Complex versioning**: Simple project versioning
@@ -173,22 +181,26 @@ jobs:
 ## Minimal Migration Path
 
 ### Day 1: Local Development
+
 1. Install uv
 2. Create pyproject.toml from requirements.txt
 3. Run `uv sync`
 4. Test: `uv run python scripts/validate_json.py`
 
 ### Day 2: Update Scripts
+
 1. Update Makefile commands
 2. Remove venv references
 3. Test all make targets
 
 ### Day 3: CI/CD
+
 1. Update GitHub Actions
 2. Remove pip commands
 3. Verify builds pass
 
 ### Day 4: Cleanup
+
 1. Delete requirements.txt files
 2. Delete venv directory
 3. Update documentation
@@ -206,14 +218,17 @@ jobs:
 ## Expected Issues & Solutions
 
 ### Issue 1: Missing system packages
+
 UV doesn't install system packages needed for weasyprint
 **Solution**: Document system deps, use Docker for CI
 
 ### Issue 2: Dashboard Flask app
+
 Flask dev server needs special handling
 **Solution**: Create run script or use `uv run flask`
 
 ### Issue 3: IDE Integration
+
 VSCode might not recognize uv environment
 **Solution**: Point VSCode to `.venv` created by uv
 

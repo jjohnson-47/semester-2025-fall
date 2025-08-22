@@ -17,7 +17,7 @@ tasks:
       - "Post technology check assignment"
       - "Create getting started checklist"
       - "Schedule Week 1 announcement for Monday 8 AM"
-  
+
   - key: WEEK-01-INTRO-DISC
     title: "Week 1: Set up introduction discussion"
     description: "Create and configure student introduction discussion board"
@@ -29,7 +29,7 @@ tasks:
       - "Set participation requirements"
       - "Configure grading rubric"
       - "Set due date for Friday of Week 1"
-  
+
   - key: WEEK-02-PREP
     title: "Week 2: First Content Module"
     description: "Prepare Week 2 content and assessments"
@@ -40,7 +40,7 @@ tasks:
       - "Post reading assignments"
       - "Set up discussion if applicable"
       - "Schedule announcement"
-  
+
   - key: WEEK-03-PREP
     title: "Week 3: Content Module"
     description: "Prepare Week 3 content and assessments"
@@ -51,7 +51,7 @@ tasks:
       - "Post reading assignments"
       - "Review Week 1 submissions"
       - "Schedule announcement"
-  
+
   - key: WEEK-04-PREP
     title: "Week 4: Content Module"
     description: "Prepare Week 4 content and assessments"
@@ -62,7 +62,7 @@ tasks:
       - "Post reading assignments"
       - "Prepare for first exam/quiz"
       - "Schedule announcement"
-  
+
   - key: MIDTERM-PREP
     title: "Midterm Exam Preparation"
     description: "Set up and configure midterm exam (Week 8)"
@@ -75,7 +75,7 @@ tasks:
       - "Create study guide"
       - "Post exam instructions"
       - "Schedule reminder announcement"
-  
+
   - key: FINAL-PREP
     title: "Final Exam Preparation"
     description: "Set up and configure final exam"

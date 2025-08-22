@@ -42,17 +42,21 @@ class BlackboardPackageBuilder:
         syllabus_html = Path(f"build/syllabi/{course_code}.html")
         if syllabus_html.exists():
             (temp_dir / "syllabus.html").write_text(syllabus_html.read_text())
-            manifest["contents"].append(
-                {"type": "document", "title": "Course Syllabus", "file": "syllabus.html"}
-            )
+            contents_list = manifest["contents"]
+            if isinstance(contents_list, list):
+                contents_list.append(
+                    {"type": "document", "title": "Course Syllabus", "file": "syllabus.html"}
+                )
 
         # Add schedule if it exists
         schedule_md = Path(f"build/schedules/{course_code}_schedule.md")
         if schedule_md.exists():
             (temp_dir / "schedule.md").write_text(schedule_md.read_text())
-            manifest["contents"].append(
-                {"type": "document", "title": "Course Schedule", "file": "schedule.md"}
-            )
+            contents_list = manifest["contents"]
+            if isinstance(contents_list, list):
+                contents_list.append(
+                    {"type": "document", "title": "Course Schedule", "file": "schedule.md"}
+                )
 
         # Create Start Here content
         start_here = f"""
@@ -74,9 +78,11 @@ class BlackboardPackageBuilder:
         """
 
         (temp_dir / "start_here.html").write_text(start_here)
-        manifest["contents"].append(
-            {"type": "content", "title": "Start Here", "file": "start_here.html"}
-        )
+        contents_list = manifest["contents"]
+        if isinstance(contents_list, list):
+            contents_list.append(
+                {"type": "content", "title": "Start Here", "file": "start_here.html"}
+            )
 
         # Write manifest
         (temp_dir / "manifest.json").write_text(json.dumps(manifest, indent=2))
@@ -94,7 +100,7 @@ class BlackboardPackageBuilder:
 
         return str(package_file)
 
-    def build_all(self, courses=None):
+    def build_all(self, courses: list[str] | None = None) -> None:
         """Build packages for all courses."""
         if courses is None:
             courses = ["MATH221", "MATH251", "STAT253"]
@@ -104,7 +110,7 @@ class BlackboardPackageBuilder:
             print(f"✓ {course} package created: {package}")
 
 
-def main():
+def main() -> None:
     """CLI entry point."""
     parser = argparse.ArgumentParser(description="Build Blackboard packages")
     parser.add_argument("--course", help="Build specific course")

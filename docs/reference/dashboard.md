@@ -132,14 +132,14 @@ def main():
         },
         "courses": []
     }
-    
+
     # Map from your existing course structure
     course_configs = [
         ("MATH221", "Mathematical Explorations", "74645"),
         ("MATH251", "Calculus I", "74647"),
         ("STAT253", "Applied Statistics for the Sciences", "74688")
     ]
-    
+
     for code, title, crn in course_configs:
         course = {
             "code": code,
@@ -156,20 +156,20 @@ def main():
                 }
             }
         }
-        
+
         # Read evaluation_tools.json if exists
         eval_path = f"content/courses/{code}/evaluation_tools.json"
         if os.path.exists(eval_path):
             with open(eval_path) as f:
                 course["evaluation"] = json.load(f)
-        
+
         courses_data["courses"].append(course)
-    
+
     # Write dashboard configuration
     os.makedirs("dashboard/state", exist_ok=True)
     with open("dashboard/state/courses.json", "w") as f:
         json.dump(courses_data, f, indent=2)
-    
+
     print("✓ Generated dashboard/state/courses.json")
 
 if __name__ == "__main__":
@@ -198,7 +198,7 @@ tasks:
       - "Submit ticket with CRN {{course.crn}}"
       - "Verify instructor access granted"
       - "Confirm shell URL is active"
-    
+
   - key: BB-COPY-CONTENT
     title: "Copy content from previous semester"
     description: "Use Ultra Copy Content from {{course.blackboard.copy_from_id}}"
@@ -231,7 +231,7 @@ tasks:
       - "Update exam dates (midterm/final)"
       - "Update drop/withdrawal deadlines"
       - "Verify holiday schedule"
-    
+
   - key: SYLL-GENERATE
     title: "Generate syllabus from templates"
     description: "Run make course COURSE={{course.code}} to generate syllabus"
@@ -264,7 +264,7 @@ tasks:
       - "Set up introduction discussion board"
       - "Post technology check assignment"
       - "Schedule Week 1 announcement for 8:00 AM Monday"
-    
+
   # Generate weeks 2-16 programmatically in your template processor
 ```
 
@@ -363,12 +363,12 @@ from datetime import datetime
 def mark_week_ready(week_num, course_code=None):
     with open("dashboard/state/tasks.json", "r+") as f:
         data = json.load(f)
-        
+
         updated = 0
         for task in data["tasks"]:
             if course_code and task["course"] != course_code:
                 continue
-            
+
             if f"WEEK-{week_num:02d}" in task["id"]:
                 task["status"] = "done"
                 task["history"].append({
@@ -376,11 +376,11 @@ def mark_week_ready(week_num, course_code=None):
                     "event": f"Batch marked Week {week_num} ready"
                 })
                 updated += 1
-        
+
         f.seek(0)
         f.truncate()
         json.dump(data, f, indent=2)
-    
+
     print(f"✓ Marked {updated} Week {week_num} tasks as done")
 
 if __name__ == "__main__":
@@ -394,7 +394,7 @@ Usage:
 # Mark all Week 3 tasks as complete
 python dashboard/tools/blackboard_batch.py 3
 
-# Mark only MATH221 Week 3 as complete  
+# Mark only MATH221 Week 3 as complete
 python dashboard/tools/blackboard_batch.py 3 MATH221
 ```
 
@@ -430,9 +430,9 @@ python -c "
 import json
 from datetime import datetime, timedelta
 tasks = json.load(open('dashboard/state/tasks.json'))['tasks']
-stale = [t for t in tasks 
-         if t['status'] == 'doing' 
-         and datetime.fromisoformat(t.get('history',  [{'at':'2025-01-01T00:00:00'}])[-1]['at']) 
+stale = [t for t in tasks
+         if t['status'] == 'doing'
+         and datetime.fromisoformat(t.get('history',  [{'at':'2025-01-01T00:00:00'}])[-1]['at'])
              < datetime.now() - timedelta(days=7)]
 for t in stale:
     print(f'⚠️  {t[\"id\"]}: In doing status for >7 days')
@@ -536,7 +536,7 @@ python -m http.server 8000 --directory build/dashboard
 ## 10. Best Practices
 
 1. **Daily**: Check dashboard, update task statuses
-2. **Weekly**: Review blocked tasks, adjust priorities  
+2. **Weekly**: Review blocked tasks, adjust priorities
 3. **Biweekly**: Run link checker, validate dependencies
 4. **Monthly**: Archive snapshots, generate reports
 5. **Per Semester**: Full reset and rollover procedure

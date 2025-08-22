@@ -76,7 +76,7 @@
 <body>
     <div class="syllabus-container">
         <h1>{{ course_code }} - {{ course_name_full }}</h1>
-        
+
         <div class="header-info">
             <strong>Section:</strong> 901 (Online)<br>
             <strong>Term:</strong> {{ semester }} {{ year }}<br>
@@ -149,7 +149,7 @@
         {% endif %}
 
         <h2>Required Materials</h2>
-        
+
         <h3>Textbook</h3>
         {% if required_textbook %}
         <table>
@@ -191,7 +191,7 @@
         </ul>
 
         <h2>Grading</h2>
-        
+
         <h3>Grade Distribution</h3>
         {% if evaluation_tools %}
         {% set total_points = grading_policy.points_total | default(1000) %}
@@ -261,7 +261,7 @@
         {% endif %}
 
         <h2>Course Schedule</h2>
-        
+
         <div class="important-dates">
             <h3>Important Dates</h3>
             <ul>
@@ -275,7 +275,7 @@
 
         <h3>Weekly Schedule</h3>
         <p>The course follows a weekly module structure. Each week begins on Monday and ends on Sunday at 11:59 PM Alaska Time.</p>
-        
+
         {% if calendar.weeks %}
         <table>
             <thead>
@@ -299,7 +299,7 @@
         {% endif %}
 
         <h2>Course Policies</h2>
-        
+
         <h3>Communication</h3>
         <ul>
             <li><strong>Email Response Time:</strong> Within 24-48 hours on weekdays</li>
@@ -318,7 +318,7 @@
         <p>All work submitted must be your own. Plagiarism, cheating, or any form of academic dishonesty will result in failure of the assignment and may result in failure of the course.</p>
 
         <h2>University Policies</h2>
-        
+
         <h3>Disability Services</h3>
         <p>Students with disabilities who may need accommodations should make an appointment with Disability Support Services (DSS) at 907-786-4530 or 907-262-4719.</p>
 

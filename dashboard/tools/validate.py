@@ -15,8 +15,8 @@ class TaskValidator:
 
     def __init__(self, tasks_file: str = "dashboard/state/tasks.json"):
         self.tasks_file = Path(tasks_file)
-        self.errors = []
-        self.warnings = []
+        self.errors: list[str] = []
+        self.warnings: list[str] = []
 
     def validate(self) -> bool:
         """Run all validations."""
@@ -130,9 +130,9 @@ class TaskValidator:
             stack.remove(node)
             return False
 
-        visited = set()
+        visited: set[str] = set()
         for task_id in deps:
-            if task_id not in visited and has_cycle(task_id, visited, set()):
+            if task_id and task_id not in visited and has_cycle(task_id, visited, set()):
                 self.errors.append(f"Circular dependency detected involving task: {task_id}")
 
     def _print_results(self) -> None:
@@ -152,7 +152,7 @@ class TaskValidator:
             print("✅ Validation passed - all tasks valid")
 
 
-def main():
+def main() -> None:
     """CLI entry point."""
     validator = TaskValidator()
 

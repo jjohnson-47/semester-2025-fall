@@ -52,16 +52,16 @@ jobs:
 
           # Create release archives
           mkdir -p release
-          
+
           # Package syllabi
           cd build/syllabi && tar -czf ../../release/syllabi.tar.gz * && cd ../..
-          
+
           # Package schedules
           cd build/schedules && tar -czf ../../release/schedules.tar.gz * && cd ../..
-          
+
           # Package Blackboard packages
           cd build/blackboard && tar -czf ../../release/blackboard-packages.tar.gz * && cd ../..
-          
+
           # Package weekly materials
           if [ -d "build/weekly" ]; then
             cd build/weekly && tar -czf ../../release/weekly-materials.tar.gz * && cd ../..
@@ -78,17 +78,17 @@ jobs:
         run: |
           echo "# Changelog" > CHANGELOG_RELEASE.md
           echo "" >> CHANGELOG_RELEASE.md
-          
+
           # Get version
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             VERSION="${{ github.event.inputs.version }}"
           else
             VERSION="${{ github.ref_name }}"
           fi
-          
+
           echo "## $VERSION - $(date +'%Y-%m-%d')" >> CHANGELOG_RELEASE.md
           echo "" >> CHANGELOG_RELEASE.md
-          
+
           # Generate changelog from commits
           if git describe --tags --abbrev=0 HEAD^ 2>/dev/null; then
             PREV_TAG=$(git describe --tags --abbrev=0 HEAD^)
@@ -96,7 +96,7 @@ jobs:
           else
             git log --pretty=format:"- %s (%h)" -n 20 >> CHANGELOG_RELEASE.md
           fi
-          
+
           echo "" >> CHANGELOG_RELEASE.md
 
       - name: Create GitHub Release

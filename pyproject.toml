@@ -43,9 +43,6 @@ dev-dependencies = [
     "pre-commit>=4.0.0",
 ]
 
-[tool.uv.python]
-warn-on-deprecated = true
-
 [tool.ruff]
 target-version = "py313"
 line-length = 100
@@ -143,7 +140,7 @@ markers = [
 ]
 filterwarnings = [
     "error::DeprecationWarning",
-    "error::PendingDeprecationWarning", 
+    "error::PendingDeprecationWarning",
     "error::FutureWarning",
     # Allow specific known deprecations temporarily
     "ignore::DeprecationWarning:flask.sessions",

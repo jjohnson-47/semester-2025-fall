@@ -1,16 +1,17 @@
 # Syllabus
 
-**{{ course.department }} {{ course.number }} Section {{ course.section }}: {{ course.title }}**  
-{{ course.semester }} {{ course.year }} - CRN {{ course.crn }}  
+**{{ course.department }} {{ course.number }} Section {{ course.section }}: {{ course.title }}**
+{{ course.semester }} {{ course.year }} - CRN {{ course.crn }}
 {{ course.location }}
 
 ---
 
 ## Instructor
 
-**Name:** {{ instructor.name }}  
-**Office Hours:** {{ instructor.office_hours }}  
+**Name:** {{ instructor.name }}
+**Office Hours:** {{ instructor.office_hours }}
 **Contact Information:**
+
 - Email: {{ instructor.email }}
 - Office: {{ instructor.office }}
 {% if instructor.zoom_link -%}
@@ -23,24 +24,32 @@
 ## Course Information
 
 ### Course Description
+
 {{ course_info.description }}
 
 ### Course Prerequisites
+
 {{ course_info.prerequisites }}
 
 {% if course_info.fees -%}
+
 ### Course Fees
+
 {{ course_info.fees }}
 {% endif %}
 
 ### Instructional Goals
+
 {% for goal in course_info.goals -%}
+
 - {{ goal }}
 {% endfor %}
 
 ### Student Outcomes
+
 Upon successful completion of this course, students will be able to:
 {% for outcome in course_info.outcomes -%}
+
 - {{ outcome }}
 {% endfor %}
 
@@ -48,11 +57,13 @@ Upon successful completion of this course, students will be able to:
 
 **Required Texts:**
 {% for text in course_info.required_texts -%}
+
 - {{ text.title }} by {{ text.author }}, {{ text.edition }} Edition (ISBN: {{ text.isbn }})
 {% endfor %}
 
 **Required Technology:**
 {% for tech in course_info.required_technology -%}
+
 - {{ tech }}
 {% endfor %}
 
@@ -67,17 +78,22 @@ Upon successful completion of this course, students will be able to:
 **Communication:** {{ policies.response_time.communication }}
 
 {% if policies.async_statement -%}
+
 ### Asynchronous Course Information
+
 {{ policies.async_statement }}
 {% endif %}
 
 ### Class Participation and Attendance
+
 {{ policies.attendance }}
 
 ### Class Atmosphere and Safety
+
 {{ policies.atmosphere }}
 
 ### Audit Policy
+
 {{ policies.audit }}
 
 ---
@@ -85,7 +101,9 @@ Upon successful completion of this course, students will be able to:
 ## Grading
 
 ### Grading Scale
+
 {% for grade, range in grading.scale.items() -%}
+
 - **{{ grade }}:** {{ range }}
 {% endfor %}
 
@@ -108,7 +126,9 @@ Upon successful completion of this course, students will be able to:
 {% endfor %}
 
 {% if final_exam -%}
+
 ### Final Exam
+
 - **Date:** {{ final_exam.date }}
 - **Time:** {{ final_exam.time }}
 - **Location:** {{ final_exam.location }}

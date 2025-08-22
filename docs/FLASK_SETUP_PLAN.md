@@ -1,9 +1,11 @@
 # Flask Setup Plan - Fall 2025 Semester Dashboard
 
 ## Overview
+
 Comprehensive plan for setting up Flask dashboard with production-ready architecture, optimal performance, and maintainable codebase.
 
 ## Phase 1: Documentation & Reference Setup ✅
+
 - [x] Review existing get-flask-docs.py script
 - [x] Create improved documentation retrieval script (get-flask-docs.sh)
 - [x] Add docs directories to .gitignore
@@ -12,13 +14,14 @@ Comprehensive plan for setting up Flask dashboard with production-ready architec
 ## Phase 2: Flask Application Architecture
 
 ### 2.1 Project Structure
+
 ```
 dashboard/
 ├── __init__.py           # Flask app factory
 ├── config.py             # Configuration classes
 ├── models.py             # Data models
 ├── extensions.py         # Flask extensions initialization
-├── 
+├──
 ├── api/                  # API blueprints
 │   ├── __init__.py
 │   ├── tasks.py         # Task management endpoints
@@ -53,6 +56,7 @@ dashboard/
 ```
 
 ### 2.2 Configuration Strategy
+
 ```python
 # config.py
 class Config:
@@ -60,17 +64,17 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-key'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSON_SORT_KEYS = False
-    
+
 class DevelopmentConfig(Config):
     """Development configuration"""
     DEBUG = True
     TESTING = False
-    
+
 class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
     TESTING = False
-    
+
 class TestingConfig(Config):
     """Testing configuration"""
     DEBUG = True
@@ -81,6 +85,7 @@ class TestingConfig(Config):
 ## Phase 3: Flask Extensions Setup
 
 ### 3.1 Core Extensions
+
 ```python
 # extensions.py
 from flask_cors import CORS
@@ -98,6 +103,7 @@ talisman = Talisman()
 ```
 
 ### 3.2 Security Configuration
+
 - **Flask-Talisman**: Force HTTPS, CSP headers
 - **Flask-Limiter**: Rate limiting for API endpoints
 - **Flask-CORS**: Controlled cross-origin access
@@ -106,6 +112,7 @@ talisman = Talisman()
 ## Phase 4: API Design
 
 ### 4.1 RESTful Endpoints
+
 ```
 GET    /api/tasks              # List all tasks
 GET    /api/tasks/<id>         # Get specific task
@@ -124,6 +131,7 @@ GET    /api/export/json        # Export as JSON
 ```
 
 ### 4.2 API Versioning
+
 ```python
 # Use URL prefix versioning
 /api/v1/tasks
@@ -133,6 +141,7 @@ GET    /api/export/json        # Export as JSON
 ## Phase 5: Database Layer
 
 ### 5.1 SQLAlchemy Models (Optional)
+
 ```python
 class Task(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -146,17 +155,20 @@ class Task(db.Model):
 ```
 
 ### 5.2 Migration Strategy
+
 - Use Flask-Migrate for database migrations
 - Or continue with JSON file storage for simplicity
 
 ## Phase 6: Frontend Architecture
 
 ### 6.1 Template System
+
 - Base template with common layout
 - Component templates for reusability
 - Macro templates for repeated elements
 
 ### 6.2 JavaScript Architecture
+
 ```javascript
 // Modern ES6+ with modules
 // dashboard.js
@@ -172,6 +184,7 @@ class DashboardApp {
 ```
 
 ### 6.3 CSS Architecture
+
 - Use CSS custom properties for theming
 - Mobile-first responsive design
 - Optional: Tailwind CSS for utility classes
@@ -179,6 +192,7 @@ class DashboardApp {
 ## Phase 7: Testing Strategy
 
 ### 7.1 Test Fixtures
+
 ```python
 @pytest.fixture
 def app():
@@ -196,6 +210,7 @@ def runner(app):
 ```
 
 ### 7.2 Test Categories
+
 - **Unit Tests**: Individual functions and methods
 - **Integration Tests**: API endpoints
 - **System Tests**: Full workflows
@@ -204,6 +219,7 @@ def runner(app):
 ## Phase 8: Performance Optimization
 
 ### 8.1 Caching Strategy
+
 ```python
 # Cache static data
 @cache.cached(timeout=300)
@@ -217,11 +233,13 @@ def calculate_stats(course_id):
 ```
 
 ### 8.2 Database Optimization
+
 - Connection pooling
 - Query optimization
 - Indexed fields
 
 ### 8.3 Asset Optimization
+
 - Minify CSS/JS in production
 - Compress responses with gzip
 - Cache static assets
@@ -229,6 +247,7 @@ def calculate_stats(course_id):
 ## Phase 9: Deployment Preparation
 
 ### 9.1 Production Server
+
 ```python
 # wsgi.py
 from dashboard import create_app
@@ -240,6 +259,7 @@ if __name__ == '__main__':
 ```
 
 ### 9.2 Gunicorn Configuration
+
 ```python
 # gunicorn_config.py
 bind = "0.0.0.0:8000"
@@ -251,6 +271,7 @@ timeout = 30
 ```
 
 ### 9.3 Docker Setup
+
 ```dockerfile
 FROM python:3.13-slim
 WORKDIR /app
@@ -263,19 +284,21 @@ CMD ["gunicorn", "--config", "gunicorn_config.py", "wsgi:app"]
 ## Phase 10: Monitoring & Logging
 
 ### 10.1 Structured Logging
+
 ```python
 import structlog
 logger = structlog.get_logger()
 
 @app.before_request
 def log_request():
-    logger.info("request_started", 
+    logger.info("request_started",
                 method=request.method,
                 path=request.path,
                 ip=request.remote_addr)
 ```
 
 ### 10.2 Error Tracking
+
 - Sentry integration for production errors
 - Custom error pages
 - Graceful error handling
@@ -301,9 +324,9 @@ def log_request():
 ## Resources
 
 - Flask Documentation: ./docs/flask-reference/
-- Flask Patterns: https://flask.palletsprojects.com/patterns/
-- Flask Security: https://flask.palletsprojects.com/security/
-- Testing Flask: https://flask.palletsprojects.com/testing/
+- Flask Patterns: <https://flask.palletsprojects.com/patterns/>
+- Flask Security: <https://flask.palletsprojects.com/security/>
+- Testing Flask: <https://flask.palletsprojects.com/testing/>
 
 ## Next Steps
 

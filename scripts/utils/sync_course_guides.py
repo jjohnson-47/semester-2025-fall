@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sync course guide Markdown into structured course JSON files.
+"""Sync course guide sources into structured course JSON files.
 
 Reads docs/reference/course-guides/<COURSE>*.(md|markdown), extracts exact
 language for Course Description, Prerequisites, Instructional Goals, and
@@ -21,6 +21,7 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 GUIDES_DIR = Path("docs/reference/course-guides")
 COURSES_DIR = Path("content/courses")
@@ -62,11 +63,12 @@ class GuideSections:
 
 
 def _is_bullet(line: str) -> bool:
-    stripped = line.strip()
-    return (
-        stripped.startswith("- ")
-        or stripped.startswith("* ")
-        or re.match(r"^\d+\.\s+", stripped) is not None
+    """Return True if a line looks like a Markdown bullet.
+
+    Supports ``- ``, ``* ``, and numbered bullets like ``1. ``.
+    """
+    return line.strip().startswith(("-", "*")) or (
+        line.strip() and line.strip()[0].isdigit() and "." in line.strip()[:3]
     )
 
 
@@ -183,6 +185,15 @@ def _extract_outcome_items(block: list[str]) -> list[str]:
 
 
 def parse_markdown_sections(md_text: str) -> GuideSections:
+    """Parse a course guide Markdown document into key sections.
+
+    Extracts exact language for Course Description, Prerequisites,
+    Instructional Goals, and Student Learning Outcomes using heading alias
+    matching and light Markdown normalization.
+
+    Returns
+    - GuideSections: structured content suitable for templating.
+    """
     lines = md_text.splitlines()
     # Find headings and their ranges
     sections: dict[str, tuple[int, int, int]] = {}  # title_lower -> (start_idx, end_idx, level)
@@ -261,6 +272,10 @@ def parse_markdown_sections(md_text: str) -> GuideSections:
 
 
 def find_guide_file(course: str) -> Path | None:
+    """Locate a course guide Markdown file by course prefix.
+
+    Accepts lower/upper/mixed file name variants.
+    """
     if not GUIDES_DIR.exists():
         return None
     # Prefer markdown files with prefix
@@ -284,11 +299,22 @@ def find_guide_file(course: str) -> Path | None:
 
 
 def write_json(path: Path, data: dict) -> None:
+    """Write JSON data to ``path`` (ensures parent directories exist)."""
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False))
 
 
 def sync_course(course: str) -> list[str]:
+    """Sync a single course's guide into JSON files used by templates.
+
+    Behavior
+    - If a standardized JSON guide exists at
+      ``content/courses/<COURSE>/source/content_guide.json``, use it.
+    - Otherwise, parse a Markdown guide from ``docs/reference/course-guides``.
+
+    Returns
+    - list[str]: list of relative file paths that were updated.
+    """
     changes: list[str] = []
     course_dir = COURSES_DIR / course
     if not course_dir.exists():
@@ -302,7 +328,7 @@ def sync_course(course: str) -> list[str]:
         except Exception:
             data = {}
 
-        def _get_text(node) -> str | None:
+        def _get_text(node: Any) -> str | None:
             if isinstance(node, str):
                 return node.strip() or None
             if isinstance(node, dict):
@@ -370,11 +396,8 @@ def main() -> None:
     parser.add_argument("--courses", nargs="*", help="Specific course codes (e.g., MATH221)")
     args = parser.parse_args()
 
-    if args.courses:
-        courses = args.courses
-    else:
-        # Infer by directories present under content/courses
-        courses = [p.name for p in COURSES_DIR.iterdir() if p.is_dir()]
+    # Use provided courses or infer from directory structure
+    courses = args.courses or [p.name for p in COURSES_DIR.iterdir() if p.is_dir()]
 
     for course in sorted(courses):
         changed = sync_course(course)

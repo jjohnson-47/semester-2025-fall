@@ -1,25 +1,25 @@
 # {{ course_code }} - {{ course_name_full }}
 
-**{{ course_code }} Section 901**  
-**{{ semester }} {{ year }}**  
-**CRN: {{ course_crn | default('TBD') }}**  
-**Credits: {{ course_credits | default(3) }}**  
+**{{ course_code }} Section 901**
+**{{ semester }} {{ year }}**
+**CRN: {{ course_crn | default('TBD') }}**
+**Credits: {{ course_credits | default(3) }}**
 **Format: Online Asynchronous**
 
 ---
 
 ## Instructor Information
 
-**Name:** {{ instructor.name }}  
-**Title:** {{ instructor.title }}  
-**Email:** {{ instructor.email }}  
-**Office:** {{ instructor.office }}  
+**Name:** {{ instructor.name }}
+**Title:** {{ instructor.title }}
+**Email:** {{ instructor.email }}
+**Office:** {{ instructor.office }}
 {% if instructor.phone -%}
-**Phone:** {{ instructor.phone | phone }}  
+**Phone:** {{ instructor.phone | phone }}
 {% endif -%}
-**Office Hours:** {{ instructor.office_hours | default('By appointment') }}  
+**Office Hours:** {{ instructor.office_hours | default('By appointment') }}
 {% if instructor.zoom_link -%}
-**Virtual Office:** [Zoom Meeting Room]({{ instructor.zoom_link }})  
+**Virtual Office:** [Zoom Meeting Room]({{ instructor.zoom_link }})
 {% endif %}
 
 ---
@@ -63,12 +63,12 @@ Student learning outcomes will be provided in Blackboard.
 ### Textbook
 
 {% if required_textbook -%}
-**Title:** {{ required_textbook.title }}  
-**Author(s):** {{ required_textbook.author }}  
-**Edition:** {{ required_textbook.edition }}  
-**ISBN:** {{ required_textbook.isbn }}  
+**Title:** {{ required_textbook.title }}
+**Author(s):** {{ required_textbook.author }}
+**Edition:** {{ required_textbook.edition }}
+**ISBN:** {{ required_textbook.isbn }}
 {% if required_textbook.notes -%}
-**Notes:** {{ required_textbook.notes }}  
+**Notes:** {{ required_textbook.notes }}
 {% endif -%}
 {% else -%}
 Textbook information will be provided in Blackboard.

@@ -13,7 +13,7 @@ import pytest
 
 pytest.importorskip("jsonschema")
 
-from scripts.validate_json import JSONValidator
+from scripts.validate_json import JSONValidator  # noqa: E402
 
 
 def _write_schema(schema_dir: Path, name: str, schema: dict) -> Path:

@@ -1,7 +1,7 @@
 {
   "name": "KPC Fall 2025 Semester Management",
   "description": "Academic course management system with automated syllabus generation and task tracking",
-  
+
   "model": {
     "default": "claude-sonnet-4-20250514",
     "architecture": "claude-opus-4-1-20250805",

@@ -86,9 +86,11 @@ class SyllabusGenerator:
                 "-t",
                 "docx",
                 "--reference-doc",
-                str(self.template_dir / "reference.docx")
-                if (self.template_dir / "reference.docx").exists()
-                else "",
+                (
+                    str(self.template_dir / "reference.docx")
+                    if (self.template_dir / "reference.docx").exists()
+                    else ""
+                ),
                 "-o",
                 output_file,
                 tmp_path,

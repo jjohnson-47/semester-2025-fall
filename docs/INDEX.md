@@ -1,29 +1,35 @@
 # Documentation Index
 
 ## 📚 Overview
+
 Complete documentation for the Fall 2025 Semester Course Management System.
 
 ## 📂 Documentation Structure
 
 ### Setup & Configuration
+
 - [Quick Start Guide](../README.md#-quick-start) - Get up and running quickly
 - [Installation Guide](../README.md#-development) - Detailed setup instructions
 - [Environment Configuration](setup/environment.md) - Setting up your development environment
 
 ### Reference Documentation
+
 - [Dashboard Workflow Guide](reference/dashboard.md) - Complete dashboard system documentation
 - [Course Information](reference/fall-2025-courses.md) - Course details, CRNs, and scheduling
 
 ### API Documentation
+
 - [Build Scripts](api/scripts.md) - Python script documentation
 - [Template System](api/templates.md) - Jinja2 template reference
 - [JSON Schemas](api/schemas.md) - Data structure specifications
 
 ### Examples
+
 - [Course Configuration Examples](examples/course-config.md) - Sample JSON configurations
 - [Template Examples](examples/templates.md) - Custom template creation
 
 ### Archive
+
 - [Legacy Documentation](archive/) - Previous versions and reference materials
 
 ## 🔍 Quick Reference

@@ -60,10 +60,10 @@ jobs:
         run: |
           # Format code
           uv run ruff format .
-          
+
           # Fix auto-fixable linting issues
           uv run ruff check . --fix --unsafe-fixes
-          
+
           # Check if there are changes
           if [[ -n $(git status --porcelain) ]]; then
             git config --local user.email "action@github.com"

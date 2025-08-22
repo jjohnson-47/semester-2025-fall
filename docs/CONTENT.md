@@ -3,12 +3,14 @@ Content Creation Guide
 
 Overview
 --------
+
 - Purpose: Define how to add and manage course content for syllabi and schedules.
 - Location: Course-specific JSON files live under `content/courses/<COURSE>/`.
 - Templates: Rendered via `templates/syllabus.html.j2` and `templates/syllabus.md.j2`.
 
 Quick Start
 -----------
+
 - Scaffold files: `make scaffold COURSE=MATH221`
 - Edit JSON files under `content/courses/MATH221/` with real content.
 - Validate JSON: `make validate`
@@ -17,6 +19,7 @@ Quick Start
 
 Course Directory Layout
 -----------------------
+
 - `course_meta.json`: Basic metadata like CRN and credits.
 - `course_description.json`: `{ "text": "..." }` course description.
 - `course_prerequisites.json`: `{ "text": "..." }` prerequisites.
@@ -31,11 +34,13 @@ Course Directory Layout
 
 Global Data
 -----------
+
 - `profiles/instructor.json` (optional): Overrides environment defaults used by builders.
 - `global/*.json` and `variables/*.json`: Included automatically for shared policies/config.
 
 Best Practices
 --------------
+
 - Validate often: run `make validate` to catch JSON syntax issues early.
 - Keep weights totaling 100 in `evaluation_tools.json`.
 - Use clear, concise text; markdown is supported in some fields.
@@ -43,7 +48,7 @@ Best Practices
 
 Advanced
 --------
+
 - Environment vars for course names: set `MATH221_FULL` and `MATH221_SHORT` in `.env`.
 - PDF generation: install `weasyprint` or `pandoc` to enable PDF outputs.
 - Schemas: Add JSON Schemas under `scripts/utils/schema/` to enforce structure when ready.
-

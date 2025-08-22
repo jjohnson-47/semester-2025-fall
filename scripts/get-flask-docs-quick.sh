@@ -39,7 +39,7 @@ for page in "${PAGES[@]}"; do
   # Create directory structure
   page_dir=$(dirname "$page")
   mkdir -p "$DEST_ROOT/$page_dir"
-  
+
   # Download with curl (timeout 10s per file)
   curl -sS --max-time 10 \
     -o "$DEST_ROOT/$page" \
@@ -53,7 +53,7 @@ cat > "$DEST_ROOT/LOCAL_INDEX.html" << 'EOF'
 <head>
     <title>Flask Documentation - Local Index</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                max-width: 800px; margin: 40px auto; padding: 0 20px; }
         h1 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
         h2 { color: #555; margin-top: 30px; }
@@ -65,19 +65,19 @@ cat > "$DEST_ROOT/LOCAL_INDEX.html" << 'EOF'
 </head>
 <body>
     <h1>Flask Documentation - Local Reference</h1>
-    
+
     <div class="note">
         <strong>Note:</strong> This is a local subset of Flask documentation for offline reference.
         For complete documentation, visit <a href="https://flask.palletsprojects.com">flask.palletsprojects.com</a>
     </div>
-    
+
     <h2>Quick Start</h2>
     <ul>
         <li><a href="index.html">Flask Home</a></li>
         <li><a href="quickstart/index.html">Quickstart Guide</a></li>
         <li><a href="tutorial/index.html">Tutorial</a></li>
     </ul>
-    
+
     <h2>Core Topics</h2>
     <ul>
         <li><a href="config/index.html">Configuration Handling</a></li>
@@ -85,18 +85,18 @@ cat > "$DEST_ROOT/LOCAL_INDEX.html" << 'EOF'
         <li><a href="patterns/index.html">Patterns & Best Practices</a></li>
         <li><a href="api/index.html">API Reference</a></li>
     </ul>
-    
+
     <h2>Development</h2>
     <ul>
         <li><a href="testing/index.html">Testing Flask Applications</a></li>
         <li><a href="errorhandling/index.html">Error Handling</a></li>
     </ul>
-    
+
     <h2>Production</h2>
     <ul>
         <li><a href="deploying/index.html">Deploying to Production</a></li>
     </ul>
-    
+
     <hr style="margin-top: 50px; border: none; border-top: 1px solid #ddd;">
     <p style="color: #777; font-size: 14px;">
         Downloaded: $(date '+%Y-%m-%d %H:%M:%S')<br>

@@ -156,9 +156,10 @@ def update_task_status(task_id):
 
         valid_statuses = ["todo", "in_progress", "completed", "blocked", "deferred"]
         if data["status"] not in valid_statuses:
-            return jsonify(
-                {"error": f"Invalid status. Must be one of: {', '.join(valid_statuses)}"}
-            ), 400
+            return (
+                jsonify({"error": f"Invalid status. Must be one of: {', '.join(valid_statuses)}"}),
+                400,
+            )
 
         success = TaskService.update_task_status(task_id, data["status"])
         if not success:

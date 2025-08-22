@@ -5,6 +5,7 @@ Shared helper functions for dashboard tools.
 
 import uuid
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any
 
 
@@ -83,7 +84,7 @@ def validate_dependencies(tasks: list) -> list:
     return errors
 
 
-def load_templates(template_file) -> list:
+def load_templates(template_file: str | Path) -> list[Any]:
     """Load task templates from file."""
     import json
 
@@ -129,7 +130,7 @@ def main() -> int:
     return 0
 
 
-def validate_all(tasks_file) -> dict[str, Any]:
+def validate_all(tasks_file: str | Path) -> dict[str, Any]:
     """Validate all aspects of task data."""
     import json
 

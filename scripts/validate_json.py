@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
-"""
-Validate JSON files against schemas with a simple CLI.
+"""JSON validation utilities and CLI.
 
-This module provides a `JSONValidator` class that supports:
-- Validating individual files (`validate_file`)
-- Validating all `*.json` files in a directory (`validate_directory`)
-- Running a project-wide validation (`validate_project`)
+Overview
+========
+This module exposes :class:`JSONValidator` to validate JSON files with optional
+JSON Schema support. It can validate individual files, directories, or all
+project-relevant directories (via :meth:`JSONValidator.validate_project`).
 
-The validator loads JSON Schema files from a directory. Schemas are expected to
-be named like `<name>.schema.json` and are referenced via `<name>` as the
-`schema_key` in validation methods.
+Schemas are loaded from a schema directory where files are named
+``<name>.schema.json`` and referred to by ``schema_key=<name>``.
 """
 
 from __future__ import annotations
@@ -23,16 +22,18 @@ from jsonschema import ValidationError, validate
 
 
 class JSONValidator:
-    """Validates JSON files against JSON Schemas.
+    """Validate JSON files against JSON Schemas.
 
     Parameters
-    ----------
-    schema_dir: str
-        Directory containing `*.schema.json` files.
-    validations: Optional[List[Tuple[str, str]]]
-        Optional list of `(directory, schema_key)` pairs used by
-        `validate_project()`. If not provided, a sensible project default is
-        used.
+    - schema_dir: directory containing ``*.schema.json`` files.
+    - validations: optional ``(directory, schema_key)`` pairs used by
+      :meth:`validate_project`.
+
+    Attributes
+    - schema_dir: resolved path to the schema directory.
+    - schemas: mapping of schema key to parsed schema dicts.
+    - errors: list of (path, message) entries recorded during validation.
+    - warnings: list of (path, message) entries for non-fatal conditions.
     """
 
     def __init__(
@@ -56,11 +57,12 @@ class JSONValidator:
         ]
 
     def _load_schemas(self) -> dict[str, dict]:
-        """Load all JSON Schemas from `schema_dir`.
+        """Load all JSON Schemas from ``schema_dir``.
 
-        Returns a mapping from schema key (basename without `.schema`) to
-        parsed schema dict. If the directory is missing, returns an empty map
-        and records a warning during project validation when applicable.
+        Returns
+        - dict[str, dict]: mapping of schema key (basename without ``.schema``)
+          to parsed schema dicts. If the directory is missing, an empty mapping
+          is returned and a warning is printed for visibility.
         """
         schemas: dict[str, dict] = {}
 
@@ -79,9 +81,14 @@ class JSONValidator:
     def validate_file(self, file_path: Path, schema_key: str | None = None) -> bool:
         """Validate a single JSON file.
 
-        Returns True if the file is syntactically valid JSON and (when
-        `schema_key` is provided and known) conforms to the corresponding
-        schema. Records errors internally on failures.
+        Parameters
+        - file_path: path to JSON file.
+        - schema_key: optional schema key to enforce. If not provided or not
+          found, only JSON parsing is performed.
+
+        Returns
+        - bool: True if parsing (and if applicable, schema validation) succeeds;
+          False otherwise. On failure, an entry is added to :attr:`errors`.
         """
         try:
             with open(file_path, encoding="utf-8") as handle:
@@ -106,10 +113,17 @@ class JSONValidator:
         return True
 
     def validate_directory(self, directory: Path, schema_key: str | None = None) -> int:
-        """Validate all `*.json` files in a directory.
+        """Validate all ``*.json`` files in a directory.
 
-        Returns the count of files that validated successfully. Adds a warning
-        if the directory does not exist.
+        Parameters
+        - directory: directory containing JSON files.
+        - schema_key: optional schema key to apply to each file.
+
+        Returns
+        - int: number of files that validated successfully.
+
+        Side effects
+        - Appends a warning to :attr:`warnings` if ``directory`` does not exist.
         """
         if not directory.exists():
             self.warnings.append((str(directory), "Directory not found"))
@@ -125,8 +139,13 @@ class JSONValidator:
     def validate_project(self) -> bool:
         """Validate all JSON files across configured directories.
 
-        Uses `self.validations` to determine `(directory, schema_key)` pairs.
-        Prints a short summary and returns True when no errors were recorded.
+        Behavior
+        - Uses :attr:`validations` to determine ``(directory, schema_key)``
+          pairs.
+        - Prints a readable summary with counts, errors, and warnings.
+
+        Returns
+        - bool: True when no errors were recorded.
         """
         print("\n=== JSON Validation ===\n")
         validations = self.validations
@@ -150,7 +169,12 @@ class JSONValidator:
         return len(self.errors) == 0
 
     def _print_summary(self, valid: int, total: int) -> None:
-        """Print validation summary."""
+        """Print a validation summary block.
+
+        Parameters
+        - valid: number of valid files.
+        - total: total number of files scanned.
+        """
         print("\n" + "=" * 50)
 
         if self.errors:
@@ -180,8 +204,12 @@ class JSONValidator:
             print("\n✗ Validation failed. Fix errors before building.")
 
 
-def main():
-    """CLI entry point."""
+def main() -> None:
+    """CLI entry point.
+
+    Parses CLI options, runs project validation, and sets exit status
+    depending on ``--strict``.
+    """
     parser = argparse.ArgumentParser(description="Validate JSON files")
     parser.add_argument("--strict", action="store_true", help="Strict validation mode")
     parser.add_argument("--schema-dir", default="scripts/utils/schema", help="Schema directory")

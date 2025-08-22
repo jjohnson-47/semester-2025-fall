@@ -26,11 +26,13 @@ def client():
     app.config["SECRET_KEY"] = "test-key"
 
     # Use temporary directory for state files
-    with tempfile.TemporaryDirectory() as tmpdir:
-        with patch("dashboard.app.STATE_DIR", Path(tmpdir)):
-            with patch("dashboard.app.TASKS_FILE", Path(tmpdir) / "tasks.json"):
-                with app.test_client() as client:
-                    yield client
+    with (
+        tempfile.TemporaryDirectory() as tmpdir,
+        patch("dashboard.app.STATE_DIR", Path(tmpdir)),
+        patch("dashboard.app.TASKS_FILE", Path(tmpdir) / "tasks.json"),
+        app.test_client() as client,
+    ):
+        yield client
 
 
 @pytest.fixture
@@ -101,14 +103,16 @@ class TestTaskManager:
         """Test saving task data."""
         tasks_file = tmp_path / "tasks.json"
 
-        with patch("dashboard.app.TASKS_FILE", tasks_file):
-            with patch("dashboard.app.AUTO_SNAPSHOT", False):
-                TaskManager.save_tasks(sample_tasks)
+        with (
+            patch("dashboard.app.TASKS_FILE", tasks_file),
+            patch("dashboard.app.AUTO_SNAPSHOT", False),
+        ):
+            TaskManager.save_tasks(sample_tasks)
 
-                # Verify file was written
-                assert tasks_file.exists()
-                loaded = json.loads(tasks_file.read_text())
-                assert len(loaded["tasks"]) == 3
+        # Verify file was written
+        assert tasks_file.exists()
+        loaded = json.loads(tasks_file.read_text())
+        assert len(loaded["tasks"]) == 3
 
     @pytest.mark.unit
     def test_update_task_status(self, tmp_path, sample_tasks):
@@ -297,14 +301,16 @@ class TestDashboardIntegration:
 
     def test_bulk_operations(self, client, sample_tasks):
         """Test bulk task operations."""
-        with patch.object(TaskManager, "load_tasks", return_value=sample_tasks):
-            with patch.object(TaskManager, "save_tasks"):
-                # Bulk update all MATH221 tasks
-                response = client.post(
-                    "/api/tasks/bulk-update",
-                    json={"filter": {"course": "MATH221"}, "update": {"status": "completed"}},
-                )
-                assert response.status_code in [200, 501]  # 501 if not implemented
+        with (
+            patch.object(TaskManager, "load_tasks", return_value=sample_tasks),
+            patch.object(TaskManager, "save_tasks"),
+        ):
+            # Bulk update all MATH221 tasks
+            response = client.post(
+                "/api/tasks/bulk-update",
+                json={"filter": {"course": "MATH221"}, "update": {"status": "completed"}},
+            )
+            assert response.status_code in [200, 501]  # 501 if not implemented
 
     def test_export_functionality(self, client, sample_tasks):
         """Test exporting tasks to different formats."""

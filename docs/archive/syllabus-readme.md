@@ -36,6 +36,7 @@ python syllabus_generator.py --init
 
 1. Edit `syllabus_data.yaml` with your course information
 2. Generate syllabi:
+
 ```bash
 python syllabus_generator.py syllabus_data.yaml
 ```
@@ -51,17 +52,20 @@ Output files will be in the `output/` directory.
 ### Platform-specific Installation
 
 #### macOS
+
 ```bash
 brew install python@3.11 pandoc
 ```
 
 #### Ubuntu/Debian
+
 ```bash
 sudo apt-get update
 sudo apt-get install python3.11 python3-pip pandoc
 ```
 
 #### Windows
+
 - Install Python from [python.org](https://python.org)
 - Install Pandoc from [pandoc.org](https://pandoc.org/installing.html)
 
@@ -211,7 +215,7 @@ on:
   push:
     paths:
       - 'data/*.yaml'
-  
+
 jobs:
   generate:
     runs-on: ubuntu-latest
@@ -237,8 +241,8 @@ jobs:
 PYTHONVERBOSE=1 python syllabus_generator.py data.yaml
 
 # Check template rendering
-python -c "from syllabus_generator import SyllabusGenerator; 
-gen = SyllabusGenerator(); 
+python -c "from syllabus_generator import SyllabusGenerator;
+gen = SyllabusGenerator();
 print(gen.env.get_template('syllabus.html.j2').module)"
 ```
 
@@ -273,7 +277,7 @@ MIT License - See LICENSE file for details
 
 - Issues: [GitHub Issues](https://github.com/your-org/syllabus-generator/issues)
 - Documentation: [Wiki](https://github.com/your-org/syllabus-generator/wiki)
-- Contact: academic-tech@alaska.edu
+- Contact: <academic-tech@alaska.edu>
 
 ## Acknowledgments
 

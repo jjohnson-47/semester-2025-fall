@@ -2,7 +2,7 @@
 # Hook that runs when a dashboard task is marked complete
 # Updates related files and triggers rebuilds as needed
 
-TASK_ID="$1"
+# TASK_ID="$1"  # Reserved for future use
 TASK_TYPE="$2"
 COURSE="$3"
 

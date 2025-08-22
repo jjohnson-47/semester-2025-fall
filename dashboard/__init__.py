@@ -4,9 +4,6 @@ Dashboard Flask application factory.
 Creates and configures the Flask application.
 """
 
-import os
-from pathlib import Path
-
 from flask import Flask
 
 
@@ -94,7 +91,8 @@ def register_error_handlers(app):
     """Register error handlers."""
 
     @app.errorhandler(404)
-    def not_found_error(error):
+    def not_found_error(_error):
+        """Handle 404 errors."""
         from flask import jsonify, request
 
         if request.path.startswith("/api/"):
@@ -105,6 +103,7 @@ def register_error_handlers(app):
 
     @app.errorhandler(500)
     def internal_error(error):
+        """Handle 500 errors."""
         from flask import jsonify, request
 
         app.logger.error(f"Internal error: {error}")
@@ -115,7 +114,8 @@ def register_error_handlers(app):
         return render_template("errors/500.html"), 500
 
     @app.errorhandler(400)
-    def bad_request_error(error):
+    def bad_request_error(_error):
+        """Handle 400 errors."""
         from flask import jsonify
 
         return jsonify({"error": "Bad request"}), 400

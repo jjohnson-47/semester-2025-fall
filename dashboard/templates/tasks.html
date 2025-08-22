@@ -11,15 +11,15 @@
     .task-blocked { opacity: 0.7; background-color: #f3f4f6; }
     .task-done { opacity: 0.6; }
     .task-done .task-title { text-decoration: line-through; }
-    
+
     /* Chevron animation */
-    .chevron { 
-        transition: transform 0.2s ease; 
+    .chevron {
+        transition: transform 0.2s ease;
         cursor: pointer;
         user-select: none;
     }
     .chevron.expanded { transform: rotate(90deg); }
-    
+
     /* Status badges */
     .status-badge {
         padding: 0.25rem 0.75rem;
@@ -32,19 +32,19 @@
     .status-todo { background: #e5e7eb; color: #374151; }
     .status-in-progress { background: #dbeafe; color: #1e40af; }
     .status-done { background: #d1fae5; color: #065f46; }
-    
+
     /* Priority indicators */
     .priority-critical { border-left: 4px solid #dc2626; }
     .priority-high { border-left: 4px solid #f59e0b; }
     .priority-medium { border-left: 4px solid #3b82f6; }
     .priority-low { border-left: 4px solid #6b7280; }
-    
+
     /* Dependency lock */
     .lock-icon {
         cursor: help;
         color: #6b7280;
     }
-    
+
     /* Command palette */
     .command-palette {
         position: fixed;
@@ -59,7 +59,7 @@
         display: none;
     }
     .command-palette.active { display: block; }
-    
+
     /* Kanban columns */
     .kanban-column {
         min-height: 400px;
@@ -89,24 +89,24 @@
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-2xl font-bold">Task Management</h1>
             <div class="flex gap-2">
-                <button onclick="toggleView('list')" 
+                <button onclick="toggleView('list')"
                         class="px-4 py-2 bg-blue-500 text-white rounded view-btn"
                         data-view="list">
                     📋 List View
                 </button>
-                <button onclick="toggleView('kanban')" 
+                <button onclick="toggleView('kanban')"
                         class="px-4 py-2 bg-gray-300 text-gray-700 rounded view-btn"
                         data-view="kanban">
                     📊 Board View
                 </button>
-                <button onclick="openCommandPalette()" 
+                <button onclick="openCommandPalette()"
                         class="px-4 py-2 bg-purple-500 text-white rounded"
                         title="Press Cmd+K or Ctrl+K">
                     ⌘ Command
                 </button>
             </div>
         </div>
-        
+
         <!-- Filter bar -->
         <div class="bg-white p-4 rounded-lg shadow mb-4"
              hx-get="/api/tasks/filtered"
@@ -120,7 +120,7 @@
                     <option value="MATH251">MATH251</option>
                     <option value="STAT253">STAT253</option>
                 </select>
-                
+
                 <select name="status" class="border rounded px-3 py-2">
                     <option value="">All Statuses</option>
                     <option value="blocked">Blocked</option>
@@ -128,7 +128,7 @@
                     <option value="in_progress">In Progress</option>
                     <option value="done">Done</option>
                 </select>
-                
+
                 <select name="category" class="border rounded px-3 py-2">
                     <option value="">All Categories</option>
                     <option value="setup">Setup</option>
@@ -136,11 +136,11 @@
                     <option value="technical">Technical</option>
                     <option value="assessment">Assessment</option>
                 </select>
-                
-                <input type="text" name="assignee" placeholder="Assignee..." 
+
+                <input type="text" name="assignee" placeholder="Assignee..."
                        class="border rounded px-3 py-2">
-                
-                <button type="button" 
+
+                <button type="button"
                         hx-get="/api/tasks"
                         hx-target="#task-container"
                         class="bg-gray-500 text-white rounded px-4 py-2">
@@ -149,7 +149,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Task container (List or Kanban) -->
     <div id="task-container">
         <!-- Default list view will be loaded here -->
@@ -159,16 +159,16 @@
 
 <!-- Command Palette Modal -->
 <div id="command-palette" class="command-palette" x-data="commandPalette()">
-    <input type="text" 
+    <input type="text"
            x-model="query"
            @keydown.escape="close()"
            @keydown.enter="executeCommand()"
            placeholder="Type a command... (+ add task, j jump to, f filter)"
            class="w-full px-4 py-3 text-lg border-b">
-    
+
     <div class="max-h-96 overflow-y-auto">
         <template x-for="result in filteredResults" :key="result.id">
-            <div @click="selectResult(result)" 
+            <div @click="selectResult(result)"
                  class="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                 <span x-text="result.icon"></span>
                 <span x-text="result.text"></span>
@@ -192,11 +192,11 @@ function toggleView(view) {
         btn.classList.remove('bg-blue-500', 'text-white');
         btn.classList.add('bg-gray-300', 'text-gray-700');
     });
-    
+
     const activeBtn = document.querySelector(`[data-view="${view}"]`);
     activeBtn.classList.remove('bg-gray-300', 'text-gray-700');
     activeBtn.classList.add('bg-blue-500', 'text-white');
-    
+
     // Load the appropriate view
     if (view === 'kanban') {
         htmx.ajax('GET', '/api/tasks/kanban', '#task-container');
@@ -224,10 +224,10 @@ function commandPalette() {
     return {
         query: '',
         results: [],
-        
+
         get filteredResults() {
             if (!this.query) return [];
-            
+
             // Parse command
             if (this.query.startsWith('+')) {
                 return [{
@@ -255,14 +255,14 @@ function commandPalette() {
                     filter: filter
                 }];
             }
-            
+
             return [];
         },
-        
+
         executeCommand() {
             const result = this.filteredResults[0];
             if (!result) return;
-            
+
             if (result.action === 'add') {
                 // Quick add task
                 const taskData = {
@@ -283,15 +283,15 @@ function commandPalette() {
                     htmx.ajax('GET', '/api/tasks?filter=overdue', '#task-container');
                 }
             }
-            
+
             this.close();
         },
-        
+
         close() {
             this.query = '';
             document.getElementById('command-palette').classList.remove('active');
         },
-        
+
         selectResult(result) {
             this.filteredResults = [result];
             this.executeCommand();
@@ -303,11 +303,11 @@ function commandPalette() {
 function toggleChildren(taskId) {
     const childrenContainer = document.getElementById(`children-${taskId}`);
     const chevron = document.getElementById(`chevron-${taskId}`);
-    
+
     if (childrenContainer.style.display === 'none') {
         childrenContainer.style.display = 'table-row-group';
         chevron.classList.add('expanded');
-        
+
         // Load children if not already loaded
         if (!childrenContainer.dataset.loaded) {
             htmx.ajax('GET', `/api/tasks/${taskId}/children`, `#children-${taskId}`);
@@ -325,7 +325,7 @@ document.body.addEventListener('htmx:afterSwap', (event) => {
     if (event.detail.target.classList.contains('task-row')) {
         const wasBlocked = event.detail.target.classList.contains('task-blocked');
         const isBlocked = event.detail.xhr.response.includes('task-blocked');
-        
+
         if (wasBlocked && !isBlocked) {
             // Task was unblocked - add animation
             event.detail.target.style.backgroundColor = '#fef3c7';

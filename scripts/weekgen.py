@@ -20,7 +20,7 @@ class WeeklyGenerator:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.calendar = SemesterCalendar()
 
-    def generate_weeks(self):
+    def generate_weeks(self) -> None:
         """Generate all weekly folders."""
         weeks = self.calendar.get_weeks()
 
@@ -104,7 +104,7 @@ class WeeklyGenerator:
         print("✓ Generated weekly index")
 
 
-def main():
+def main() -> None:
     """CLI entry point."""
     parser = argparse.ArgumentParser(description="Generate weekly modules")
     parser.add_argument("--output", default="build/weekly", help="Output directory")

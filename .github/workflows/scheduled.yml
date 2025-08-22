@@ -37,7 +37,7 @@ jobs:
         run: |
           # Update all dependencies to latest compatible versions
           uv lock --upgrade
-          
+
           # Check if there are changes
           if [[ -n $(git status --porcelain uv.lock) ]]; then
             echo "dependencies_updated=true" >> $GITHUB_ENV
@@ -60,18 +60,18 @@ jobs:
           title: "Weekly dependency updates"
           body: |
             ## 📦 Dependency Updates
-            
+
             This PR contains the weekly update of all dependencies to their latest compatible versions.
-            
+
             ### Changes
             - Updated `uv.lock` with latest dependency versions
             - All tests have been run and are passing
-            
+
             ### Review Checklist
             - [ ] Review changelog of major updates
             - [ ] Check for breaking changes
             - [ ] Verify application still works as expected
-            
+
             ---
             *This is an automated pull request created by the scheduled maintenance workflow.*
           branch: deps/weekly-update
@@ -115,7 +115,7 @@ jobs:
           import os
           from datetime import datetime, date
           from pathlib import Path
-          
+
           errors = []
           for json_file in Path('content').rglob('*.json'):
               with open(json_file) as f:
@@ -127,7 +127,7 @@ jobs:
                           if week_date:
                               if datetime.strptime(week_date, '%Y-%m-%d').date() < date.today():
                                   errors.append(f'{json_file}: Week {week.get(\"week\")} has past date {week_date}')
-          
+
           if errors:
               print('⚠️ Found past dates in content:')
               for error in errors:
@@ -147,12 +147,12 @@ jobs:
               repo: context.repo.repo,
               title: '⚠️ Content Validation Failed',
               body: `The weekly content validation has failed. Please review the [workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.
-              
+
               Common issues:
               - Past dates in schedule files
               - Invalid JSON structure
               - Missing required fields
-              
+
               Please fix these issues to ensure content accuracy.`,
               labels: ['bug', 'content', 'automated']
             })

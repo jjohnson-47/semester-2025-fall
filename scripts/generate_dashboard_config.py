@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 
 
-def main():
+def main() -> None:
     """Generate dashboard configuration."""
 
     # Read academic calendar
@@ -92,7 +92,9 @@ def main():
                 desc_data = json.load(f)
                 course["description"] = desc_data.get("text", "")
 
-        courses_data["courses"].append(course)
+        courses_list = courses_data["courses"]
+        if isinstance(courses_list, list):
+            courses_list.append(course)
 
     # Write dashboard configuration
     os.makedirs("dashboard/state", exist_ok=True)
@@ -103,9 +105,13 @@ def main():
 
     print("✓ Generated dashboard/state/courses.json")
     print(f"  - Semester: {courses_data['semester']}")
-    print(f"  - Courses: {', '.join(c['code'] for c in courses_data['courses'])}")
-    print(f"  - First day: {courses_data['important_dates']['first_day']}")
-    print(f"  - Last day: {courses_data['important_dates']['last_day']}")
+    courses = courses_data.get("courses", [])
+    if courses:
+        print(f"  - Courses: {', '.join(c['code'] for c in courses)}")
+    dates = courses_data.get("important_dates", {})
+    if dates:
+        print(f"  - First day: {dates.get('first_day', 'N/A')}")
+        print(f"  - Last day: {dates.get('last_day', 'N/A')}")
 
     # Also create an empty tasks.json if it doesn't exist
     tasks_path = Path("dashboard/state/tasks.json")

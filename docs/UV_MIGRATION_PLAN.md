@@ -7,21 +7,25 @@ Migrate from traditional pip/venv to uv for Python package and environment manag
 ## Key Benefits for This Project
 
 ### 1. **Speed Improvements**
+
 - **10-100x faster** than pip for package installation
 - Near-instant environment creation
 - Faster CI/CD builds in GitHub Actions
 
 ### 2. **Simplified Workflow**
+
 - Single tool replaces multiple Python tools
 - Built-in lockfile support (no more pip-freeze)
 - Automatic Python version management
 
 ### 3. **Project-Centric Features**
+
 - `pyproject.toml` as single source of truth
 - Dependency groups (dev, docs, dashboard, etc.)
 - Workspace support for multi-project repos
 
 ### 4. **GitHub Integration**
+
 - Native GitHub Actions support
 - Faster dependency caching
 - Reproducible builds across platforms
@@ -29,6 +33,7 @@ Migrate from traditional pip/venv to uv for Python package and environment manag
 ## Migration Architecture
 
 ### Current Setup
+
 ```
 semester-2025-fall/
 ├── requirements.txt         # Basic dependencies
@@ -38,6 +43,7 @@ semester-2025-fall/
 ```
 
 ### Target UV Setup
+
 ```
 semester-2025-fall/
 ├── pyproject.toml          # All project config
@@ -49,6 +55,7 @@ semester-2025-fall/
 ## Implementation Plan
 
 ### Phase 1: UV Installation & Setup
+
 ```bash
 # Install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -61,6 +68,7 @@ uv init --name semester-2025-fall --python 3.11
 ```
 
 ### Phase 2: Create pyproject.toml
+
 ```toml
 [project]
 name = "semester-2025-fall"
@@ -102,39 +110,41 @@ build-backend = "hatchling.build"
 ```
 
 ### Phase 3: Makefile Updates
+
 ```makefile
 # UV-based commands
 UV := uv
 
 # Initialize environment (replaces venv creation)
 init:
-	@$(UV) sync
-	@echo "✓ Environment ready"
+ @$(UV) sync
+ @echo "✓ Environment ready"
 
 # Run with proper environment
 syllabi:
-	@$(UV) run python scripts/build_syllabi.py
+ @$(UV) run python scripts/build_syllabi.py
 
 # Dashboard with optional deps
 dash:
-	@$(UV) sync --extra dashboard
-	@$(UV) run python dashboard/app.py
+ @$(UV) sync --extra dashboard
+ @$(UV) run python dashboard/app.py
 
 # Development tools
 format:
-	@$(UV) run black scripts/ dashboard/
+ @$(UV) run black scripts/ dashboard/
 
 lint:
-	@$(UV) run ruff check scripts/ dashboard/
+ @$(UV) run ruff check scripts/ dashboard/
 
 # Add new dependency
 add-dep:
-	@$(UV) add $(PACKAGE)
+ @$(UV) add $(PACKAGE)
 ```
 
 ### Phase 4: Scripts & Tools Integration
 
 #### Script Execution
+
 ```bash
 # Old way
 source venv/bin/activate && python scripts/build_syllabi.py
@@ -144,6 +154,7 @@ uv run python scripts/build_syllabi.py
 ```
 
 #### Inline Script Dependencies
+
 ```python
 #!/usr/bin/env python
 # /// script
@@ -160,6 +171,7 @@ from rich import console
 ```
 
 ### Phase 5: GitHub Actions Integration
+
 ```yaml
 name: Build Course Materials
 
@@ -170,21 +182,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install uv
         uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
-      
+
       - name: Install Python
         run: uv python install 3.11
-      
+
       - name: Install dependencies
         run: uv sync
-      
+
       - name: Run tests
         run: uv run pytest
-      
+
       - name: Build materials
         run: |
           uv run make syllabi
@@ -194,13 +206,16 @@ jobs:
 ## Useful UV Features for This Project
 
 ### 1. **Dependency Groups**
+
 Separate dependencies by purpose:
+
 - `core`: Essential for syllabus generation
-- `dashboard`: Flask and web dependencies  
+- `dashboard`: Flask and web dependencies
 - `dev`: Testing and linting tools
 - `docs`: PDF generation tools
 
 ### 2. **Platform-Specific Locks**
+
 ```bash
 # Generate cross-platform lockfile
 uv lock --universal
@@ -210,6 +225,7 @@ uv sync --platform windows
 ```
 
 ### 3. **Tool Management**
+
 ```bash
 # Install and run tools without polluting project
 uv tool install ruff
@@ -220,6 +236,7 @@ uv run --with pandas python -c "import pandas; print(pandas.__version__)"
 ```
 
 ### 4. **Python Version Management**
+
 ```bash
 # Install specific Python version
 uv python install 3.11
@@ -232,7 +249,9 @@ uv python list
 ```
 
 ### 5. **Workspace Support** (Future)
+
 If you expand to multiple semesters:
+
 ```toml
 [tool.uv.workspace]
 members = [

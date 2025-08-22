@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""
-Build syllabi from JSON data and Jinja2 templates.
-Generates HTML, Markdown, and optionally PDF versions.
+"""Syllabus builder: render course data with Jinja2 templates.
+
+Loads course, global, and instructor data and renders Markdown/HTML syllabi
+into ``build/syllabi``. Optionally attempts PDF generation using WeasyPrint or
+Pandoc if available in the environment.
 """
 
 import argparse
@@ -27,7 +29,12 @@ if env_file.exists():
 
 
 class SyllabusBuilder:
-    """Builds course syllabi from templates and data."""
+    """Build course syllabi from templates and data.
+
+    Parameters
+    - template_dir: root directory for Jinja2 templates.
+    - output_dir: destination directory for rendered files.
+    """
 
     def __init__(self, template_dir: str = "templates", output_dir: str = "build/syllabi"):
         self.template_dir = Path(template_dir)
@@ -38,7 +45,14 @@ class SyllabusBuilder:
         self.calendar = SemesterCalendar()
 
     def load_course_data(self, course_code: str) -> dict[str, Any]:
-        """Load all JSON data for a course."""
+        """Load all JSON data for a course.
+
+        Parameters
+        - course_code: e.g., ``MATH221``.
+
+        Returns
+        - dict: combined context used by templates (course/global/instructor/calendar).
+        """
         course_dir = Path(f"content/courses/{course_code}")
         if not course_dir.exists():
             raise FileNotFoundError(f"Course directory not found: {course_dir}")
@@ -72,7 +86,11 @@ class SyllabusBuilder:
         return data
 
     def _load_global_data(self, data: dict[str, Any]) -> None:
-        """Load global policies and configuration."""
+        """Load global policies and configuration into ``data``.
+
+        Scans ``global/`` and ``variables/`` for JSON files and attaches their
+        contents using ``global_<name>`` and ``var_<name>`` keys respectively.
+        """
         global_dir = Path("global")
         if global_dir.exists():
             for json_file in global_dir.glob("*.json"):
@@ -89,7 +107,11 @@ class SyllabusBuilder:
                     data[key] = json.load(f)
 
     def _load_instructor_data(self, data: dict[str, Any]) -> None:
-        """Load instructor profile."""
+        """Load instructor profile into ``data``.
+
+        If ``profiles/instructor.json`` is missing, populates a minimal profile
+        from environment variables.
+        """
         instructor_file = Path("profiles/instructor.json")
         if instructor_file.exists():
             with open(instructor_file, encoding="utf-8") as f:
@@ -105,7 +127,12 @@ class SyllabusBuilder:
             }
 
     def build_syllabus(self, course_code: str) -> dict[str, str]:
-        """Build syllabus for a single course."""
+        """Build syllabus for a single course.
+
+        Returns
+        - dict: mapping of artifact types to file paths (``html``, ``markdown``,
+          and optionally ``pdf`` if available).
+        """
         print(f"Building syllabus for {course_code}...")
 
         # Load data
@@ -131,11 +158,16 @@ class SyllabusBuilder:
         return {
             "html": str(html_path),
             "markdown": str(md_path),
-            "pdf": str(pdf_path) if pdf_path else None,
+            "pdf": str(pdf_path) if pdf_path else "",
         }
 
     def _generate_pdf(self, html_path: Path, course_code: str) -> Path | None:
-        """Generate PDF from HTML using weasyprint or pandoc."""
+        """Generate a PDF from an HTML file using WeasyPrint or Pandoc.
+
+        Returns
+        - Path | None: path to the generated PDF, or None if PDF generation is
+          not available.
+        """
         pdf_path = self.output_dir / f"{course_code}.pdf"
 
         try:
@@ -161,7 +193,12 @@ class SyllabusBuilder:
                 return None
 
     def build_all(self, courses: list[str] | None = None) -> dict[str, dict[str, str]]:
-        """Build syllabi for all courses."""
+        """Build syllabi for all courses.
+
+        Parameters
+        - courses: optional subset of course codes. If omitted, defaults to the
+          standard set.
+        """
         if courses is None:
             courses = ["MATH221", "MATH251", "STAT253"]
 
@@ -177,7 +214,7 @@ class SyllabusBuilder:
         return results
 
 
-def main():
+def main() -> None:
     """CLI entry point."""
     parser = argparse.ArgumentParser(description="Build course syllabi")
     parser.add_argument("--course", help="Build specific course (e.g., MATH221)")

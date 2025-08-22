@@ -13,7 +13,7 @@ LOG_FILE="$DOCS_ROOT/fetch_log_${TIMESTAMP}.txt"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
+# YELLOW='\033[1;33m'  # Currently unused
 NC='\033[0m' # No Color
 
 # Create directory structure
@@ -41,12 +41,12 @@ fetch_doc() {
     local category="$2"
     local name="$3"
     local retries=3
-    
+
     info "Fetching $name from $url"
-    
+
     # Create category directory
     mkdir -p "$DOCS_ROOT/$category/$name"
-    
+
     # Try fetching with retries
     for i in $(seq 1 $retries); do
         if curl -sS --max-time 30 \
@@ -56,13 +56,13 @@ fetch_doc() {
             log "✓ Downloaded $name"
             return 0
         else
-            if [ $i -lt $retries ]; then
+            if [ "$i" -lt "$retries" ]; then
                 error "Failed attempt $i for $name, retrying..."
                 sleep 2
             fi
         fi
     done
-    
+
     error "Failed to download $name after $retries attempts"
     return 1
 }
@@ -72,10 +72,10 @@ fetch_page_complete() {
     local url="$1"
     local category="$2"
     local name="$3"
-    
+
     info "Fetching complete page: $name"
     mkdir -p "$DOCS_ROOT/$category/$name"
-    
+
     wget --quiet \
         --tries=3 \
         --timeout=30 \
@@ -88,7 +88,7 @@ fetch_page_complete() {
         error "Failed to fetch complete page: $name"
         return 1
     }
-    
+
     log "✓ Downloaded complete page: $name"
 }
 

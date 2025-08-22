@@ -5,6 +5,7 @@ Generate tasks from templates and course configuration.
 
 import argparse
 import json
+import logging
 import re
 import sys
 from datetime import datetime, timedelta
@@ -12,6 +13,9 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 
 class TaskGenerator:
@@ -159,7 +163,8 @@ class TaskGenerator:
         try:
             base_date = datetime.strptime(base, "%Y-%m-%d")
             return base_date + timedelta(days=days)
-        except:
+        except (ValueError, TypeError) as e:
+            logger.debug(f"Failed to parse date '{base}' with offset {days}: {e}")
             return None
 
     def _substitute_vars(self, text: str, context: dict[str, Any]) -> str:

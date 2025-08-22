@@ -6,7 +6,7 @@
             <span>🔒 Blocked</span>
             <span class="text-sm text-gray-500">{{ kanban.blocked|length }}</span>
         </h3>
-        <div class="space-y-2" 
+        <div class="space-y-2"
              id="kanban-blocked"
              hx-post="/api/tasks/move"
              hx-trigger="drop"
@@ -16,7 +16,7 @@
             {% endfor %}
         </div>
     </div>
-    
+
     <!-- To Do Column -->
     <div class="kanban-column">
         <h3 class="font-semibold text-gray-700 mb-3 flex items-center justify-between">
@@ -33,7 +33,7 @@
             {% endfor %}
         </div>
     </div>
-    
+
     <!-- In Progress Column -->
     <div class="kanban-column">
         <h3 class="font-semibold text-gray-700 mb-3 flex items-center justify-between">
@@ -50,7 +50,7 @@
             {% endfor %}
         </div>
     </div>
-    
+
     <!-- Done Column -->
     <div class="kanban-column">
         <h3 class="font-semibold text-gray-700 mb-3 flex items-center justify-between">
@@ -75,19 +75,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Make cards draggable
     document.querySelectorAll('.kanban-card').forEach(card => {
         card.draggable = true;
-        
+
         card.addEventListener('dragstart', (e) => {
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/html', e.target.innerHTML);
             e.dataTransfer.setData('task-id', e.target.dataset.taskId);
             e.target.classList.add('opacity-50');
         });
-        
+
         card.addEventListener('dragend', (e) => {
             e.target.classList.remove('opacity-50');
         });
     });
-    
+
     // Make columns droppable
     document.querySelectorAll('.kanban-column > div').forEach(column => {
         column.addEventListener('dragover', (e) => {
@@ -95,18 +95,18 @@ document.addEventListener('DOMContentLoaded', function() {
             e.dataTransfer.dropEffect = 'move';
             column.classList.add('bg-blue-50');
         });
-        
+
         column.addEventListener('dragleave', (e) => {
             column.classList.remove('bg-blue-50');
         });
-        
+
         column.addEventListener('drop', (e) => {
             e.preventDefault();
             column.classList.remove('bg-blue-50');
-            
+
             const taskId = e.dataTransfer.getData('task-id');
             const newStatus = column.id.replace('kanban-', '').replace('-', '_');
-            
+
             // Use HTMX to update the task status
             htmx.ajax('POST', `/api/tasks/${taskId}/status`, {
                 values: { status: newStatus },

@@ -13,7 +13,7 @@ import pytest
 # Skip the module-level import if jsonschema isn't available
 pytest.importorskip("jsonschema")
 
-from scripts.validate_json import JSONValidator
+from scripts.validate_json import JSONValidator  # noqa: E402
 
 
 def test_validate_file_invalid_json_returns_false(tmp_path: Path) -> None:

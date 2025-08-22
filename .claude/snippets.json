@@ -64,7 +64,7 @@
   },
   "shortcuts": {
     "cs": "course-schedule",
-    "ss": "syllabus-section", 
+    "ss": "syllabus-section",
     "tt": "task-template",
     "mt": "makefile-target",
     "jf": "jinja-filter",

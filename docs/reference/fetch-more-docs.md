@@ -156,4 +156,3 @@ If you want me to also generate a minimal `docs/vendor/INDEX.md` and a Makefile 
 [12]: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/?utm_source=chatgpt.com "Dialog (Modal) Pattern | APG | WAI"
 [13]: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Roles/dialog_role?utm_source=chatgpt.com "ARIA: dialog role - MDN - Mozilla"
 [14]: https://docs.python.org/uk/3.12/library/graphlib.html?utm_source=chatgpt.com "graphlib — Functionality to operate with graph-like structures"
-

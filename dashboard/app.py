@@ -6,6 +6,9 @@ Task management system for semester course preparation
 
 import fcntl
 import json
+
+# Set up logging
+import logging
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -13,16 +16,19 @@ from typing import Any
 
 import pytz
 from flask import Flask, jsonify, render_template, request
+from dashboard.config import Config
+
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY", "dev-key-change-in-production")
+app.config.from_object(Config)
 
-# Configuration
-TIMEZONE = pytz.timezone("America/Anchorage")
-STATE_DIR = Path(__file__).parent / "state"
-TASKS_FILE = STATE_DIR / "tasks.json"
-COURSES_FILE = STATE_DIR / "courses.json"
-AUTO_SNAPSHOT = os.environ.get("DASH_AUTO_SNAPSHOT", "true").lower() == "true"
+# Configuration from Config class
+TIMEZONE = pytz.timezone(Config.TIMEZONE)
+STATE_DIR = Config.STATE_DIR
+TASKS_FILE = Config.TASKS_FILE
+COURSES_FILE = Config.COURSES_FILE
+AUTO_SNAPSHOT = Config.AUTO_SNAPSHOT
 
 # Ensure state directory exists
 STATE_DIR.mkdir(exist_ok=True)
@@ -150,7 +156,8 @@ def calculate_priority(task: dict[str, Any]) -> int:
                 priority += 20
             elif days_until <= 7:  # Due this week
                 priority += 10
-        except:
+        except (ValueError, TypeError, AttributeError) as e:
+            logger.debug(f"Date parsing error in priority calculation: {e}")
             pass
 
     return priority
@@ -185,7 +192,8 @@ def get_due_color(task: dict[str, Any]) -> str:
             return "info"  # Due soon
         elif days_until <= 7:
             return "primary"  # Due this week
-    except:
+    except (ValueError, TypeError, AttributeError) as e:
+        logger.debug(f"Date parsing error in color calculation: {e}")
         pass
 
     return ""
@@ -209,7 +217,8 @@ def index():
                 due = datetime.fromisoformat(task["due"])
                 task["due_display"] = due.strftime("%b %d, %Y")
                 task["due_relative"] = get_relative_time(due)
-            except:
+            except (ValueError, TypeError, AttributeError) as e:
+                logger.debug(f"Failed to format due date for task {task.get('id')}: {e}")
                 task["due_display"] = task["due"]
 
     # Sort by priority
@@ -329,8 +338,9 @@ def filtered_view(view_name):
                     due = datetime.fromisoformat(task["due"])
                     if due.date() == now.date():
                         filtered_tasks.append(task)
-                except:
-                    pass
+                except (ValueError, TypeError, AttributeError) as e:
+                    logger.debug(f"Invalid date in filtered view: {e}")
+                    continue
 
     elif view_name == "week":
         week_end = now + timedelta(days=7)
@@ -340,8 +350,9 @@ def filtered_view(view_name):
                     due = datetime.fromisoformat(task["due"])
                     if now <= due <= week_end:
                         filtered_tasks.append(task)
-                except:
-                    pass
+                except (ValueError, TypeError, AttributeError) as e:
+                    logger.debug(f"Invalid date in filtered view: {e}")
+                    continue
 
     elif view_name == "overdue":
         for task in data["tasks"]:
@@ -350,8 +361,9 @@ def filtered_view(view_name):
                     due = datetime.fromisoformat(task["due"])
                     if due < now:
                         filtered_tasks.append(task)
-                except:
-                    pass
+                except (ValueError, TypeError, AttributeError) as e:
+                    logger.debug(f"Invalid date in filtered view: {e}")
+                    continue
 
     elif view_name == "blocked":
         filtered_tasks = [t for t in data["tasks"] if t.get("status") == "blocked"]
@@ -370,7 +382,8 @@ def filtered_view(view_name):
                 due = datetime.fromisoformat(task["due"])
                 task["due_display"] = due.strftime("%b %d, %Y")
                 task["due_relative"] = get_relative_time(due)
-            except:
+            except (ValueError, TypeError, AttributeError) as e:
+                logger.debug(f"Failed to format due date for task {task.get('id')}: {e}")
                 task["due_display"] = task["due"]
 
     filtered_tasks.sort(key=lambda t: t["priority"], reverse=True)
@@ -406,6 +419,53 @@ def get_relative_time(dt: datetime) -> str:
         return f"Due in {days} days"
     else:
         return f"Due in {days} days"
+
+
+@app.route("/syllabi/<course_code>")
+def view_syllabus(course_code: str):
+    """Serve generated syllabus for a course."""
+    from flask import abort, send_from_directory
+    from dashboard.config import Config
+
+    # Use configured paths
+    syllabi_dir = Config.SYLLABI_DIR
+
+    # Try HTML first, then Markdown
+    html_path = syllabi_dir / f"{course_code}.html"
+    md_path = syllabi_dir / f"{course_code}.md"
+
+    if html_path.exists():
+        return send_from_directory(str(syllabi_dir), f"{course_code}.html")
+    elif md_path.exists():
+        # Read markdown and render it with basic HTML wrapper
+        with open(md_path) as f:
+            md_content = f.read()
+
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>{course_code} Syllabus</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                body {{ padding: 20px; max-width: 900px; margin: 0 auto; }}
+                pre {{ background: #f5f5f5; padding: 10px; border-radius: 5px; }}
+                table {{ width: 100%; margin: 20px 0; }}
+                th, td {{ padding: 8px; border: 1px solid #ddd; }}
+                th {{ background-color: #f2f2f2; }}
+            </style>
+        </head>
+        <body>
+            <div class="mb-3">
+                <a href="/" class="btn btn-sm btn-secondary">← Back to Dashboard</a>
+            </div>
+            <pre>{md_content}</pre>
+        </body>
+        </html>
+        """
+        return html_content
+    else:
+        abort(404, f"Syllabus not found for {course_code}")
 
 
 @app.template_filter("status_icon")

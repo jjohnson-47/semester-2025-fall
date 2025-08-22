@@ -7,6 +7,14 @@ Provides different configuration classes for development, testing, and productio
 import os
 from datetime import timedelta
 from pathlib import Path
+from typing import Any
+
+# Load .env file if available
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # dotenv not available, use system env vars
 
 
 class Config:
@@ -25,11 +33,24 @@ class Config:
     JSON_SORT_KEYS = False
     JSONIFY_PRETTYPRINT_REGULAR = True
 
-    # File paths
-    BASE_DIR = Path(__file__).parent.parent
-    STATE_DIR = Path(__file__).parent / "state"
+    # File paths - use env vars with sensible defaults
+    PROJECT_ROOT = Path(os.environ.get("PROJECT_ROOT", Path(__file__).parent.parent))
+    BASE_DIR = PROJECT_ROOT
+    
+    # Dashboard specific paths
+    DASHBOARD_DIR = PROJECT_ROOT / "dashboard"
+    STATE_DIR = PROJECT_ROOT / os.environ.get("DASHBOARD_STATE_DIR", "dashboard/state")
     TASKS_FILE = STATE_DIR / "tasks.json"
     COURSES_FILE = STATE_DIR / "courses.json"
+    
+    # Build output paths
+    BUILD_DIR = PROJECT_ROOT / os.environ.get("BUILD_DIR", "build")
+    SYLLABI_DIR = BUILD_DIR / "syllabi"
+    SCHEDULES_DIR = BUILD_DIR / "schedules"
+    
+    # Content source paths
+    CONTENT_DIR = PROJECT_ROOT / os.environ.get("DATA_DIR", "content")
+    TEMPLATE_DIR = PROJECT_ROOT / os.environ.get("TEMPLATE_DIR", "templates")
 
     # Timezone
     TIMEZONE = "America/Anchorage"
@@ -56,11 +77,26 @@ class Config:
     ENABLE_PROFILING = False
 
     @staticmethod
-    def init_app(app):
+    def init_app(app: Any) -> None:
         """Initialize application with this config."""
         # Ensure required directories exist
         Config.STATE_DIR.mkdir(parents=True, exist_ok=True)
         (Config.BASE_DIR / "logs").mkdir(exist_ok=True)
+
+        # Set up logging for the app
+        import logging
+
+        logging.basicConfig(
+            level=getattr(logging, app.config.get("LOG_LEVEL", "INFO")),
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            handlers=[
+                logging.FileHandler(Config.BASE_DIR / "logs" / "dashboard.log"),
+                logging.StreamHandler(),
+            ],
+        )
+        app.logger.info(
+            f"Application initialized with {app.config.get('ENV', 'default')} configuration"
+        )
 
 
 class DevelopmentConfig(Config):
@@ -88,7 +124,7 @@ class DevelopmentConfig(Config):
     SESSION_COOKIE_SECURE = False
 
     @staticmethod
-    def init_app(app):
+    def init_app(app: Any) -> None:
         Config.init_app(app)
 
         # Development-specific initialization
@@ -126,7 +162,7 @@ class TestingConfig(Config):
     BCRYPT_LOG_ROUNDS = 4
 
     @staticmethod
-    def init_app(app):
+    def init_app(app: Any) -> None:
         Config.init_app(app)
 
 
@@ -173,7 +209,7 @@ class ProductionConfig(Config):
     ENABLE_PROFILING = os.environ.get("ENABLE_PROFILING", "false").lower() == "true"
 
     @staticmethod
-    def init_app(app):
+    def init_app(app: Any) -> None:
         Config.init_app(app)
 
         # Production logging

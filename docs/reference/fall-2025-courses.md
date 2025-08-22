@@ -3,7 +3,7 @@
 
 ### Course Summary
 
-| Course | CRN | Credits | 
+| Course | CRN | Credits |
 |--------|-----|---------|
 | **MATH 221** | 74645 | 3 |
 | **MATH 251** (Calculus I) | 74647 | 4 |
@@ -43,7 +43,7 @@
 | MATH 251 (Calculus I) | 74647 | 4 | |
 | STAT 253 | 74688 | 4 | |
 
-**Registration Opens:** April 4, 2025  
-**Registration Closes:** September 5, 2025  
-**Classes Begin:** August 25, 2025  
+**Registration Opens:** April 4, 2025
+**Registration Closes:** September 5, 2025
+**Classes Begin:** August 25, 2025
 **Classes End:** December 13, 2025

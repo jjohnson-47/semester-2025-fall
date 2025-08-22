@@ -334,10 +334,18 @@ class TestSmokeTests:
     def test_imports(self):
         """Test that all modules can be imported."""
         try:
+            # Test imports by verifying they have expected attributes
             from dashboard.app import TaskManager, app
+
+            assert hasattr(TaskManager, "load_tasks")
+            assert hasattr(TaskManager, "save_tasks")
+            assert hasattr(app, "route")
+
             from dashboard.tools import generate_tasks, validate
 
-            assert True
+            # These modules should be importable even if we don't use them directly
+            assert generate_tasks is not None
+            assert validate is not None
         except ImportError as e:
             pytest.fail(f"Import failed: {e}")
 

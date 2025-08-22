@@ -192,9 +192,8 @@ class Task:
 
         # Convert datetime strings to datetime objects
         for field_name in ["created_at", "updated_at", "completed_at"]:
-            if field_name in data and data[field_name]:
-                if isinstance(data[field_name], str):
-                    data[field_name] = datetime.fromisoformat(data[field_name])
+            if field_name in data and data[field_name] and isinstance(data[field_name], str):
+                data[field_name] = datetime.fromisoformat(data[field_name])
 
         # Ensure depends_on is a list
         if "depends_on" not in data:
@@ -327,8 +326,8 @@ class TaskGraph:
         sorted_tasks = self.topological_sort()
 
         # Calculate cumulative weights
-        weights = {}
-        paths = {}
+        weights: dict[str, float] = {}
+        paths: dict[str, list[Task]] = {}
 
         for task in sorted_tasks:
             max_weight = 0
@@ -340,14 +339,14 @@ class TaskGraph:
                     predecessor = dep_id
 
             weights[task.id] = max_weight + task.weight
-            paths[task.id] = paths.get(predecessor, []) + [task]
+            paths[task.id] = (paths.get(predecessor, []) if predecessor else []) + [task]
 
         # Find the path with maximum weight
         if not weights:
             return []
 
-        max_task_id = max(weights, key=weights.get)
-        return paths[max_task_id]
+        max_task_id = max(weights, key=lambda k: weights[k])
+        return paths.get(max_task_id, [])
 
     def _update_relationships(self) -> None:
         """Update the children and blockers relationships."""

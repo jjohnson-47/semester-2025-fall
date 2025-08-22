@@ -17,7 +17,7 @@ tasks:
       - "Update evaluation_tools.json"
       - "Update grading_policy.json"
       - "Update required_textbook.json"
-  
+
   - key: SYLL-UPDATE-DATES
     title: "Update syllabus dates and schedule"
     description: "Update all dates in syllabus for Fall 2025 ({{semester.first_day}} - {{semester.last_day}})"
@@ -30,7 +30,7 @@ tasks:
       - "Update withdrawal deadline: {{semester.withdrawal_deadline}}"
       - "Verify holiday schedule"
       - "Update office hours"
-  
+
   - key: SYLL-GENERATE
     title: "Generate syllabus from templates"
     description: "Run make course COURSE={{course.code}} to generate syllabus"
@@ -47,7 +47,7 @@ tasks:
         url: "file://./templates/syllabus.html.j2"
       - name: "Generated Syllabus"
         url: "file://./build/syllabi/{{course.code}}.html"
-  
+
   - key: SYLL-UPLOAD-BB
     title: "Upload syllabus to Blackboard"
     description: "Upload generated syllabus to Blackboard course shell"
@@ -59,7 +59,7 @@ tasks:
       - "Add syllabus link to Start Here"
       - "Add syllabus to Week 1 module"
       - "Create syllabus acknowledgment assignment"
-  
+
   - key: SYLL-SCHEDULE
     title: "Generate and post course schedule"
     description: "Create detailed course schedule with weekly topics"

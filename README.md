@@ -90,7 +90,7 @@ semester-2025-fall/
 
 The integrated task dashboard helps track semester preparation:
 
-- **URL:** http://127.0.0.1:5055 (when running)
+- **URL:** <http://127.0.0.1:5055> (when running)
 - **Features:**
   - Visual task tracking with 5 status levels
   - Automatic dependency resolution
@@ -197,8 +197,8 @@ This project is for educational use at Kenai Peninsula College / University of A
 
 ## 👤 Contact
 
-**Instructor:** Jeffrey Johnson  
-**Email:** jjohnson47@alaska.edu  
+**Instructor:** Jeffrey Johnson
+**Email:** <jjohnson47@alaska.edu>
 **Institution:** Kenai Peninsula College
 
 ---

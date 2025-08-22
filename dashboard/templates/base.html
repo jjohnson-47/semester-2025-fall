@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Dashboard - Fall 2025{% endblock %}</title>
-    
+
     <!-- CSS -->
     <style>
         * {
@@ -12,35 +12,35 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             line-height: 1.6;
             color: #333;
             background: #f5f5f5;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
         }
-        
+
         header {
             background: #2c3e50;
             color: white;
             padding: 1rem 0;
             margin-bottom: 2rem;
         }
-        
+
         header h1 {
             font-size: 1.5rem;
         }
-        
+
         nav {
             margin-top: 1rem;
         }
-        
+
         nav a {
             color: white;
             text-decoration: none;
@@ -50,46 +50,46 @@
             border-radius: 4px;
             display: inline-block;
         }
-        
+
         nav a:hover {
             background: rgba(255,255,255,0.2);
         }
-        
+
         main {
             background: white;
             padding: 2rem;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
+
         .flash-messages {
             margin-bottom: 1rem;
         }
-        
+
         .flash {
             padding: 1rem;
             border-radius: 4px;
             margin-bottom: 0.5rem;
         }
-        
+
         .flash.success {
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-        
+
         .flash.error {
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-        
+
         .flash.info {
             background: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
         }
-        
+
         footer {
             margin-top: 3rem;
             padding: 2rem 0;
@@ -98,7 +98,7 @@
             font-size: 0.9rem;
         }
     </style>
-    
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -113,7 +113,7 @@
             </nav>
         </div>
     </header>
-    
+
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -124,18 +124,18 @@
                 </div>
             {% endif %}
         {% endwith %}
-        
+
         <main>
             {% block content %}{% endblock %}
         </main>
     </div>
-    
+
     <footer>
         <div class="container">
             <p>&copy; 2025 Fall Semester Dashboard | Built with Flask {{ config.FLASK_VERSION | default('3.x') }}</p>
         </div>
     </footer>
-    
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

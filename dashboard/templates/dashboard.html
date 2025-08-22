@@ -19,35 +19,35 @@
         .status-doing { border-left-color: #ffc107; }
         .status-review { border-left-color: #0dcaf0; }
         .status-done { border-left-color: #198754; opacity: 0.7; }
-        
+
         .due-overdue { background-color: #fff5f5; }
         .due-today { background-color: #fff9e6; }
         .due-soon { background-color: #f0f8ff; }
-        
+
         .checklist-item {
             padding: 2px 0;
         }
         .checklist-item input {
             margin-right: 8px;
         }
-        
+
         .stats-card {
             text-align: center;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 10px;
         }
-        
+
         .filter-pills .badge {
             cursor: pointer;
             margin: 2px;
         }
-        
+
         .task-meta {
             font-size: 0.85em;
             color: #666;
         }
-        
+
         #search-box {
             position: sticky;
             top: 0;
@@ -73,29 +73,38 @@
                     <h3>{{ stats.total }}</h3>
                     <small>Total Tasks</small>
                 </div>
-                
+
                 <div class="stats-card bg-danger text-white">
                     <h3>{{ stats.overdue }}</h3>
                     <small>Overdue</small>
                 </div>
-                
+
                 <div class="stats-card bg-warning">
                     <h3>{{ stats.doing }}</h3>
                     <small>In Progress</small>
                 </div>
-                
+
                 <div class="stats-card bg-primary text-white">
                     <h3>{{ stats.todo }}</h3>
                     <small>To Do</small>
                 </div>
-                
+
                 <div class="stats-card bg-success text-white">
                     <h3>{{ stats.done }}</h3>
                     <small>Complete</small>
                 </div>
-                
+
                 <hr>
-                
+
+                <div class="mb-3">
+                    <h6>Course Syllabi</h6>
+                    <a href="/syllabi/MATH221" class="badge bg-primary d-block mb-1">MATH221 Syllabus</a>
+                    <a href="/syllabi/MATH251" class="badge bg-primary d-block mb-1">MATH251 Syllabus</a>
+                    <a href="/syllabi/STAT253" class="badge bg-primary d-block mb-1">STAT253 Syllabus</a>
+                </div>
+
+                <hr>
+
                 <div class="filter-pills">
                     <h6>Quick Filters</h6>
                     <a href="/view/today" class="badge bg-warning text-dark">Today</a>
@@ -110,16 +119,19 @@
             <!-- Main content -->
             <div class="col-md-10">
                 <div id="search-box">
-                    <input type="text" class="form-control" id="task-search" 
+                    <input type="text" class="form-control" id="task-search"
                            placeholder="🔍 Search tasks... (/ to focus)">
                 </div>
 
                 {% for course, course_tasks in by_course.items() %}
                 <div class="course-section mb-4">
-                    <h4 class="border-bottom pb-2">{{ course }}</h4>
-                    
+                    <h4 class="border-bottom pb-2">
+                        {{ course }}
+                        <a href="/syllabi/{{ course }}" class="btn btn-sm btn-outline-primary float-end">View Syllabus</a>
+                    </h4>
+
                     {% for task in course_tasks %}
-                    <div class="card task-card status-{{ task.status|default('todo') }} 
+                    <div class="card task-card status-{{ task.status|default('todo') }}
                                 {% if task.due_color == 'danger' %}due-overdue{% endif %}
                                 {% if task.due_color == 'warning' %}due-today{% endif %}
                                 {% if task.due_color == 'info' %}due-soon{% endif %}"
@@ -132,12 +144,12 @@
                                         {{ task.title }}
                                     </h6>
                                     <p class="card-text text-muted small">{{ task.description }}</p>
-                                    
+
                                     {% if task.checklist %}
                                     <div class="checklist">
                                         {% for item in task.checklist %}
                                         <div class="checklist-item">
-                                            <input type="checkbox" 
+                                            <input type="checkbox"
                                                    id="check-{{ task.id }}-{{ loop.index }}"
                                                    {% if item.done %}checked{% endif %}>
                                             <label for="check-{{ task.id }}-{{ loop.index }}">
@@ -147,17 +159,17 @@
                                         {% endfor %}
                                     </div>
                                     {% endif %}
-                                    
+
                                     {% if task.links %}
                                     <div class="task-links mt-2">
                                         {% for link in task.links %}
-                                        <a href="{{ link.url }}" class="badge bg-light text-dark" 
+                                        <a href="{{ link.url }}" class="badge bg-light text-dark"
                                            target="_blank">🔗 {{ link.name }}</a>
                                         {% endfor %}
                                     </div>
                                     {% endif %}
                                 </div>
-                                
+
                                 <div class="col-md-4 text-end">
                                     <div class="task-meta">
                                         {% if task.due %}
@@ -169,20 +181,20 @@
                                             <small>{{ task.due_relative }}</small>
                                         </div>
                                         {% endif %}
-                                        
+
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <button class="btn btn-outline-secondary" 
+                                            <button class="btn btn-outline-secondary"
                                                     onclick="updateStatus('{{ task.id }}', 'blocked')">🚫</button>
-                                            <button class="btn btn-outline-primary" 
+                                            <button class="btn btn-outline-primary"
                                                     onclick="updateStatus('{{ task.id }}', 'todo')">📋</button>
-                                            <button class="btn btn-outline-warning" 
+                                            <button class="btn btn-outline-warning"
                                                     onclick="updateStatus('{{ task.id }}', 'doing')">⚡</button>
-                                            <button class="btn btn-outline-info" 
+                                            <button class="btn btn-outline-info"
                                                     onclick="updateStatus('{{ task.id }}', 'review')">👀</button>
-                                            <button class="btn btn-outline-success" 
+                                            <button class="btn btn-outline-success"
                                                     onclick="updateStatus('{{ task.id }}', 'done')">✅</button>
                                         </div>
-                                        
+
                                         {% if task.blocked_by %}
                                         <div class="mt-2">
                                             <small class="text-danger">
@@ -190,7 +202,7 @@
                                             </small>
                                         </div>
                                         {% endif %}
-                                        
+
                                         {% if task.tags %}
                                         <div class="mt-2">
                                             {% for tag in task.tags %}
@@ -248,7 +260,7 @@
             checkbox.addEventListener('change', function() {
                 const taskCard = this.closest('.task-card');
                 const taskId = taskCard.dataset.taskId;
-                
+
                 // Collect all checklist states
                 const checklistItems = [];
                 taskCard.querySelectorAll('.checklist-item').forEach(item => {
@@ -259,7 +271,7 @@
                         done: input.checked
                     });
                 });
-                
+
                 // Update task
                 fetch(`/api/task/${taskId}`, {
                     method: 'POST',

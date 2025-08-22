@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""
-Build course schedules from course `schedule.json` and align with the academic
-calendar. Generates a per-course Markdown schedule with aligned week date
-ranges and assignment due-day alignment (Sunday by default).
+"""Schedule builder: align course plans to the academic calendar.
+
+Reads each course's ``content/courses/<COURSE>/schedule.json`` and generates
+Markdown schedules in ``build/schedules/`` with week ranges aligned to the
+academic calendar. Assigns student-friendly due days by item type and shifts
+around major holidays (e.g., Fall Break). No weekend deadlines are produced.
 """
 
 from __future__ import annotations
@@ -23,7 +25,13 @@ def _parse_date(date_str: str) -> datetime:
 
 
 class ScheduleBuilder:
-    """Build course schedules aligned to the semester calendar."""
+    """Build course schedules aligned to the semester calendar.
+
+    Parameters
+    - output_dir: destination directory for Markdown outputs.
+    - calendar: optional injected calendar instance (primarily for tests).
+    - content_root: project root (for tests); defaults to current directory.
+    """
 
     def __init__(
         self,
@@ -37,15 +45,25 @@ class ScheduleBuilder:
         self.content_root = Path(".") if content_root is None else Path(content_root)
 
     def _load_course_schedule(self, course_code: str) -> dict[str, Any] | None:
+        """Load a course's schedule JSON if available.
+
+        Parameters
+        - course_code: e.g., ``MATH221``.
+
+        Returns
+        - dict | None: parsed schedule or None on missing/unreadable file.
+        """
         schedule_path = self.content_root / f"content/courses/{course_code}/schedule.json"
         if not schedule_path.exists():
             return None
         try:
-            return json.loads(schedule_path.read_text(encoding="utf-8"))
+            data: dict[str, Any] | None = json.loads(schedule_path.read_text(encoding="utf-8"))
+            return data
         except Exception:
             return None
 
     def _format_dates_range(self, start: str, end_friday: str) -> str:
+        """Format a Monday–Sunday date range for display (e.g., ``Sep 02 - Sep 08``)."""
         start_dt = _parse_date(start)
         end_dt = _parse_date(end_friday) + timedelta(days=2)  # align to Sunday
         start_str = start_dt.strftime("%b %d")
@@ -53,41 +71,47 @@ class ScheduleBuilder:
         return f"{start_str} - {end_str}"
 
     def _choose_due_weekday(self, label: str, is_assessment: bool = False) -> int:
-        """Pick a due weekday index (Mon=0..Sun=6) based on label heuristics.
+        """Pick a due weekday index (Mon=0..Sun=6) using heuristics.
 
-        - Discussions/BB tasks: Wed (2)
-        - Quizzes: Fri (4)
-        - Exams/Tests (non-finals): Thu (3)
-        - All other assignments (homework/platforms): Fri (4)
+        - Discussions / BB tasks → Wed (2)
+        - Quizzes → Fri (4)
+        - Exams / Midterms / Tests → Thu (3)
+        - Homework / platforms → Fri (4)
         """
-        l = label.lower()
+        label_lower = label.lower()
         if not is_assessment:
-            if "discussion" in l or l.startswith("bb") or "bb" in l:
+            if "discussion" in label_lower or label_lower.startswith("bb") or "bb" in label_lower:
                 return 2  # Wed
             # homework/platforms default to Friday
             return 4  # Fri
         # assessments
-        if "quiz" in l:
+        if "quiz" in label_lower:
             return 4  # Fri
-        if "exam" in l or "midterm" in l or "test" in l:
+        if "exam" in label_lower or "midterm" in label_lower or "test" in label_lower:
             return 3  # Thu
         return 4
 
     def _apply_holiday_shift(
         self, weekday: int, holidays: list[str], label: str, is_assessment: bool
-    ) -> (int, int):
+    ) -> tuple[int, int]:
         """Shift due weekday to avoid major breaks when reasonable.
 
         - If Fall Break present:
           - Exams/Quizzes scheduled Thu/Fri shift to Wed of same week.
-          - Homework (Fri) shifts to next Monday (avoid weekend/break).
+          - Homework (Fri) shifts to next Monday.
+        Returns a tuple of (weekday, extra_days).
         """
         add_days = 0
         if holidays:
             joined = ", ".join(holidays)
             if "Fall Break" in joined and weekday in (3, 4):  # Thu/Fri
-                l = label.lower()
-                if is_assessment and ("quiz" in l or "exam" in l or "test" in l or "midterm" in l):
+                label_lower = label.lower()
+                if is_assessment and (
+                    "quiz" in label_lower
+                    or "exam" in label_lower
+                    or "test" in label_lower
+                    or "midterm" in label_lower
+                ):
                     return 2, 0  # shift to Wed same week
                 # assignments/homework -> shift to next Monday
                 return 0, 7
@@ -104,9 +128,15 @@ class ScheduleBuilder:
         return f"(due {day_label} {due_dt.strftime('%m/%d')})"
 
     def build_schedule(self, course_code: str, default_due_day: str = "Sun") -> str:
-        """Build schedule for a single course by aligning course weeks to calendar weeks.
+        """Build schedule for a single course by aligning to calendar weeks.
 
-        default_due_day: label for due day appended to assignment names.
+        Parameters
+        - course_code: e.g., ``MATH251``.
+        - default_due_day: retained for backward compatibility; the builder
+          now emits concrete due dates instead of this label.
+
+        Returns
+        - str: path to the generated Markdown file.
         """
         print(f"Building schedule for {course_code}...")
 
@@ -188,7 +218,7 @@ class ScheduleBuilder:
         return str(output_file)
 
     def build_all(self, courses: list[str] | None = None) -> None:
-        """Build schedules for all courses."""
+        """Build schedules for all courses in ``courses`` (or the defaults)."""
         if courses is None:
             courses = ["MATH221", "MATH251", "STAT253"]
 
@@ -198,7 +228,7 @@ class ScheduleBuilder:
 
 
 def main() -> None:
-    """CLI entry point."""
+    """CLI entry point for the schedule builder."""
     parser = argparse.ArgumentParser(description="Build course schedules")
     parser.add_argument("--course", help="Build specific course")
     parser.add_argument("--output", default="build/schedules", help="Output directory")

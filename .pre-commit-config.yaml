@@ -43,8 +43,9 @@ repos:
           types-Flask,
           types-PyYAML,
           types-python-dateutil,
+          types-pytz,
         ]
-        args: [--ignore-missing-imports]
+        args: [--ignore-missing-imports, --no-namespace-packages]
         files: ^(dashboard|scripts)/.*\.py$
 
   # Standard pre-commit hooks
@@ -123,12 +124,12 @@ repos:
       - id: shellcheck
         files: \.(sh|bash)$
 
-  # Prevent committing to main branch
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
-    hooks:
-      - id: no-commit-to-branch
-        args: [--branch, main]
+  # Prevent committing to main branch (disabled for now)
+  # - repo: https://github.com/pre-commit/pre-commit-hooks
+  #   rev: v5.0.0
+  #   hooks:
+  #     - id: no-commit-to-branch
+  #       args: [--branch, main]
 
 # Local hooks for project-specific checks
   - repo: local

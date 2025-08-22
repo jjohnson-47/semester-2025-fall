@@ -21,6 +21,7 @@ from bs4 import BeautifulSoup
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dashboard import create_app
+from dashboard.services.dependency_service import DependencyService
 
 
 class TestHTMXEndpoints:

@@ -15,7 +15,7 @@ tasks:
       - "Include course title and section"
       - "Verify instructor access granted"
       - "Confirm shell URL is active"
-    
+
   - key: BB-COPY-CONTENT
     title: "Copy content from previous semester"
     description: "Use Ultra Copy Content from {{course.blackboard.copy_from_id}}"
@@ -28,7 +28,7 @@ tasks:
       - "Exclude: Grade columns marked 'legacy'"
       - "Include: All course content and assessments"
       - "Verify all modules copied correctly"
-  
+
   - key: BB-UPDATE-DATES
     title: "Update all Blackboard dates and deadlines"
     description: "Update assignment, test, and discussion due dates for Fall 2025"
@@ -41,7 +41,7 @@ tasks:
       - "Update discussion board dates"
       - "Set grade center date management"
       - "Configure late submission policies"
-  
+
   - key: BB-GRADE-CENTER
     title: "Configure Grade Center categories and weights"
     description: "Set up Grade Center with proper categories and weighting"
@@ -54,7 +54,7 @@ tasks:
       - "Set up weighted total column"
       - "Hide unnecessary columns"
       - "Configure grade schema (A/B/C/D/F)"
-  
+
   - key: BB-WELCOME
     title: "Create welcome announcement and Start Here"
     description: "Post welcome message and update Start Here page"

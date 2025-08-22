@@ -2,7 +2,7 @@
 
 ## Course Information
 
-**Last Approved:** September 18, 2024  
+**Last Approved:** September 18, 2024
 **Last Edit:** September 17, 2024
 
 ### Basic Details
