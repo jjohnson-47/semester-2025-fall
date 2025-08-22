@@ -35,7 +35,7 @@ case $choice in
         echo "3. DELETE from USB:"
         echo "   shred -vfz /media/usb/age-key-backup.txt"
         ;;
-        
+
     2)
         echo -e "\n🔌 SSH Transfer"
         echo "==============="
@@ -44,7 +44,7 @@ case $choice in
         echo
         read -p "Enter destination hostname/IP: " dest_host
         read -p "Enter destination username: " dest_user
-        
+
         echo
         echo "Run this command:"
         echo "scp ~/.config/age/keys.txt ${dest_user}@${dest_host}:~/age-key-temp.txt"
@@ -54,7 +54,7 @@ case $choice in
         echo "mv ~/age-key-temp.txt ~/.config/age/keys.txt"
         echo "chmod 600 ~/.config/age/keys.txt"
         ;;
-        
+
     3)
         echo -e "\n📦 GitHub Transfer (Temporary)"
         echo "==============================="
@@ -65,18 +65,18 @@ case $choice in
         echo
         read -sp "Confirm passphrase: " passphrase2
         echo
-        
+
         if [ "$passphrase" != "$passphrase2" ]; then
             echo "❌ Passphrases don't match"
             exit 1
         fi
-        
+
         echo
         echo "Encrypting age key..."
         # Use openssl for universal availability
         openssl enc -aes-256-cbc -salt -pbkdf2 -in ~/.config/age/keys.txt \
             -out age-key-transfer.enc -pass pass:"$passphrase"
-        
+
         echo "✅ Created age-key-transfer.enc"
         echo
         echo "1. Commit this file:"
@@ -95,7 +95,7 @@ case $choice in
         echo "   git commit -m 'Remove temporary key transfer file'"
         echo "   git push"
         ;;
-        
+
     4)
         echo -e "\n📱 QR Code Transfer"
         echo "==================="
@@ -104,10 +104,10 @@ case $choice in
             echo "Installing qrencode..."
             sudo dnf install -y qrencode || sudo apt-get install -y qrencode
         fi
-        
+
         echo "Generating QR code..."
         qrencode -t ANSIUTF8 < ~/.config/age/keys.txt
-        
+
         echo
         echo "On new machine:"
         echo "1. Install QR scanner: sudo dnf install zbar"
@@ -116,7 +116,7 @@ case $choice in
         echo "4. Save to ~/.config/age/keys.txt"
         echo "5. chmod 600 ~/.config/age/keys.txt"
         ;;
-        
+
     5)
         echo -e "\n📧 Email Transfer"
         echo "================="
@@ -125,11 +125,11 @@ case $choice in
         echo
         read -sp "Enter a strong passphrase: " passphrase
         echo
-        
+
         # Create encrypted version
         openssl enc -aes-256-cbc -salt -pbkdf2 -in ~/.config/age/keys.txt \
             -out ~/age-key-email.enc -pass pass:"$passphrase" -base64
-        
+
         echo "✅ Created ~/age-key-email.enc (base64 encoded)"
         echo
         echo "1. Email the contents of ~/age-key-email.enc to yourself"

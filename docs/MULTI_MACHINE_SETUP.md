@@ -3,6 +3,7 @@
 ## Overview
 
 This guide ensures seamless development across multiple machines, specifically optimized for:
+
 - **Primary**: Fedora 42 (native Linux)
 - **Secondary**: Fedora 42 (WSL2 on Windows)
 - **Future**: Any Unix-like environment with bash
@@ -32,11 +33,13 @@ make validate
 ### Prerequisites
 
 #### Required Tools
+
 - Git (with SSH configured for GitHub)
 - Python 3.13.6+
 - UV package manager
 
 #### Optional (but recommended)
+
 - age (for encryption)
 - gopass (for secret management)
 - make (for automation)
@@ -53,6 +56,7 @@ fi
 ```
 
 WSL-specific adjustments applied:
+
 - Git line ending configuration (`core.autocrlf input`)
 - Script permission fixes
 - Path normalization
@@ -64,6 +68,7 @@ Three options available via `init-secrets.sh`:
 #### Option 1: Gopass with GitHub Sync (Recommended)
 
 **Setup on primary machine:**
+
 ```bash
 # Store secrets in gopass
 gopass insert development/jjohnson-47/flask-secret-key
@@ -75,6 +80,7 @@ git push
 ```
 
 **Setup on secondary machine:**
+
 ```bash
 # Install gopass
 sudo dnf install -y gopass age
@@ -91,6 +97,7 @@ gopass init --store root
 #### Option 2: Age-Encrypted File
 
 **On primary machine:**
+
 ```bash
 # Create and encrypt secrets
 cat > .env.secrets << EOF
@@ -105,6 +112,7 @@ git push
 ```
 
 **On secondary machine:**
+
 ```bash
 # Pull and decrypt
 git pull
@@ -114,6 +122,7 @@ age -d -i ~/.config/age/keys.txt .env.secrets.age > .env.secrets
 #### Option 3: Manual Configuration
 
 Create `.env.secrets` manually:
+
 ```bash
 cat > .env.secrets << 'EOF'
 # Generate with: python -c "import secrets; print(secrets.token_hex(32))"
@@ -128,6 +137,7 @@ EOF
 Use `./scripts/transfer-age-key.sh` for secure transfer between machines:
 
 #### Method 1: USB Drive (Most Secure)
+
 ```bash
 # On primary
 ./scripts/transfer-age-key.sh
@@ -138,6 +148,7 @@ Use `./scripts/transfer-age-key.sh` for secure transfer between machines:
 ```
 
 #### Method 2: SSH Transfer (Direct)
+
 ```bash
 # From secondary machine
 scp primary-machine:~/.config/age/keys.txt ~/.config/age/
@@ -145,6 +156,7 @@ chmod 600 ~/.config/age/keys.txt
 ```
 
 #### Method 3: Encrypted GitHub (Convenient)
+
 ```bash
 # On primary
 ./scripts/transfer-age-key.sh
@@ -156,6 +168,7 @@ git pull
 ```
 
 #### Method 4: QR Code (Visual)
+
 ```bash
 # On primary
 ./scripts/transfer-age-key.sh
@@ -320,11 +333,13 @@ age -d -i ~/.config/age/keys.txt .env.secrets.age > .env.secrets
 ### Common Issues
 
 #### "Permission denied" on scripts
+
 ```bash
 chmod +x scripts/*.sh
 ```
 
 #### "command not found: uv"
+
 ```bash
 # Install UV
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -332,6 +347,7 @@ source ~/.bashrc
 ```
 
 #### "age: no identity matched"
+
 ```bash
 # Check key exists
 ls -la ~/.config/age/keys.txt
@@ -341,12 +357,14 @@ age-keygen -o ~/.config/age/keys.txt
 ```
 
 #### "gopass: store not found"
+
 ```bash
 # Reinitialize
 gopass init --store root
 ```
 
 #### WSL: "bind: address already in use"
+
 ```bash
 # Find and kill process
 lsof -i :5055
@@ -374,6 +392,7 @@ python -c "import os; print(os.environ.get('FLASK_SECRET_KEY', 'NOT SET'))"
 ## Security Best Practices
 
 ### Do's
+
 - ✅ Use unique Flask secret keys per environment
 - ✅ Rotate secrets regularly
 - ✅ Use age encryption for file-based secrets
@@ -381,6 +400,7 @@ python -c "import os; print(os.environ.get('FLASK_SECRET_KEY', 'NOT SET'))"
 - ✅ Use SSH keys for GitHub access
 
 ### Don'ts
+
 - ❌ Never commit `.env.secrets` unencrypted
 - ❌ Don't share age keys via unencrypted channels
 - ❌ Avoid hardcoding secrets in code

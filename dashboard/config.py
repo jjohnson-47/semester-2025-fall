@@ -17,7 +17,7 @@ try:
     load_dotenv()
 
     # Load secrets if available
-    secrets_file = Path('.env.secrets')
+    secrets_file = Path(".env.secrets")
     if secrets_file.exists():
         load_dotenv(secrets_file)
 except ImportError:

@@ -57,8 +57,15 @@ def _contracts():
         "anchors": [{"id_suffix": "QUIZ"}],
         "now_queue": {"max_items": 5, "per_course_limit": 2, "ensure_each_course": True},
         "pins": {"by_id": ["B-CONTENT"], "pin_boost": 50.0},
-        "staleness": {"enabled": True, "days_until_stale": 7, "stale_penalty": -1.0, "max_penalty": -10.0},
-        "phases": {"build": {"start_days": -3, "end_days": 10, "category_boosts": {"content": 2.0}}},
+        "staleness": {
+            "enabled": True,
+            "days_until_stale": 7,
+            "stale_penalty": -1.0,
+            "max_penalty": -10.0,
+        },
+        "phases": {
+            "build": {"start_days": -3, "end_days": 10, "category_boosts": {"content": 2.0}}
+        },
         "critical_path": {"method": "sum", "distance_decay": 0.9},
     }
 
@@ -78,7 +85,11 @@ def test_taskgraph_methods():
 
 def test_smart_prioritizer_scoring_and_queue():
     tasks = _sample_tasks()
-    p = SmartPrioritizer(tasks, _contracts(), semester_first_day=(datetime.now() - timedelta(days=1)).date().isoformat())
+    p = SmartPrioritizer(
+        tasks,
+        _contracts(),
+        semester_first_day=(datetime.now() - timedelta(days=1)).date().isoformat(),
+    )
     # Score a task
     scored = p.calculate_smart_score(dict(tasks[1]))
     assert "smart_score" in scored and isinstance(scored["smart_score"], float)

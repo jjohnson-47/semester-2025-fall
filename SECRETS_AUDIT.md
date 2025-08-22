@@ -1,9 +1,11 @@
 # Secrets and Environment Variables Audit Report
+
 ## Fall 2025 Semester Project
 
 ### Current State
 
 #### 1. Environment Variables in Use
+
 - **Configuration File**: `.env` (active), `.env.example` (template)
 - **Non-sensitive settings** currently stored:
   - Semester information (code, name, timezone)
@@ -17,29 +19,33 @@
 #### 2. Secrets Found in Codebase
 
 ##### Dashboard Application
+
 - **Flask SECRET_KEY**: Currently using default `"dev-key-change-in-production"`
   - Location: `dashboard/config.py:13`
   - **SECURITY RISK**: Needs proper secret for production
 
 ##### GitHub Actions
+
 - Using standard GitHub secrets:
   - `GITHUB_TOKEN` (provided by GitHub)
   - `CODECOV_TOKEN` (for code coverage - optional)
 
 ##### Course Platform Credentials
+
 - **MyOpenMath (MATH221)**:
   - Course ID: `292612` (public)
   - Enrollment Key: `math221fall2025` (semi-public, stored in JSON)
-  
+
 - **Edfinity (MATH251)**:
   - Registration Link: `https://edfinity.com/join/H7C84FUR` (contains access code)
-  
+
 - **Pearson MyLab (STAT253)**:
   - Integrated with Blackboard (no separate credentials stored)
 
 ### Security Assessment
 
 #### ✅ Good Practices Found
+
 1. Using `.env` file for configuration (gitignored)
 2. Providing `.env.example` template without sensitive data
 3. GitHub Actions using built-in secrets management
@@ -57,6 +63,7 @@
 #### 1. Immediate Actions
 
 ##### A. Flask Secret Key
+
 ```bash
 # Generate and store in gopass
 python -c "import secrets; print(secrets.token_hex(32))" | gopass insert development/jjohnson-47/flask-secret-key
@@ -66,6 +73,7 @@ echo "FLASK_SECRET_KEY=$(gopass show -o development/jjohnson-47/flask-secret-key
 ```
 
 ##### B. Course Platform Credentials
+
 ```bash
 # Store course enrollment keys in gopass
 gopass insert development/jjohnson-47/myopenmath/course-id
@@ -74,6 +82,7 @@ gopass insert development/jjohnson-47/edfinity/registration-code
 ```
 
 #### 2. Create .env.secrets Template
+
 ```bash
 # .env.secrets (for sensitive values only)
 FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
@@ -83,7 +92,9 @@ EDFINITY_REGISTRATION_CODE=${EDFINITY_REGISTRATION_CODE}
 ```
 
 #### 3. Setup Script for Secret Loading
+
 Create `scripts/load_secrets.sh`:
+
 ```bash
 #!/bin/bash
 # Load secrets from gopass into environment
@@ -97,6 +108,7 @@ export EDFINITY_REGISTRATION_CODE=$(gopass show -o development/jjohnson-47/edfin
 #### 4. Potential Future Secrets
 
 Based on the codebase, you might need:
+
 - **Blackboard API credentials** (if automating course management)
 - **Email service credentials** (for notifications)
 - **Database credentials** (if adding persistence)
@@ -106,6 +118,7 @@ Based on the codebase, you might need:
 ### Gopass Organization Structure
 
 Recommended hierarchy for this project:
+
 ```
 development/
 └── jjohnson-47/
@@ -134,6 +147,7 @@ development/
 ### Multi-Machine Development Setup
 
 #### Development Environments
+
 - **Primary**: Fedora 42 (native Linux)
 - **Secondary**: Fedora 42 (WSL on Windows)
 - **Requirement**: Portable secrets management across both machines
@@ -141,6 +155,7 @@ development/
 #### Portable Secrets Strategy
 
 ##### Option 1: Gopass Sync (Recommended)
+
 Leverage your existing gopass GitHub backup for seamless sync:
 
 ```bash
@@ -163,6 +178,7 @@ gopass ls
 ```
 
 ##### Option 2: Encrypted .env.secrets File
+
 For simpler setup without gopass on secondary machine:
 
 ```bash
@@ -185,6 +201,7 @@ source .env && source .env.secrets
 #### Development Setup Scripts
 
 ##### 1. Create `scripts/dev-setup.sh`
+
 ```bash
 #!/bin/bash
 # Universal development environment setup
@@ -268,6 +285,7 @@ echo "   Then: make validate"
 ```
 
 ##### 2. Create `scripts/init-secrets.sh`
+
 ```bash
 #!/bin/bash
 # Initialize secrets for new development machine
@@ -287,44 +305,44 @@ read -p "Select option (1-3): " choice
 case $choice in
     1)
         echo -e "\n📦 Setting up gopass..."
-        
+
         # Check gopass installation
         if ! command -v gopass &> /dev/null; then
             echo "Installing gopass..."
             sudo dnf install -y gopass age || sudo apt-get install -y gopass age
         fi
-        
+
         # Clone store
         read -p "Enter your GitHub username [verlyn13]: " github_user
         github_user=${github_user:-verlyn13}
-        
+
         echo "Cloning gopass store..."
         git clone git@github.com:${github_user}/gopass-secrets.git ~/.local/share/gopass/stores/root
-        
+
         echo "⚠️  You need to transfer your age key from primary machine:"
         echo "   On primary: cat ~/.config/age/keys.txt"
         echo "   Paste here (or manually create ~/.config/age/keys.txt)"
         read -p "Continue when ready..."
-        
+
         gopass init --store root
         ./scripts/setup-gopass-secrets.sh
         ;;
-        
+
     2)
         echo -e "\n🔓 Setting up age encryption..."
-        
+
         if ! command -v age &> /dev/null; then
             echo "Installing age..."
             sudo dnf install -y age || sudo apt-get install -y age
         fi
-        
+
         if [ ! -f ~/.config/age/keys.txt ]; then
             echo "Generating age keypair..."
             mkdir -p ~/.config/age
             age-keygen -o ~/.config/age/keys.txt
             echo "⚠️  BACKUP THIS KEY: ~/.config/age/keys.txt"
         fi
-        
+
         if [ -f .env.secrets.age ]; then
             echo "Decrypting existing secrets..."
             age -d -i ~/.config/age/keys.txt .env.secrets.age > .env.secrets
@@ -333,7 +351,7 @@ case $choice in
             ./scripts/create-secrets-interactive.sh
         fi
         ;;
-        
+
     3)
         echo -e "\n📝 Manual setup..."
         if [ ! -f .env.secrets ]; then
@@ -363,6 +381,7 @@ echo -e "\n✅ Secrets initialization complete!"
 ```
 
 ##### 3. Create `scripts/setup-gopass-secrets.sh`
+
 ```bash
 #!/bin/bash
 # Setup project secrets in gopass
@@ -399,6 +418,7 @@ echo "✅ Secrets configured in gopass"
 ```
 
 ##### 4. Create `scripts/load-secrets-gopass.sh`
+
 ```bash
 #!/bin/bash
 # Load secrets from gopass into environment
@@ -427,6 +447,7 @@ echo "✅ Secrets loaded from gopass"
 ```
 
 ##### 5. Create `scripts/sync-secrets.sh`
+
 ```bash
 #!/bin/bash
 # Sync secrets between machines
@@ -452,7 +473,9 @@ fi
 ```
 
 #### Updated .gitignore
+
 Add these entries:
+
 ```
 # Secrets - never commit these
 .env.secrets
@@ -495,6 +518,7 @@ make validate
    - Encrypted email
 
 2. **Git SSH**: Ensure SSH keys are configured for GitHub:
+
    ```bash
    # Check SSH agent
    eval $(ssh-agent -s)
@@ -502,6 +526,7 @@ make validate
    ```
 
 3. **File permissions**: WSL may need permission fixes:
+
    ```bash
    # Fix script permissions
    chmod +x scripts/*.sh

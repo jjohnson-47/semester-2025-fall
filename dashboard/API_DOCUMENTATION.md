@@ -65,12 +65,14 @@ Config.AUTO_SNAPSHOT   # Boolean for auto-snapshot
 
 **Description:** Main dashboard interface with smart prioritization
 **Response:** HTML dashboard featuring:
+
 - Now Queue with 3-7 highest priority tasks
 - Task lists organized by course
 - Smart scores and chain head indicators
 - Unblock counts showing task impact
 
 **Features:**
+
 - Automatically loads `now_queue.json` if available
 - Displays tasks sorted by `smart_score` when present
 - Falls back to basic priority calculation if not prioritized
@@ -417,6 +419,7 @@ Add fields to task structure and update:
    - CSV/Excel export
    - PDF reports
    - Calendar integration
+
 ## Export API
 
 #### GET /api/export
@@ -424,6 +427,7 @@ Add fields to task structure and update:
 Export tasks in various formats.
 
 Query parameters:
+
 - `format`: `csv` | `json` | `ics` (default: `csv`)
 - `course` (optional): filter by course code
 - `status` (optional): filter by task status

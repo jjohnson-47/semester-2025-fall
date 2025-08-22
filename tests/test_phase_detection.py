@@ -49,8 +49,8 @@ def build_contracts() -> dict[str, Any]:
     [
         (-26, "Pre-Launch"),  # clearly before start
         (-5, "Launch Week"),  # within launch window
-        (1, "Week One"),      # first day after start
-        (11, "In Term"),      # well into term
+        (1, "Week One"),  # first day after start
+        (11, "In Term"),  # well into term
     ],
 )
 def test_phase_detection_across_windows(offset_days: int, expected_name: str) -> None:
@@ -68,4 +68,3 @@ def test_phase_detection_across_windows(offset_days: int, expected_name: str) ->
     phase = p.get_current_phase()
     assert phase is not None, "Phase should not be None for tested windows"
     assert phase.get("name") == expected_name
-

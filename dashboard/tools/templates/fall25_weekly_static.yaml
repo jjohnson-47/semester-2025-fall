@@ -28,7 +28,7 @@ tasks:
     description: "Review and update all content items for Week 1"
     parent_id: "{{course.code}}-2025F-W01-ROLLUP"
     due_offset: { days: -3, from: semester.first_day }
-    blocked_by: 
+    blocked_by:
       - "{{course.code}}-2025F-WEEKLY-MODULES-TEMPLATE"
       - "{{course.code}}-2025F-COPY-PRIOR-CONTENT"
     weight: 3
@@ -111,7 +111,7 @@ tasks:
     description: "Review and update all content items for Week 2"
     parent_id: "{{course.code}}-2025F-W02-ROLLUP"
     due_offset: { days: 4, from: semester.first_day }
-    blocked_by: 
+    blocked_by:
       - "{{course.code}}-2025F-WEEKLY-MODULES-TEMPLATE"
       - "{{course.code}}-2025F-COPY-PRIOR-CONTENT"
     weight: 3
@@ -191,7 +191,7 @@ tasks:
     description: "Review Week 3 content"
     parent_id: "{{course.code}}-2025F-W03-ROLLUP"
     due_offset: { days: 11, from: semester.first_day }
-    blocked_by: 
+    blocked_by:
       - "{{course.code}}-2025F-WEEKLY-MODULES-TEMPLATE"
       - "{{course.code}}-2025F-COPY-PRIOR-CONTENT"
     weight: 3

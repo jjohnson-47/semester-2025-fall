@@ -43,11 +43,15 @@ def test_validate_json_decorator(client):
     assert resp.status_code == 400
 
     # Malformed JSON
-    resp = client.post("/decorators/echo", data="{bad}", headers={"Content-Type": "application/json"})
+    resp = client.post(
+        "/decorators/echo", data="{bad}", headers={"Content-Type": "application/json"}
+    )
     assert resp.status_code == 400
 
     # OK JSON
-    resp = client.post("/decorators/echo", data=json.dumps({}), headers={"Content-Type": "application/json"})
+    resp = client.post(
+        "/decorators/echo", data=json.dumps({}), headers={"Content-Type": "application/json"}
+    )
     assert resp.status_code == 200
 
 

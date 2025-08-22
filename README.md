@@ -109,6 +109,7 @@ The system uses multiple signals to identify high-impact work:
 4. **Due Date Integration** - Incorporates traditional deadline urgency
 
 Run prioritization:
+
 ```bash
 make reprioritize
 # Or manually:

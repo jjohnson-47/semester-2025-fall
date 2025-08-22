@@ -20,6 +20,7 @@ make validate
 ## 🔑 Secret Management Options
 
 ### Option 1: Gopass (Recommended for multi-machine)
+
 ```bash
 # Primary machine
 gopass insert development/jjohnson-47/flask-secret-key
@@ -31,6 +32,7 @@ gopass insert development/jjohnson-47/flask-secret-key
 ```
 
 ### Option 2: Age Encryption (Simple file-based)
+
 ```bash
 # Primary machine
 ./scripts/init-secrets.sh  # Choose option 2
@@ -43,6 +45,7 @@ age -d -i ~/.config/age/keys.txt .env.secrets.age > .env.secrets
 ```
 
 ### Option 3: Manual (Quick testing)
+
 ```bash
 cp .env.example .env
 ./scripts/create-secrets-interactive.sh
@@ -119,11 +122,13 @@ git status           # Check this repo
 ## 🚨 Troubleshooting
 
 ### "Permission denied" on scripts
+
 ```bash
 chmod +x scripts/*.sh
 ```
 
 ### "age: no identity matched"
+
 ```bash
 # Check key exists
 ls -la ~/.config/age/keys.txt
@@ -132,6 +137,7 @@ ls -la ~/.config/age/keys.txt
 ```
 
 ### WSL: Port already in use
+
 ```bash
 lsof -i :5055
 kill -9 <PID>
@@ -140,6 +146,7 @@ DASH_PORT=5056 make dash
 ```
 
 ### Secrets not loading
+
 ```bash
 # Check which method is configured
 ./scripts/verify-setup.sh

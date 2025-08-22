@@ -21,4 +21,3 @@ def test_type_aliases_basic_usage():
     assert isinstance(resp, dict)
     assert isinstance(stats, dict)
     assert isinstance(ctx, dict)
-

@@ -499,6 +499,7 @@ def api_export() -> Response:
         )
 
     if export_format == "ics":
+
         def _priority_to_ics(priority: str) -> int:
             mapping = {"critical": 1, "high": 3, "medium": 5, "low": 7}
             return mapping.get(priority, 5)

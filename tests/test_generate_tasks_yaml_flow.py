@@ -59,4 +59,3 @@ tasks:
     by_id = {t["id"]: t for t in tasks}
     assert by_id["MATH221-BB-SETUP"]["depends_on"] == ["MATH221-INTRO"]
     assert any("due_date" in t for t in tasks)
-

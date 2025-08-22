@@ -466,9 +466,7 @@ def main() -> None:
         contracts = yaml.safe_load(f)
 
     # Process tasks
-    prioritizer = SmartPrioritizer(
-        tasks_data.get("tasks", []), contracts, args.semester_first_day
-    )
+    prioritizer = SmartPrioritizer(tasks_data.get("tasks", []), contracts, args.semester_first_day)
     updated_tasks, now_queue = prioritizer.process()
 
     # Update tasks data

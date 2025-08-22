@@ -110,7 +110,7 @@ due_offset: { days: 14, from: today }
 tasks:
   - key: TASK-A
     title: "First task"
-  
+
   - key: TASK-B
     title: "Second task"
     blocked_by: ["TASK-A"]  # B depends on A
@@ -203,6 +203,7 @@ dashboard/tools/templates/
 ### Loading Order
 
 Templates are processed alphabetically, allowing for:
+
 1. Base templates (prefixed with numbers: `01_base.yaml`)
 2. Category templates (`02_content.yaml`, `03_assessment.yaml`)
 3. Course-specific overrides (`99_math221_custom.yaml`)
@@ -324,7 +325,7 @@ Use parent tasks to group related work:
 ```yaml
 - key: WEEK-01-PARENT
   blocked_by: [all-child-tasks]
-  
+
 - key: WEEK-01-CHILD-1
   parent_id: "{{course.code}}-WEEK-01-PARENT"
 ```
@@ -378,21 +379,27 @@ python dashboard/tools/validate.py \
 ### Common Validation Errors
 
 **Circular dependencies**
+
 ```
 ERROR: Circular dependency detected: A → B → C → A
 ```
+
 Solution: Review and break the cycle
 
 **Missing dependencies**
+
 ```
 WARNING: Task references unknown dependency: NONEXISTENT-TASK
 ```
+
 Solution: Check task keys and IDs
 
 **Invalid dates**
+
 ```
 ERROR: Due date calculation failed for task X
 ```
+
 Solution: Verify offset configuration
 
 ## Advanced Features
@@ -462,6 +469,7 @@ defaults:
 ## Support
 
 For template issues:
+
 - Check YAML syntax with online validators
 - Review generated tasks.json for output
 - Enable verbose mode in generator

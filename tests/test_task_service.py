@@ -75,7 +75,9 @@ def test_task_service_crud_and_bulk(app):
         assert page1["total"] >= 3
 
         # Bulk update
-        count = TaskService.bulk_update({"course": "MATH221", "status": "todo"}, {"status": "completed"})
+        count = TaskService.bulk_update(
+            {"course": "MATH221", "status": "todo"}, {"status": "completed"}
+        )
         assert count >= 2
 
         # Delete task
@@ -92,4 +94,3 @@ def test_task_service_crud_and_bulk(app):
         TaskService.seed_sample_data()
         after = TaskService.get_tasks()["total"]
         assert after > before
-

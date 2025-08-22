@@ -47,4 +47,3 @@ def test_taskvalidator_missing_file(tmp_path: Path):
     p = tmp_path / "missing.json"
     v = TaskValidator(str(p))
     assert v.validate() is False
-

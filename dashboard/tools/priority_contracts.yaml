@@ -10,19 +10,19 @@
 coefficients:
   # Base priority from due dates (your existing logic)
   alpha_due: 1.0
-  
+
   # Critical chain weight (sum of weights along heaviest path to anchor)
   beta_critical: 2.5
-  
+
   # Unblock impact (number of blocked descendants)
   gamma_impact: 3.0
-  
+
   # Anchor proximity (inverse of steps to nearest anchor)
   delta_proximity: 1.5
-  
+
   # Chain head boost (next actionable task in chain)
   epsilon_head: 10.0
-  
+
   # Phase and category adjustments
   zeta_phase: 0.5
 
@@ -43,7 +43,7 @@ phases:
       assessment: 1.0
       communication: 0.5
     description: "Focus on infrastructure and content preparation"
-  
+
   launch_week:
     name: "Launch Week"
     start_days: -7   # 7 days before semester
@@ -56,7 +56,7 @@ phases:
       content: 1.5
       materials: 1.0
     description: "Final testing, gradebook setup, and welcome comms"
-  
+
   week_one:
     name: "Week One"
     start_days: 1    # Day 1 of semester
@@ -69,7 +69,7 @@ phases:
       setup: 0.5
       materials: 0.5
     description: "Student support and real-time adjustments"
-  
+
   in_term:
     name: "In Term"
     start_days: 8    # Week 2 onwards
@@ -91,15 +91,15 @@ anchors:
   - id_suffix: "COURSE-READY"
     weight_multiplier: 5.0
     description: "Course ready for student access"
-  
+
   - id_suffix: "OPEN-COURSE"
     weight_multiplier: 3.0
     description: "Course opened to students"
-  
+
   - id_suffix: "QA-STUDENT-PREVIEW"
     weight_multiplier: 2.0
     description: "Quality assurance complete"
-  
+
   # Optional global root
   - id: "FALL-2025-ROOT"
     weight_multiplier: 10.0
@@ -111,16 +111,16 @@ anchors:
 now_queue:
   # Total tasks to show in Now Queue
   max_items: 7
-  
+
   # Maximum tasks per course (prevents one course from dominating)
   per_course_limit: 3
-  
+
   # Ensure at least one task from each course if available
   ensure_each_course: true
-  
+
   # Prefer chain heads even if score is slightly lower
   chain_head_preference: 1.2  # Chain heads get 20% boost for queue selection
-  
+
   # Include blocked tasks that are close to being unblocked
   include_near_unblocked: false
   near_unblocked_threshold: 1  # How many deps away counts as "near"
@@ -134,12 +134,12 @@ pins:
   by_id:
     # - "MATH221-2025F-SYLLABUS-GENERATE"  # Example: uncomment to pin
     # - "STAT253-2025F-R-SETUP"
-  
+
   # Pin by ID suffix pattern
   by_suffix:
     # - "SYLLABUS-REVIEW"  # Example: all syllabus reviews
     # - "ROSTER-ROLES"     # Example: all roster checks
-  
+
   # Boost multiplier for pinned tasks
   pin_boost: 100.0
 
@@ -160,10 +160,10 @@ critical_path:
   # Method for computing critical chain weight
   # Options: "sum" (add all weights), "max" (longest single path), "hybrid"
   method: "sum"
-  
+
   # Include completed tasks in chain weight calculation
   include_completed: false
-  
+
   # Discount factor for each hop away from anchor (0.9 = 10% reduction per hop)
   distance_decay: 0.95
 
@@ -189,7 +189,7 @@ llm_rerank:
   max_candidates: 20  # Send top N to LLM for reranking
   require_justification: true
   fallback_on_error: true  # Use deterministic order if LLM fails
-  
+
   # Context to include with each task
   include_context:
     - "title"
@@ -199,7 +199,7 @@ llm_rerank:
     - "depends_on"
     - "weight"
     - "smart_score"
-  
+
   # System prompt template
   system_prompt: |
     You are a course preparation assistant. Given a list of tasks with dependencies,
@@ -216,15 +216,15 @@ llm_rerank:
 debug:
   # Show detailed scoring breakdown in console
   verbose_scoring: false
-  
+
   # Write scoring details to file
   score_log_file: "dashboard/logs/scoring.log"
-  
+
   # Include scoring breakdown in task JSON
   include_score_breakdown: true
-  
+
   # Show dependency chains in output
   show_chains: true
-  
+
   # Highlight critical path in visualizations
   highlight_critical: true

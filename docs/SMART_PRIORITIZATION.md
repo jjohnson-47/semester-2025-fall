@@ -15,6 +15,7 @@ smart_score = Σ(coefficient × factor_value)
 ```
 
 The factors include:
+
 - **Base Priority** (α): Traditional due date urgency
 - **Critical Chain Weight** (β): Sum of weights along path to anchors
 - **Unblock Impact** (γ): Number of downstream tasks freed
@@ -25,6 +26,7 @@ The factors include:
 ### 2. Chain Heads
 
 Tasks are marked as "chain heads" (displayed with ➜) when:
+
 - Status is `todo` (ready to work)
 - All dependencies are `done` (nothing blocking)
 - They represent the next actionable step in a dependency chain
@@ -44,25 +46,33 @@ Anchors are milestone tasks that represent major completion points. The system i
 The system recognizes different semester phases and adjusts priorities accordingly:
 
 #### Pre-Launch Phase (-30 to -8 days)
+
 Focus on infrastructure and content creation:
+
 - Setup tasks: 5.0x boost
 - Technical tasks: 4.0x boost
 - Materials: 3.0x boost
 
 #### Launch Week (-7 to 0 days)
+
 Final preparations and testing:
+
 - Technical tasks: 5.0x boost
 - Assessment setup: 4.0x boost
 - Communication prep: 3.0x boost
 
 #### Week One (1 to 7 days)
+
 Active semester support:
+
 - Communication: 5.0x boost
 - Technical support: 3.0x boost
 - Assessment delivery: 2.0x boost
 
 #### In-Term (8+ days)
+
 Steady-state operations:
+
 - Assessment: 3.0x boost
 - Communication: 2.5x boost
 - Content updates: 2.0x boost
@@ -84,6 +94,7 @@ coefficients:
 ```
 
 Adjust these coefficients to change the system's behavior:
+
 - Increase `beta_critical` to focus more on critical path
 - Increase `gamma_impact` to prioritize high-unblock tasks
 - Increase `alpha_due` to make deadlines more important
@@ -118,6 +129,7 @@ pins:
 ### Critical Chain Calculation
 
 The system computes the critical chain weight by:
+
 1. Starting from the task
 2. Following all paths to anchor tasks
 3. Summing weights along the heaviest path
@@ -211,13 +223,16 @@ The system generates two files:
 The dashboard automatically uses smart scores when available:
 
 ### Visual Indicators
+
 - **➜** Chain head marker (immediately actionable)
 - **Score badges** showing smart_score value
 - **Unblock counts** showing downstream impact
 - **Anchor paths** showing milestone connection
 
 ### Now Queue Display
+
 The Now Queue appears prominently at the top of the dashboard with:
+
 - Task title and course
 - Smart score
 - Unblock count
@@ -225,6 +240,7 @@ The Now Queue appears prominently at the top of the dashboard with:
 - Brief description
 
 ### Sorting
+
 All task lists sort by `smart_score` descending, ensuring high-impact work naturally floats to the top.
 
 ## Tuning Guide
@@ -232,21 +248,27 @@ All task lists sort by `smart_score` descending, ensuring high-impact work natur
 ### For Different Work Styles
 
 #### "Deadline Driven"
+
 Increase due date weight:
+
 ```yaml
 coefficients:
   alpha_due: 3.0  # Triple due date importance
 ```
 
 #### "Unblock Everything"
+
 Prioritize freeing up work:
+
 ```yaml
 coefficients:
   gamma_impact: 5.0  # Heavily weight unblocking
 ```
 
 #### "Critical Path Focus"
+
 Emphasize chain progression:
+
 ```yaml
 coefficients:
   beta_critical: 4.0   # Increase chain weight
@@ -256,7 +278,9 @@ coefficients:
 ### For Different Phases
 
 #### Summer Prep (Early Start)
+
 Extend pre-launch phase:
+
 ```yaml
 phases:
   prelaunch:
@@ -265,7 +289,9 @@ phases:
 ```
 
 #### Compressed Timeline
+
 Shorten phases and increase urgency:
+
 ```yaml
 phases:
   prelaunch:
@@ -279,16 +305,19 @@ phases:
 ### Common Issues
 
 **All tasks have similar scores**
+
 - Increase coefficient differentiation
 - Check that dependencies are properly set
 - Verify anchor tasks are identified
 
 **Wrong tasks appearing in Now Queue**
+
 - Check phase detection (days calculation)
 - Review category boosts for current phase
 - Verify task statuses are correct
 
 **Chain heads not detected**
+
 - Ensure dependencies use correct task IDs
 - Check that prerequisite tasks are marked `done`
 - Verify task status is `todo` (not `blocked`)
@@ -296,6 +325,7 @@ phases:
 ### Debugging
 
 Enable verbose output:
+
 ```yaml
 debug:
   verbose_scoring: true
@@ -335,11 +365,13 @@ The LLM reviews top candidates and can re-order based on semantic understanding,
 ## Performance Considerations
 
 The system efficiently handles:
+
 - 500+ tasks with sub-second scoring
 - Complex dependency graphs (100+ edges)
 - Real-time re-prioritization on status changes
 
 For very large task sets (1000+), consider:
+
 - Increasing the distance decay factor
 - Limiting chain depth calculation
 - Caching anchor paths between runs
@@ -347,6 +379,7 @@ For very large task sets (1000+), consider:
 ## Future Enhancements
 
 Planned improvements include:
+
 - Multi-user task assignment and workload balancing
 - Time estimation and capacity planning
 - Historical velocity tracking
@@ -357,6 +390,7 @@ Planned improvements include:
 ## Support
 
 For issues or questions:
+
 - Review score breakdowns in task data
 - Check phase detection matches expected timeline
 - Verify dependency chains with dashboard visualization

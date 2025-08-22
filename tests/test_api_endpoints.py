@@ -78,7 +78,9 @@ def test_tasks_crud_and_filters(app, client):
     assert client.get("/api/tasks/MISSING").status_code == 404
 
     # POST invalid content-type
-    resp = client.post("/api/tasks", data=json.dumps({"x": 1}), headers={"Content-Type": "text/plain"})
+    resp = client.post(
+        "/api/tasks", data=json.dumps({"x": 1}), headers={"Content-Type": "text/plain"}
+    )
     assert resp.status_code == 400
 
     # POST missing fields
@@ -124,7 +126,9 @@ def test_tasks_crud_and_filters(app, client):
 
 def test_stats_endpoints(app, client):
     with app.app_context():
-        TaskService._save_tasks_data({"tasks": _seed_tasks(), "metadata": {"version": "1.0", "updated": ""}})
+        TaskService._save_tasks_data(
+            {"tasks": _seed_tasks(), "metadata": {"version": "1.0", "updated": ""}}
+        )
 
     # Overall stats
     resp = client.get("/api/stats")
@@ -147,7 +151,9 @@ def test_stats_endpoints(app, client):
 
 def test_export_endpoints(app, client):
     with app.app_context():
-        TaskService._save_tasks_data({"tasks": _seed_tasks(), "metadata": {"version": "1.0", "updated": ""}})
+        TaskService._save_tasks_data(
+            {"tasks": _seed_tasks(), "metadata": {"version": "1.0", "updated": ""}}
+        )
 
     # JSON export
     resp = client.get("/api/export/json?course=MATH221")
@@ -183,4 +189,3 @@ def test_courses_endpoints(app, client):  # noqa: ARG001
     assert client.get("/api/courses/MATH221").status_code == 200
     # Not found
     assert client.get("/api/courses/UNKNOWN").status_code == 404
-

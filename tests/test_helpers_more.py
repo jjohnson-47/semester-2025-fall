@@ -13,7 +13,17 @@ from dashboard.tools import helpers as H
 
 
 def test_helpers_load_and_generate(tmp_path: Path):
-    tpl = {"templates": [{"id": "x", "title": "Hello {course}", "category": "setup", "priority": "low", "days_before_start": 1}]}
+    tpl = {
+        "templates": [
+            {
+                "id": "x",
+                "title": "Hello {course}",
+                "category": "setup",
+                "priority": "low",
+                "days_before_start": 1,
+            }
+        ]
+    }
     p = tmp_path / "tpl.json"
     p.write_text(json.dumps(tpl))
     templates = H.load_templates(p)
@@ -31,8 +41,24 @@ def test_helpers_load_and_generate(tmp_path: Path):
 def test_helpers_validation(tmp_path: Path):
     tasks = {
         "tasks": [
-            {"id": "t1", "course": "X", "title": "A", "status": "todo", "priority": "low", "category": "setup", "due_date": "bad"},
-            {"id": "t1", "course": "X", "title": "A2", "status": "todo", "priority": "low", "category": "setup", "depends_on": ["missing"]},
+            {
+                "id": "t1",
+                "course": "X",
+                "title": "A",
+                "status": "todo",
+                "priority": "low",
+                "category": "setup",
+                "due_date": "bad",
+            },
+            {
+                "id": "t1",
+                "course": "X",
+                "title": "A2",
+                "status": "todo",
+                "priority": "low",
+                "category": "setup",
+                "depends_on": ["missing"],
+            },
         ]
     }
     path = tmp_path / "tasks.json"
@@ -41,4 +67,3 @@ def test_helpers_validation(tmp_path: Path):
     summary = H.validate_all(path)
     assert summary["valid"] is False
     assert summary["error_count"] >= 2
-

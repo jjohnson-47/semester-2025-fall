@@ -9,18 +9,21 @@
 ## Core Documentation
 
 ### System Architecture
+
 - **[docs/SMART_PRIORITIZATION.md](SMART_PRIORITIZATION.md)** - Smart task prioritization system
 - **[docs/TASK_TEMPLATES.md](TASK_TEMPLATES.md)** - Task template system documentation
 - **[dashboard/API_DOCUMENTATION.md](../dashboard/API_DOCUMENTATION.md)** - Dashboard API reference
 - **[docs/CONTENT.md](CONTENT.md)** - Content structure and organization
 
 ### Development Guides
+
 - **[docs/FLASK_SETUP_PLAN.md](FLASK_SETUP_PLAN.md)** - Flask application setup
 - **[docs/UV_MIGRATION_PLAN.md](UV_MIGRATION_PLAN.md)** - UV package manager migration
 - **[docs/UV_TECHNICAL_PLAN.md](UV_TECHNICAL_PLAN.md)** - UV technical implementation
 - **[docs/MYPY_STRATEGY.md](MYPY_STRATEGY.md)** - Type checking strategy
 
 ### Reference Materials
+
 - **[docs/reference/dashboard.md](reference/dashboard.md)** - Dashboard workflow guide
 - **[docs/reference/fall-2025-courses.md](reference/fall-2025-courses.md)** - Course information
 - **[docs/reference/syllabus-info.md](reference/syllabus-info.md)** - Syllabus generation guide
@@ -28,6 +31,7 @@
 ## Key Components
 
 ### Dashboard System
+
 ```
 dashboard/
 ├── app.py                    # Main Flask application
@@ -44,6 +48,7 @@ dashboard/
 ```
 
 ### Content Management
+
 ```
 content/courses/
 ├── MATH221/                 # Applied Calculus
@@ -57,6 +62,7 @@ content/courses/
 ```
 
 ### Build System
+
 ```
 scripts/
 ├── build_syllabi.py         # Syllabus generation
@@ -69,16 +75,19 @@ scripts/
 ## Configuration Files
 
 ### Project Configuration
+
 - **[pyproject.toml](../pyproject.toml)** - Python project configuration
 - **[.pre-commit-config.yaml](../.pre-commit-config.yaml)** - Code quality hooks
 - **[pytest.ini](../pytest.ini)** - Test configuration
 
 ### Course Data
+
 - **[academic-calendar.json](../academic-calendar.json)** - Semester calendar
 - **[variables/semester.json](../variables/semester.json)** - Semester variables
 - **[profiles/instructor.json](../profiles/instructor.json)** - Instructor info
 
 ### Task Templates
+
 - **[dashboard/tools/templates/](../dashboard/tools/templates/)** - YAML task templates
   - `fall25_blackboard_ultra.yaml` - Main course setup tasks
   - `fall25_weekly_static.yaml` - Weekly module tasks
@@ -134,12 +143,14 @@ GET /view/<filter>         # Filtered views
 ## Testing
 
 ### Test Files
+
 - **[tests/test_models.py](../tests/test_models.py)** - Model unit tests
 - **[tests/test_dashboard_app.py](../tests/test_dashboard_app.py)** - Dashboard tests
 - **[tests/test_phase_detection.py](../tests/test_phase_detection.py)** - Phase logic tests
 - **[tests/test_dependency_service.py](../tests/test_dependency_service.py)** - Dependency tests
 
 ### Running Tests
+
 ```bash
 # All tests
 pytest
@@ -155,18 +166,21 @@ pytest -m integration
 ## Workflow Guides
 
 ### Adding a New Course
+
 1. Create directory: `content/courses/NEW_COURSE/`
 2. Add JSON data files (use existing courses as templates)
 3. Update `dashboard/state/courses.json`
 4. Run `make dash-gen` to generate tasks
 
 ### Customizing Prioritization
+
 1. Edit `dashboard/tools/priority_contracts.yaml`
 2. Adjust coefficients for different factors
 3. Modify phase definitions and dates
 4. Run `make reprioritize` to apply
 
 ### Creating Task Templates
+
 1. Create YAML file in `dashboard/tools/templates/`
 2. Define tasks with dependencies and due dates
 3. Run `make dash-gen` to generate
@@ -175,11 +189,13 @@ pytest -m integration
 ## Support Resources
 
 ### Documentation
+
 - Flask documentation (local mirror): `docs/flask-reference/`
 - Python 3.13 documentation: `docs/reference/docs.python.org/`
 - HTMX documentation: `docs/reference/htmx.org/`
 
 ### External Links
+
 - [Flask Documentation](https://flask.palletsprojects.com/)
 - [UV Package Manager](https://github.com/astral-sh/uv)
 - [Bootstrap 5](https://getbootstrap.com/docs/5.1/)
@@ -188,6 +204,7 @@ pytest -m integration
 ## Project Status
 
 ### Completed Features ✅
+
 - Smart task prioritization system
 - Now Queue with AI-driven task selection
 - Dependency-aware task management
@@ -198,11 +215,13 @@ pytest -m integration
 - Multi-course support
 
 ### In Progress 🚧
+
 - LLM-assisted re-ranking (optional)
 - Mobile responsive improvements
 - Advanced analytics dashboard
 
 ### Planned Features 📋
+
 - Multi-user support
 - Time tracking
 - Progress predictions
@@ -211,9 +230,9 @@ pytest -m integration
 
 ## Contact
 
-**Instructor:** Jeffrey Johnson  
-**Email:** jjohnson47@alaska.edu  
-**Institution:** Kenai Peninsula College  
+**Instructor:** Jeffrey Johnson
+**Email:** <jjohnson47@alaska.edu>
+**Institution:** Kenai Peninsula College
 **Semester:** Fall 2025 (August 25 - December 13)
 
 ---

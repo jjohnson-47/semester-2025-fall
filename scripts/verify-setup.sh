@@ -52,7 +52,7 @@ echo
 echo "4. Python Environment:"
 if [ -d ".venv" ]; then
     echo -e "   ${GREEN}✓${NC} Virtual environment exists"
-    
+
     # Check Python version
     PYTHON_VERSION=$(.venv/bin/python --version 2>&1 | cut -d' ' -f2)
     echo -e "   ${GREEN}✓${NC} Python version: $PYTHON_VERSION"
@@ -86,7 +86,7 @@ echo "6. Age Encryption:"
 if command -v age &> /dev/null; then
     if [ -f ~/.config/age/keys.txt ]; then
         echo -e "   ${GREEN}✓${NC} Age key exists"
-        
+
         # Check permissions
         PERMS=$(stat -c %a ~/.config/age/keys.txt)
         if [ "$PERMS" = "600" ]; then
@@ -128,7 +128,7 @@ echo "9. Flask Configuration:"
 if [ -d ".venv" ]; then
     # Activate venv and test config
     source .venv/bin/activate
-    
+
     # Test secret key
     FLASK_TEST=$(python -c "
 from dashboard.config import Config
@@ -138,7 +138,7 @@ if len(c.SECRET_KEY) > 20 and c.SECRET_KEY != 'dev-key-change-in-production':
 else:
     print('insecure')
 " 2>/dev/null) || FLASK_TEST="error"
-    
+
     if [ "$FLASK_TEST" = "secure" ]; then
         echo -e "   ${GREEN}✓${NC} Flask secret key configured"
     elif [ "$FLASK_TEST" = "insecure" ]; then

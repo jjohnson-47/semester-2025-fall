@@ -129,7 +129,9 @@ class TaskGenerator:
         due_date = self._calculate_due_date(task_template.get("due_offset", {}))
 
         # Get category from task or defaults
-        category = task_template.get("category", template.get("defaults", {}).get("category", "setup"))
+        category = task_template.get(
+            "category", template.get("defaults", {}).get("category", "setup")
+        )
 
         # Create task
         task = {
@@ -222,6 +224,7 @@ class TaskGenerator:
 # ------------------------
 # Lightweight JSON helpers
 # ------------------------
+
 
 def load_templates(template_file: Path | str) -> list[dict[str, Any]]:
     """Load templates from a JSON file with a top-level 'templates' list."""
