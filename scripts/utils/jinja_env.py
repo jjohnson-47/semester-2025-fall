@@ -6,7 +6,7 @@ Jinja2 environment configuration and custom filters.
 from datetime import datetime
 from typing import Any
 
-import markdown as md
+import markdown as md  # type: ignore[import-untyped]
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
