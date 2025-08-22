@@ -45,14 +45,10 @@ import os
 from datetime import datetime, timedelta
 from typing import Any
 
-import pytz
+import pytz  # type: ignore[import-untyped]
 from flask import Flask, Response, jsonify, render_template, request
 
-# Import config - try both relative and absolute imports
-try:
-    from config import Config
-except ImportError:
-    from dashboard.config import Config
+from dashboard.config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +88,7 @@ class TaskManager:
                 data = json.load(f)
             finally:
                 fcntl.flock(f, fcntl.LOCK_UN)
-        return data
+        return dict(data)
 
     @staticmethod
     def save_tasks(data: dict[str, Any]) -> None:
@@ -147,7 +143,8 @@ class TaskManager:
             return {"courses": [], "semester": "2025-fall"}
 
         with open(COURSES_FILE) as f:
-            return json.load(f)
+            data = json.load(f)
+            return dict(data)
 
 
 def calculate_progress(tasks: list[dict[str, Any]]) -> dict[str, Any]:
