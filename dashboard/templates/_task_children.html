@@ -1,0 +1,9 @@
+{# Renders child task rows for lazy loading #}
+{% for task in tasks %}
+  <tr id="task-{{ task.id }}" class="task-child">
+    <td>{{ task.title }}</td>
+    <td>{{ task.course }}</td>
+    <td>{{ task.status }}</td>
+    <td>{{ task.category }}</td>
+  </tr>
+{% endfor %}

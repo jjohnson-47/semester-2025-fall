@@ -28,6 +28,12 @@ output/
 .env
 .env.local
 .env.*.local
+.env.secrets
+*.key
+*.pem
+
+# Encrypted secrets (safe to commit)
+# .env.secrets.age
 
 # Logs
 *.log

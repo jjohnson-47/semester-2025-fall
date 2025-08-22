@@ -164,3 +164,83 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+# ------------------------
+# Lightweight helper APIs
+# ------------------------
+
+def validate_task_structure(task: dict[str, Any]) -> bool:
+    """Validate a single task has the core required fields.
+
+    Required: id, course, title, status, priority, category
+    Optional: due_date (ISO date)
+    """
+    required = ["id", "course", "title", "status", "priority", "category"]
+    for field in required:
+        if field not in task:
+            return False
+    # If due_date present, verify format
+    if "due_date" in task:
+        try:
+            datetime.fromisoformat(task["due_date"])  # type: ignore[arg-type]
+        except Exception:
+            return False
+    return True
+
+
+def validate_dates(tasks: list[dict[str, Any]]) -> list[str]:
+    """Return list of error messages for invalid due_date values."""
+    errors: list[str] = []
+    for t in tasks:
+        if "due_date" in t:
+            try:
+                datetime.fromisoformat(t["due_date"])  # type: ignore[arg-type]
+            except Exception:
+                errors.append(f"Task {t.get('id')} has invalid due_date: {t.get('due_date')}")
+    return errors
+
+
+def check_duplicates(tasks: list[dict[str, Any]]) -> list[str]:
+    """Return list of duplicate task IDs."""
+    seen: set[str] = set()
+    dups: list[str] = []
+    for t in tasks:
+        tid = t.get("id")
+        if tid in seen:
+            dups.append(tid)  # type: ignore[arg-type]
+        if tid is not None:
+            seen.add(tid)
+    return dups
+
+
+def validate_dependencies(tasks: list[dict[str, Any]]) -> list[str]:
+    """Return list of errors for depends_on IDs that do not exist."""
+    errors: list[str] = []
+    ids = {t.get("id") for t in tasks}
+    for t in tasks:
+        deps = t.get("depends_on", []) or []
+        for dep in deps:
+            if dep not in ids:
+                errors.append(f"Task {t.get('id')} depends on missing task: {dep}")
+    return errors
+
+
+def validate_all(tasks_file: Path | str) -> dict[str, Any]:
+    """Validate a tasks.json file and return summary info used by tests."""
+    data = json.loads(Path(tasks_file).read_text())
+    tasks = data.get("tasks", [])
+    errors: list[str] = []
+    # Structure
+    for t in tasks:
+        if not validate_task_structure(t):
+            errors.append(f"Task {t.get('id')} has invalid structure")
+    # Dates
+    errors.extend(validate_dates(tasks))
+    # Duplicates
+    dups = check_duplicates(tasks)
+    errors.extend([f"Duplicate task ID: {d}" for d in dups])
+    # Dependencies
+    errors.extend(validate_dependencies(tasks))
+
+    return {"valid": len(errors) == 0, "error_count": len(errors), "errors": errors}

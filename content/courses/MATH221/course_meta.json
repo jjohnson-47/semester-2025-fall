@@ -1,4 +1,6 @@
 {
   "course_crn": "74645",
-  "course_credits": 3
+  "course_credits": 3,
+  "section": "RW1",
+  "format": "Online Asynchronous"
 }

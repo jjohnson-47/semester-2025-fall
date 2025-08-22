@@ -76,6 +76,13 @@ class SyllabusBuilder:
         # Load instructor profile
         self._load_instructor_data(data)
 
+        # Map course meta to top-level header fields
+        meta = data.get("course_meta", {}) if isinstance(data.get("course_meta"), dict) else {}
+        data["course_crn"] = meta.get("course_crn", data.get("course_crn"))
+        data["course_credits"] = meta.get("course_credits", data.get("course_credits"))
+        data["course_section"] = meta.get("section", os.getenv(f"{course_code}_SECTION"))
+        data["course_format"] = meta.get("format", os.getenv(f"{course_code}_FORMAT"))
+
         # Add calendar data
         data["calendar"] = self.calendar.get_course_calendar(course_code)
 

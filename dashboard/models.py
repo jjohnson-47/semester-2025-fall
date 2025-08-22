@@ -293,12 +293,13 @@ class TaskGraph:
         """
         from collections import deque
 
-        # Build in-degree map
-        in_degree = dict.fromkeys(self.tasks, 0)
+        # Build in-degree map: number of dependencies for each task
+        in_degree = {task_id: 0 for task_id in self.tasks.keys()}
         for task in self.tasks.values():
-            for dep_id in task.depends_on:
-                if dep_id in in_degree:
-                    in_degree[dep_id] += 1
+            for _dep_id in task.depends_on:
+                # Edge is dep -> task, so increment task's in-degree
+                if task.id in in_degree:
+                    in_degree[task.id] += 1
 
         # Start with tasks that have no dependencies
         queue = deque([task_id for task_id, degree in in_degree.items() if degree == 0])

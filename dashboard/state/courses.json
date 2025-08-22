@@ -1,0 +1,39 @@
+{
+  "semester": "2025-fall",
+  "courses": [
+    {
+      "code": "MATH221",
+      "name": "Applied Calculus for Business and Economics",
+      "section": "F01",
+      "credits": 3,
+      "format": "online",
+      "instructor": "Jeffrey Johnson"
+    },
+    {
+      "code": "MATH251",
+      "name": "Calculus I",
+      "section": "F01",
+      "credits": 4,
+      "format": "online",
+      "instructor": "Jeffrey Johnson"
+    },
+    {
+      "code": "STAT253",
+      "name": "Introduction to Statistics",
+      "section": "F01",
+      "credits": 3,
+      "format": "online",
+      "instructor": "Jeffrey Johnson"
+    }
+  ],
+  "important_dates": {
+    "first_day": "2025-08-25",
+    "last_day": "2025-12-13",
+    "add_drop_deadline": "2025-09-03",
+    "withdrawal_deadline": "2025-10-31",
+    "thanksgiving_break_start": "2025-11-26",
+    "thanksgiving_break_end": "2025-11-30",
+    "finals_start": "2025-12-09",
+    "finals_end": "2025-12-13"
+  }
+}

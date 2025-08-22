@@ -13,7 +13,13 @@ from typing import Any
 try:
     from dotenv import load_dotenv
 
+    # Load base config
     load_dotenv()
+    
+    # Load secrets if available
+    secrets_file = Path('.env.secrets')
+    if secrets_file.exists():
+        load_dotenv(secrets_file)
 except ImportError:
     pass  # dotenv not available, use system env vars
 
@@ -22,7 +28,12 @@ class Config:
     """Base configuration with common settings."""
 
     # Basic Flask config
-    SECRET_KEY = os.environ.get("SECRET_KEY") or "dev-key-change-in-production"
+    # Support both SECRET_KEY and FLASK_SECRET_KEY for flexibility
+    SECRET_KEY = (
+        os.environ.get("FLASK_SECRET_KEY") 
+        or os.environ.get("SECRET_KEY") 
+        or "dev-key-change-in-production"
+    )
 
     # Session configuration
     SESSION_COOKIE_SECURE = False

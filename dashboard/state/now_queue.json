@@ -1,0 +1,119 @@
+{
+  "queue": [
+    {
+      "id": "STAT253-2025F-PREFLIGHT",
+      "course": "STAT253",
+      "title": "STAT253 \u2014 Preflight (sources, policies, calendar)",
+      "description": "Pick master source shell(s), export/archive prior term, confirm Fall 2025 milestones, and lock naming conventions.\n",
+      "category": "setup",
+      "status": "todo",
+      "priority": "medium",
+      "weight": 2,
+      "tags": [],
+      "created_at": "2025-08-22T08:37:15.010523",
+      "updated_at": "2025-08-22T08:37:15.010524",
+      "history": [],
+      "due_date": "2025-07-28T00:00:00",
+      "parent_id": null,
+      "depends_on": [],
+      "smart_score": 345.79,
+      "is_chain_head": true,
+      "chain_anchor": "STAT253-2025F-QA-STUDENT-PREVIEW",
+      "chain_distance": 7,
+      "unblock_count": 49,
+      "score_breakdown": {
+        "base_priority": 150.0,
+        "chain_weight": 36.66,
+        "unblock_impact": 147.0,
+        "anchor_proximity": 1.88,
+        "chain_head_boost": 10.0,
+        "phase_category": 0.25,
+        "staleness": 0,
+        "pin_boost": 0
+      }
+    },
+    {
+      "id": "MATH221-2025F-PREFLIGHT",
+      "course": "MATH221",
+      "title": "MATH221 \u2014 Preflight (sources, policies, calendar)",
+      "description": "Pick master source shell(s), export/archive prior term, confirm Fall 2025 milestones, and lock naming conventions.\n",
+      "category": "setup",
+      "status": "todo",
+      "priority": "medium",
+      "weight": 2,
+      "tags": [],
+      "created_at": "2025-08-22T08:37:15.009273",
+      "updated_at": "2025-08-22T08:37:15.009274",
+      "history": [],
+      "due_date": "2025-07-28T00:00:00",
+      "parent_id": null,
+      "depends_on": [],
+      "smart_score": 342.79,
+      "is_chain_head": true,
+      "chain_anchor": "MATH221-2025F-QA-STUDENT-PREVIEW",
+      "chain_distance": 7,
+      "unblock_count": 48,
+      "score_breakdown": {
+        "base_priority": 150.0,
+        "chain_weight": 36.66,
+        "unblock_impact": 144.0,
+        "anchor_proximity": 1.88,
+        "chain_head_boost": 10.0,
+        "phase_category": 0.25,
+        "staleness": 0,
+        "pin_boost": 0
+      }
+    },
+    {
+      "id": "MATH251-2025F-PREFLIGHT",
+      "course": "MATH251",
+      "title": "MATH251 \u2014 Preflight (sources, policies, calendar)",
+      "description": "Pick master source shell(s), export/archive prior term, confirm Fall 2025 milestones, and lock naming conventions.\n",
+      "category": "setup",
+      "status": "todo",
+      "priority": "medium",
+      "weight": 2,
+      "tags": [],
+      "created_at": "2025-08-22T08:37:15.009855",
+      "updated_at": "2025-08-22T08:37:15.009857",
+      "history": [],
+      "due_date": "2025-07-28T00:00:00",
+      "parent_id": null,
+      "depends_on": [],
+      "smart_score": 342.79,
+      "is_chain_head": true,
+      "chain_anchor": "MATH251-2025F-QA-STUDENT-PREVIEW",
+      "chain_distance": 7,
+      "unblock_count": 48,
+      "score_breakdown": {
+        "base_priority": 150.0,
+        "chain_weight": 36.66,
+        "unblock_impact": 144.0,
+        "anchor_proximity": 1.88,
+        "chain_head_boost": 10.0,
+        "phase_category": 0.25,
+        "staleness": 0,
+        "pin_boost": 0
+      }
+    }
+  ],
+  "metadata": {
+    "generated": "2025-08-22T10:26:49.183959",
+    "phase": {
+      "name": "Week One",
+      "start_days": 1,
+      "end_days": 7,
+      "category_boosts": {
+        "communication": 5.0,
+        "technical": 3.0,
+        "assessment": 2.0,
+        "content": 1.5,
+        "setup": 0.5,
+        "materials": 0.5
+      },
+      "description": "Student support and real-time adjustments"
+    },
+    "total_tasks": 157,
+    "actionable_tasks": 12
+  }
+}

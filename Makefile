@@ -153,6 +153,16 @@ sync-guides: ## Convert course guide Markdown into course JSON (description, pre
 	@$(PYTHON) scripts/utils/sync_course_guides.py --courses MATH221 MATH251 STAT253
 	@echo "$(GREEN)✓ Course guides synced$(NC)"
 
+.PHONY: preview
+preview: ## Build syllabi/schedules and launch dashboard (one-step workflow)
+	@echo "$(BLUE)Preparing syllabi and schedules for dashboard...$(NC)"
+	@$(MAKE) sync-guides --no-print-directory
+	@$(MAKE) validate --no-print-directory || true
+	@$(MAKE) syllabi --no-print-directory
+	@$(MAKE) schedules --no-print-directory
+	@$(MAKE) weekly --no-print-directory
+	@$(MAKE) dash --no-print-directory
+
 # Scaffold course content
 scaffold: ## Scaffold content for a course (use COURSE=MATH221)
 ifndef COURSE
@@ -188,7 +198,17 @@ dash-gen: dash-init ## Generate tasks from templates
 		--templates dashboard/templates_src \
 		--out dashboard/state/tasks.json
 	@$(MAKE) dash-validate --no-print-directory
+	@$(MAKE) dash-prioritize --no-print-directory
 	@echo "$(GREEN)✓ Tasks generated successfully$(NC)"
+
+dash-prioritize: ## Compute smart scores and Now Queue
+	@echo "$(BLUE)Reprioritizing tasks...$(NC)"
+	@$(PYTHON) dashboard/tools/reprioritize.py \
+		--tasks dashboard/state/tasks.json \
+		--contracts dashboard/tools/priority_contracts.yaml \
+		--semester-first-day 2025-08-25 \
+		--write
+	@echo "$(GREEN)✓ Reprioritization complete$(NC)"
 
 dash-validate: ## Validate task data integrity
 	@echo "$(BLUE)Validating task data...$(NC)"

@@ -1,0 +1,378 @@
+# Fall 2025 — Blackboard Ultra build & manage (course-agnostic)
+applies_to: [MATH221, MATH251, STAT253]
+
+defaults:
+  weight: 2
+  # category is set per-task; weights tuned so critical path floats up with calculate_priority()
+
+tasks:
+
+  # ───────────────────────────── Meta / rollup (one per course)
+  - key: COURSE-READY
+    id: "{{course.code}}-2025F-COURSE-READY"
+    title: "{{course.code}} — Ready for student access"
+    category: setup
+    description: >
+      Aggregation task signaling the course is fully prepared for students.
+      Blocks publishing/go-live tasks. Auto-unblocks when all prerequisites are done.
+    due_offset: { days: -2, from: semester.first_day }
+    blocked_by:
+      - "{{course.code}}-2025F-QA-STUDENT-PREVIEW"
+      - "{{course.code}}-2025F-ANNOUNCEMENTS-SCHEDULE"
+      - "{{course.code}}-2025F-GRADEBOOK-VERIFY"
+      - "{{course.code}}-2025F-LTI-GRADESYNC-VERIFY"
+      - "{{course.code}}-2025F-WEEKLY-MODULES-TEMPLATE"
+      - "{{course.code}}-2025F-BULK-DATE-SHIFT"
+      - "{{course.code}}-2025F-SHELL-PREP"
+    weight: 1
+
+  - key: OPEN-COURSE
+    id: "{{course.code}}-2025F-OPEN-COURSE"
+    title: "{{course.code}} — Open course & set availability"
+    category: setup
+    description: Set course availability to students; final smoke check immediately after opening.
+    due_offset: { days: -1, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-COURSE-READY"]
+    weight: 1
+
+  # ───────────────────────────── Preflight & syllabus
+  - key: PREFLIGHT
+    id: "{{course.code}}-2025F-PREFLIGHT"
+    title: "{{course.code}} — Preflight (sources, policies, calendar)"
+    category: setup
+    description: >
+      Pick master source shell(s), export/archive prior term, confirm Fall 2025 milestones,
+      and lock naming conventions.
+    due_offset: { days: -28, from: semester.first_day }
+    weight: 2
+
+  - key: SYLLABUS-GENERATE
+    id: "{{course.code}}-2025F-SYLLABUS-GENERATE"
+    title: "{{course.code}} — Generate syllabus & schedule (toolchain)"
+    category: materials
+    description: Build PDF/HTML/DOCX via your Jinja/JSON pipeline; store artifacts and link in course.
+    due_offset: { days: -27, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-PREFLIGHT"]
+    weight: 2
+
+  - key: SYLLABUS-REVIEW
+    id: "{{course.code}}-2025F-SYLLABUS-REVIEW"
+    title: "{{course.code}} — Review syllabus & policies"
+    category: materials
+    description: Proofread, check policy language, accessibility, and all term dates.
+    due_offset: { days: -26, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-SYLLABUS-GENERATE"]
+    weight: 2
+
+  # ───────────────────────────── Shell & copy
+  - key: SHELL-PREP
+    id: "{{course.code}}-2025F-SHELL-PREP"
+    title: "{{course.code}} — Prepare Ultra shell (nav, tools, entry point)"
+    category: setup
+    description: Configure course name, banner, availability=private, left-nav pruning, entry point.
+    due_offset: { days: -24, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-SYLLABUS-REVIEW"]
+    weight: 3
+
+  - key: COPY-PRIOR-CONTENT
+    id: "{{course.code}}-2025F-COPY-PRIOR-CONTENT"
+    title: "{{course.code}} — Copy content from prior term"
+    category: setup
+    description: Copy items, modules, assessments, pools, rubrics, groups, gradebook cats, LTI links.
+    due_offset: { days: -23, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-SHELL-PREP"]
+    weight: 3
+
+  - key: CALENDAR-MILESTONES-VERIFY
+    id: "{{course.code}}-2025F-CALENDAR-MILESTONES-VERIFY"
+    title: "{{course.code}} — Verify calendar milestones"
+    category: setup
+    description: Verify institutional holidays, campus closures, exam windows against your schedule.
+    due_offset: { days: -25, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-SYLLABUS-REVIEW"]
+    weight: 2
+
+  - key: BULK-DATE-SHIFT
+    id: "{{course.code}}-2025F-BULK-DATE-SHIFT"
+    title: "{{course.code}} — Batch edit all due/release dates"
+    category: setup
+    description: Use Ultra Batch Edit to shift dates; spot-check edge cases (late windows, time zone AK).
+    due_offset: { days: -22, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-COPY-PRIOR-CONTENT", "{{course.code}}-2025F-CALENDAR-MILESTONES-VERIFY"]
+    weight: 2
+
+  - key: TEXT-DATES-SCAN
+    id: "{{course.code}}-2025F-TEXT-DATES-SCAN"
+    title: "{{course.code}} — Search/replace date text in item bodies"
+    category: content
+    description: Replace old term strings (e.g., "Spring 2024") and hardcoded dates in descriptions/pages.
+    due_offset: { days: -19, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-COPY-PRIOR-CONTENT"]
+    weight: 2
+
+  - key: CONTENT-DESCRIPTIONS-UPDATE
+    id: "{{course.code}}-2025F-CONTENT-DESCRIPTIONS-UPDATE"
+    title: "{{course.code}} — Update/clarify item descriptions"
+    category: content
+    description: Refresh instructions, readings, links; ensure consistent voice and learning outcomes.
+    due_offset: { days: -18, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-COPY-PRIOR-CONTENT"]
+    weight: 3
+
+  # ───────────────────────────── Weekly modules (consistency)
+  - key: WEEKLY-MODULES-TEMPLATE
+    id: "{{course.code}}-2025F-WEEKLY-MODULES-TEMPLATE"
+    title: "{{course.code}} — Apply weekly module template (W01–W15)"
+    category: content
+    description: Ensure each week has Overview, Read/Watch, Practice, Homework, Quiz, Discussion, Links.
+    due_offset: { days: -18, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-COPY-PRIOR-CONTENT"]
+    weight: 4
+
+  # ───────────────────────────── LTI / Homework systems / Assessments
+  - key: LTI-RELINK
+    id: "{{course.code}}-2025F-LTI-RELINK"
+    title: "{{course.code}} — Re-link LTI tools to Fall 2025 sections"
+    category: technical
+    description: Reauthenticate and point LTI links (MOM/publisher/Perusall/etc.) to 2025 courses.
+    due_offset: { days: -18, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-COPY-PRIOR-CONTENT"]
+    weight: 4
+
+  - key: HOMEWORK-WINDOWS
+    id: "{{course.code}}-2025F-HOMEWORK-WINDOWS"
+    title: "{{course.code}} — Align homework open/due/late windows"
+    category: assessment
+    description: Set windows in the homework system to mirror Ultra dates; tolerances/randomization OK.
+    due_offset: { days: -16, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-LTI-RELINK", "{{course.code}}-2025F-WEEKLY-MODULES-TEMPLATE"]
+    weight: 3
+
+  - key: QUIZZES-TESTS-SETTINGS
+    id: "{{course.code}}-2025F-QUIZZES-TESTS-SETTINGS"
+    title: "{{course.code}} — Quiz/Test settings & pools"
+    category: assessment
+    description: Pools mapped; random blocks; time limits; attempts; feedback timing; prevent backtracking (if used).
+    due_offset: { days: -14, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-COPY-PRIOR-CONTENT"]
+    weight: 3
+
+  - key: PROCTORING-CONFIG
+    id: "{{course.code}}-2025F-PROCTORING-CONFIG"
+    title: "{{course.code}} — Proctoring config (if used)"
+    category: technical
+    description: LockDown/Respondus settings; create practice test; document requirements for students.
+    due_offset: { days: -14, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-QUIZZES-TESTS-SETTINGS"]
+    weight: 2
+
+  - key: ACCOMMODATIONS-SETUP
+    id: "{{course.code}}-2025F-ACCOMMODATIONS-SETUP"
+    title: "{{course.code}} — Accommodations & exceptions"
+    category: assessment
+    description: Enter ADA letters; set test exceptions/extra time and verify per assessment.
+    due_offset: { days: -12, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-QUIZZES-TESTS-SETTINGS"]
+    weight: 2
+
+  # ───────────────────────────── Gradebook
+  - key: GRADEBOOK-STRUCTURE
+    id: "{{course.code}}-2025F-GRADEBOOK-STRUCTURE"
+    title: "{{course.code}} — Gradebook categories/weights/schemas"
+    category: assessment
+    description: Categories, weights (sum=100% or points plan), calc columns, EC items placed correctly.
+    due_offset: { days: -16, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-COPY-PRIOR-CONTENT"]
+    weight: 3
+
+  - key: LTI-GRADESYNC-VERIFY
+    id: "{{course.code}}-2025F-LTI-GRADESYNC-VERIFY"
+    title: "{{course.code}} — Verify LTI grade sync"
+    category: technical
+    description: Post test assignment → confirm grades flow into the correct Gradebook categories.
+    due_offset: { days: -12, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-LTI-RELINK", "{{course.code}}-2025F-GRADEBOOK-STRUCTURE"]
+    weight: 2
+
+  - key: GRADEBOOK-VERIFY
+    id: "{{course.code}}-2025F-GRADEBOOK-VERIFY"
+    title: "{{course.code}} — Gradebook QA (totals, visibility, release)"
+    category: assessment
+    description: Totals math, schema cutoffs, posting policy, student visibility; fix anomalies.
+    due_offset: { days: -13, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-GRADEBOOK-STRUCTURE", "{{course.code}}-2025F-LTI-RELINK"]
+    weight: 2
+
+  # ───────────────────────────── Communication
+  - key: ANNOUNCEMENTS-TEMPLATE
+    id: "{{course.code}}-2025F-ANNOUNCEMENTS-TEMPLATE"
+    title: "{{course.code}} — Build announcement templates"
+    category: communication
+    description: Welcome, weekly cadence (Mon "This week", Fri "Looking ahead"), exam reminders.
+    due_offset: { days: -9, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-WEEKLY-MODULES-TEMPLATE"]
+    weight: 2
+
+  - key: ANNOUNCEMENTS-SCHEDULE
+    id: "{{course.code}}-2025F-ANNOUNCEMENTS-SCHEDULE"
+    title: "{{course.code}} — Schedule/queue announcements"
+    category: communication
+    description: Schedule welcome + Week 1 announcements; draft Week 2–3; confirm student notifications.
+    due_offset: { days: -5, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-ANNOUNCEMENTS-TEMPLATE"]
+    weight: 2
+
+  # ───────────────────────────── People & groups
+  - key: ROSTER-ROLES
+    id: "{{course.code}}-2025F-ROSTER-ROLES"
+    title: "{{course.code}} — Roster & roles"
+    category: setup
+    description: Verify roster sync; Instructor/TA/Grader roles correct; attendance tool as needed.
+    due_offset: { days: -12, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-SHELL-PREP"]
+    weight: 1
+
+  - key: GROUPS-SETUP
+    id: "{{course.code}}-2025F-GROUPS-SETUP"
+    title: "{{course.code}} — Groups (projects/labs) & tool access"
+    category: setup
+    description: Create group sets; assign or enable self-enroll with caps; attach tools/rubrics.
+    due_offset: { days: -11, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-ROSTER-ROLES", "{{course.code}}-2025F-WEEKLY-MODULES-TEMPLATE"]
+    weight: 2
+
+  # ───────────────────────────── Accessibility & polish
+  - key: ACCESSIBILITY-PASS
+    id: "{{course.code}}-2025F-ACCESSIBILITY-PASS"
+    title: "{{course.code}} — Ally & accessibility pass"
+    category: materials
+    description: Fix Ally issues; captions/transcripts; headings/tables/alt text; color contrast.
+    due_offset: { days: -10, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-CONTENT-DESCRIPTIONS-UPDATE"]
+    weight: 3
+
+  - key: UX-POLISH
+    id: "{{course.code}}-2025F-UX-POLISH"
+    title: "{{course.code}} — Navigation & UX polish"
+    category: content
+    description: Minimal left nav; consistent module names; mobile preview; clean link text; icons sparingly.
+    due_offset: { days: -9, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-ACCESSIBILITY-PASS"]
+    weight: 1
+
+  # ───────────────────────────── End-to-end QA
+  - key: QA-STUDENT-PREVIEW
+    id: "{{course.code}}-2025F-QA-STUDENT-PREVIEW"
+    title: "{{course.code}} — Student Preview end-to-end test"
+    category: setup
+    description: Navigate Week 0–2, submit samples, verify dates/time zone, gradebook visibility, all links.
+    due_offset: { days: -7, from: semester.first_day }
+    blocked_by:
+      - "{{course.code}}-2025F-LTI-GRADESYNC-VERIFY"
+      - "{{course.code}}-2025F-ACCESSIBILITY-PASS"
+      - "{{course.code}}-2025F-ANNOUNCEMENTS-TEMPLATE"
+      - "{{course.code}}-2025F-GRADEBOOK-VERIFY"
+    weight: 3
+
+  # ───────────────────────────── Early-term management stubs (optional)
+  - key: WEEK-01-ENABLE
+    id: "{{course.code}}-2025F-WEEK-01-ENABLE"
+    title: "{{course.code}} — Enable Week 01 & office hours link"
+    category: content
+    description: Release Week 01, confirm dates, post "This Week" announcement.
+    due_offset: { days: 0, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-OPEN-COURSE"]
+    weight: 1
+
+  - key: WEEK-02-DRAFT
+    id: "{{course.code}}-2025F-WEEK-02-DRAFT"
+    title: "{{course.code}} — Draft Week 02 announcement & checks"
+    category: communication
+    description: Draft next week's announcement; verify upcoming windows and accommodations.
+    due_offset: { days: 5, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-WEEK-01-ENABLE"]
+    weight: 1
+
+# ───────────────────────────── MATH221 (Applied Calculus) nuances
+---
+applies_to: [MATH221]
+defaults:
+  weight: 2
+
+tasks:
+  - key: M221-HW-MAP
+    id: "MATH221-2025F-HW-MAP"
+    title: "MATH221 — Map homework sets to weekly modules"
+    category: assessment
+    description: Ensure each MOM/publisher set aligns to W01–W15; verify points & tolerances.
+    due_offset: { days: -15, from: semester.first_day }
+    blocked_by: ["MATH221-2025F-HOMEWORK-WINDOWS", "MATH221-2025F-WEEKLY-MODULES-TEMPLATE"]
+    weight: 3
+
+  - key: M221-APPLIED-CASES
+    id: "MATH221-2025F-APPLIED-CASES"
+    title: "MATH221 — Update applied case studies/examples"
+    category: content
+    description: Refresh business/social-science examples; link datasets or articles where used.
+    due_offset: { days: -12, from: semester.first_day }
+    blocked_by: ["MATH221-2025F-CONTENT-DESCRIPTIONS-UPDATE"]
+    weight: 2
+
+# ───────────────────────────── MATH251 (Calculus I) nuances
+---
+applies_to: [MATH251]
+defaults:
+  weight: 2
+
+tasks:
+  - key: M251-EXAM-FREE-RESPONSE
+    id: "MATH251-2025F-EXAM-FR"
+    title: "MATH251 — Free-response problem pools"
+    category: assessment
+    description: Check pool coverage for limits/derivatives; rubrics attached; partial-credit settings.
+    due_offset: { days: -14, from: semester.first_day }
+    blocked_by: ["MATH251-2025F-QUIZZES-TESTS-SETTINGS"]
+    weight: 3
+
+  - key: M251-GRAPHING-DEMOS
+    id: "MATH251-2025F-GRAPHING-DEMOS"
+    title: "MATH251 — Graphing/interactive demos linked"
+    category: technical
+    description: Verify Desmos/GeoGebra embeds and accessibility alternatives.
+    due_offset: { days: -13, from: semester.first_day }
+    blocked_by: ["MATH251-2025F-CONTENT-DESCRIPTIONS-UPDATE"]
+    weight: 2
+
+# ───────────────────────────── STAT253 (Intro Statistics) nuances
+---
+applies_to: [STAT253]
+defaults:
+  weight: 2
+
+tasks:
+  - key: STAT253-R-SETUP
+    id: "STAT253-2025F-R-SETUP"
+    title: "STAT253 — R setup & lab instructions"
+    category: materials
+    description: Update R install page, R_info, and sample scripts; test on Linux/macOS/Windows.
+    due_offset: { days: -15, from: semester.first_day }
+    blocked_by: ["STAT253-2025F-CONTENT-DESCRIPTIONS-UPDATE"]
+    weight: 3
+
+  - key: STAT253-DATASETS
+    id: "STAT253-2025F-DATASETS"
+    title: "STAT253 — Upload/verify datasets"
+    category: materials
+    description: Upload CSVs; document codebooks; verify links in weekly modules and assessments.
+    due_offset: { days: -13, from: semester.first_day }
+    blocked_by: ["STAT253-2025F-WEEKLY-MODULES-TEMPLATE"]
+    weight: 2
+
+  - key: STAT253-RANDOMIZATION-CHECK
+    id: "STAT253-2025F-RANDOMIZATION-CHECK"
+    title: "STAT253 — Randomization/seed checks for quizzes"
+    category: assessment
+    description: Confirm random variants and feedback release align with learning goals.
+    due_offset: { days: -12, from: semester.first_day }
+    blocked_by: ["STAT253-2025F-QUIZZES-TESTS-SETTINGS"]
+    weight: 2

@@ -8,6 +8,7 @@ from flask import render_template, request
 
 from dashboard.api import api_bp
 from dashboard.services.dependency_service import DependencyService
+from dashboard.services.task_service import TaskService
 
 
 @api_bp.route("/tasks/<task_id>/status", methods=["POST"])
@@ -171,8 +172,6 @@ def quick_add_task():
     Quick add a task from the command palette.
     Returns the updated task list.
     """
-    from dashboard.services.task_service import TaskService
-
     title = request.form.get("title", "").strip()
     if not title:
         return render_template("_error.html", message="Title required"), 400

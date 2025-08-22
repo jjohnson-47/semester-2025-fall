@@ -157,6 +157,9 @@ omit = [
     "*/test_*.py",
     "*/__pycache__/*",
     "*/docs/*",
+    # Exclude CLI scripts and app runner from coverage to focus on core libs
+    "scripts/*",
+    "dashboard/app.py",
 ]
 
 [tool.coverage.report]

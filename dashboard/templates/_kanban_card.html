@@ -43,8 +43,9 @@
                 <span></span>
             {% endif %}
 
-            {% if task.weight > 1 %}
-                <span title="Weight: {{ task.weight }} points">⚖️ {{ task.weight }}</span>
+            {% set wt = task.weight|default(1) %}
+            {% if wt > 1 %}
+                <span title="Weight: {{ wt }} points">⚖️ {{ wt }}</span>
             {% endif %}
         </div>
 

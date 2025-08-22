@@ -46,7 +46,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 import pytz
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, Response, jsonify, render_template, request
 
 # Import config - try both relative and absolute imports
 try:
@@ -58,6 +58,10 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Note: The more advanced API is exposed via the package factory in
+# dashboard/__init__.py. For this module-level app (used in simpler tests),
+# we provide lightweight endpoints implemented against TaskManager.
 
 # Configuration from Config class
 TIMEZONE = pytz.timezone(Config.TIMEZONE)
@@ -235,20 +239,47 @@ def get_due_color(task: dict[str, Any]) -> str:
     return ""
 
 
+# Backwards-compatible helper for tests expecting module-level function
+def validate_task_data(task: dict[str, Any]) -> bool:
+    """Validate task structure (wrapper around TaskManager)."""
+    return TaskManager.validate_task_data(task)
+
+
 @app.route("/")
 def index():
     """Main dashboard view."""
     data = TaskManager.load_tasks()
     courses = TaskManager.load_courses()
+    
+    # Load Now Queue if it exists
+    now_queue = []
+    now_queue_file = STATE_DIR / "now_queue.json"
+    if now_queue_file.exists():
+        with open(now_queue_file) as f:
+            now_queue_data = json.load(f)
+            now_queue = now_queue_data.get("queue", [])
 
     # Calculate priorities and add display helpers
     for task in data["tasks"]:
-        task["priority"] = calculate_priority(task)
+        # Use smart_score if available, otherwise calculate basic priority
+        if "smart_score" not in task:
+            task["priority"] = calculate_priority(task)
+        else:
+            task["priority"] = task["smart_score"]
+            
         task["status_color"] = get_status_color(task.get("status", "todo"))
         task["due_color"] = get_due_color(task)
 
         # Format due date for display
-        if "due" in task:
+        if "due_date" in task:
+            try:
+                due = datetime.fromisoformat(task["due_date"])
+                task["due_display"] = due.strftime("%b %d, %Y")
+                task["due_relative"] = get_relative_time(due)
+            except (ValueError, TypeError, AttributeError) as e:
+                logger.debug(f"Failed to format due date for task {task.get('id')}: {e}")
+                task["due_display"] = task.get("due_date", "")
+        elif "due" in task:  # Fallback for old format
             try:
                 due = datetime.fromisoformat(task["due"])
                 task["due_display"] = due.strftime("%b %d, %Y")
@@ -257,8 +288,8 @@ def index():
                 logger.debug(f"Failed to format due date for task {task.get('id')}: {e}")
                 task["due_display"] = task["due"]
 
-    # Sort by priority
-    data["tasks"].sort(key=lambda t: t["priority"], reverse=True)
+    # Sort by smart_score/priority
+    data["tasks"].sort(key=lambda t: t.get("smart_score", t.get("priority", 0)), reverse=True)
 
     # Group by course
     by_course = {}
@@ -286,7 +317,238 @@ def index():
         courses=courses.get("courses", []),
         stats=stats,
         updated=data["metadata"].get("updated"),
+        now_queue=now_queue,
     )
+
+
+# --- Lightweight JSON API (TaskManager-backed) ---
+@app.route("/api/tasks", methods=["GET"])
+def api_get_tasks():
+    """Return tasks with optional filtering by course and status."""
+    data = TaskManager.load_tasks()
+    tasks = data.get("tasks", [])
+
+    course = request.args.get("course")
+    status = request.args.get("status")
+
+    if course:
+        tasks = [t for t in tasks if t.get("course") == course]
+    if status:
+        tasks = [t for t in tasks if t.get("status") == status]
+
+    return jsonify({"tasks": tasks, "metadata": data.get("metadata", {})})
+
+
+@app.route("/api/tasks", methods=["POST"])
+def api_create_task():
+    """Create a new task and persist it to state."""
+    payload = request.get_json(silent=True) or {}
+    required = ["course", "title", "status", "priority"]
+    missing = [f for f in required if f not in payload]
+    if missing:
+        return jsonify({"error": f"Missing required fields: {', '.join(missing)}"}), 400
+
+    data = TaskManager.load_tasks()
+    tasks = data.setdefault("tasks", [])
+
+    # Generate a simple ID if not provided
+    task_id = payload.get("id")
+    if not task_id:
+        base = f"{payload['course']}-{len(tasks)+1:03d}"
+        # Ensure uniqueness
+        existing_ids = {t.get("id") for t in tasks}
+        i = 1
+        candidate = base
+        while candidate in existing_ids:
+            i += 1
+            candidate = f"{base}-{i}"
+        task_id = candidate
+    payload["id"] = task_id
+
+    tasks.append(payload)
+    TaskManager.save_tasks(data)
+
+    return jsonify({"id": task_id}), 201
+
+
+@app.route("/api/tasks/<task_id>", methods=["PUT"])
+def api_update_task(task_id: str):
+    """Update a task's status. Expects JSON: {"status": "..."}."""
+    body = request.get_json(silent=True) or {}
+    new_status = body.get("status")
+    if not new_status:
+        return jsonify({"error": "Missing 'status' in request body"}), 400
+
+    updated = TaskManager.update_task_status(task_id, new_status)
+    if not updated:
+        return jsonify({"error": "Task not found"}), 404
+
+    # Return updated task payload for parity with API blueprint
+    data = TaskManager.load_tasks()
+    task = next((t for t in data.get("tasks", []) if t.get("id") == task_id), None)
+    return jsonify({"success": True, "task": task})
+
+
+@app.route("/api/stats", methods=["GET"])
+def api_stats():
+    """Return basic task statistics for dashboard tests."""
+    data = TaskManager.load_tasks()
+    tasks = data.get("tasks", [])
+
+    stats = {
+        "total": len(tasks),
+        "completed": sum(1 for t in tasks if t.get("status") == "completed"),
+        "in_progress": sum(1 for t in tasks if t.get("status") == "in_progress"),
+        "todo": sum(1 for t in tasks if t.get("status") == "todo"),
+    }
+
+    return jsonify(stats)
+
+
+@app.route("/api/tasks/bulk-update", methods=["POST"])
+def api_bulk_update() -> Response:
+    """Bulk update tasks matching simple filter criteria.
+
+    Expected body: {"filter": {...}, "update": {...}}
+    Matches on equality for provided filter fields.
+    """
+    body = request.get_json(silent=True) or {}
+    if "filter" not in body or "update" not in body:
+        return jsonify({"error": "Missing filter or update parameters"}), 400
+
+    filter_params = body["filter"] or {}
+    update_params = body["update"] or {}
+
+    data = TaskManager.load_tasks()
+    tasks = data.get("tasks", [])
+
+    updated_count = 0
+    for task in tasks:
+        if all(task.get(k) == v for k, v in filter_params.items()):
+            task.update(update_params)
+            task["updated"] = datetime.now().isoformat()
+            updated_count += 1
+
+    if updated_count:
+        TaskManager.save_tasks(data)
+
+    return jsonify({"success": True, "updated_count": updated_count})
+
+
+@app.route("/api/export", methods=["GET"])
+def api_export() -> Response:
+    """Export tasks in CSV, JSON, or ICS format.
+
+    Query params: format=csv|json|ics, optional course, status filters.
+    """
+    export_format = (request.args.get("format", "csv") or "csv").lower()
+    course = request.args.get("course")
+    status = request.args.get("status")
+
+    data = TaskManager.load_tasks()
+    tasks = data.get("tasks", [])
+
+    if course:
+        tasks = [t for t in tasks if t.get("course") == course]
+    if status:
+        tasks = [t for t in tasks if t.get("status") == status]
+
+    if export_format == "json":
+        payload = {
+            "exported_at": datetime.now().isoformat(),
+            "filters": {"course": course, "status": status},
+            "count": len(tasks),
+            "tasks": tasks,
+        }
+        return Response(
+            json.dumps(payload, indent=2),
+            mimetype="application/json",
+            headers={
+                "Content-Disposition": f"attachment; filename=tasks_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            },
+        )
+
+    if export_format == "csv":
+        import csv
+        from io import StringIO
+
+        output = StringIO()
+        fieldnames = [
+            "id",
+            "course",
+            "title",
+            "status",
+            "priority",
+            "category",
+            "due_date",
+            "description",
+            "created_at",
+            "updated_at",
+        ]
+        writer = csv.DictWriter(output, fieldnames=fieldnames)
+        writer.writeheader()
+        for task in tasks:
+            writer.writerow(task)
+
+        return Response(
+            output.getvalue(),
+            mimetype="text/csv",
+            headers={
+                "Content-Disposition": f"attachment; filename=tasks_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+            },
+        )
+
+    if export_format == "ics":
+        def _priority_to_ics(priority: str) -> int:
+            mapping = {"critical": 1, "high": 3, "medium": 5, "low": 7}
+            return mapping.get(priority, 5)
+
+        def _status_to_ics(status_value: str) -> str:
+            mapping = {
+                "todo": "NEEDS-ACTION",
+                "in_progress": "IN-PROCESS",
+                "completed": "COMPLETED",
+                "blocked": "CANCELLED",
+                "deferred": "TENTATIVE",
+            }
+            return mapping.get(status_value, "NEEDS-ACTION")
+
+        ics_lines = [
+            "BEGIN:VCALENDAR",
+            "VERSION:2.0",
+            "PRODID:-//Dashboard//Task Calendar//EN",
+            "CALSCALE:GREGORIAN",
+            "METHOD:PUBLISH",
+        ]
+
+        for task in tasks:
+            due = (task.get("due_date") or "").replace("-", "")
+            if len(due) == 8:  # YYYYMMDD
+                ics_lines.extend(
+                    [
+                        "BEGIN:VEVENT",
+                        f"UID:{task.get('id')}@dashboard.local",
+                        f"DTSTART;VALUE=DATE:{due}",
+                        f"DTEND;VALUE=DATE:{due}",
+                        f"SUMMARY:[{task.get('course')}] {task.get('title')}",
+                        f"DESCRIPTION:{task.get('description', '')}",
+                        f"PRIORITY:{_priority_to_ics(task.get('priority', 'medium'))}",
+                        f"STATUS:{_status_to_ics(task.get('status', 'todo'))}",
+                        "END:VEVENT",
+                    ]
+                )
+
+        ics_lines.append("END:VCALENDAR")
+
+        return Response(
+            "\r\n".join(ics_lines),
+            mimetype="text/calendar",
+            headers={
+                "Content-Disposition": f"attachment; filename=tasks_{datetime.now().strftime('%Y%m%d')}.ics"
+            },
+        )
+
+    return jsonify({"error": f"Unsupported format: {export_format}"}), 400
 
 
 @app.route("/api/task/<task_id>", methods=["GET", "POST"])
@@ -339,7 +601,7 @@ def api_task(task_id):
 
 
 @app.route("/api/tasks/bulk", methods=["POST"])
-def api_bulk_update():
+def api_bulk_update_tasks_list():
     """Bulk update tasks."""
     data = TaskManager.load_tasks()
     updates = request.json

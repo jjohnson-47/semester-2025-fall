@@ -78,11 +78,11 @@
         <h1>{{ course_code }} - {{ course_name_full }}</h1>
 
         <div class="header-info">
-            <strong>Section:</strong> 901 (Online)<br>
+            <strong>Section:</strong> {{ course_section | default('901') }}<br>
             <strong>Term:</strong> {{ semester }} {{ year }}<br>
             <strong>CRN:</strong> {{ course_crn | default('TBD') }}<br>
             <strong>Credits:</strong> {{ course_credits | default(3) }}<br>
-            <strong>Format:</strong> Online Asynchronous
+            <strong>Format:</strong> {{ course_format | default('Online Asynchronous') }}
         </div>
 
         <h2>Instructor Information</h2>
@@ -185,10 +185,19 @@
             <li>Reliable internet connection</li>
             <li>Computer capable of running modern web browsers</li>
             <li>Webcam and microphone for proctored exams</li>
-            {% if calculators_and_technology %}
-            <li>{{ calculators_and_technology.requirements }}</li>
-            {% endif %}
         </ul>
+        {% if calculators_and_technology %}
+        <div>
+            {{ calculators_and_technology.requirements | markdown | safe }}
+        </div>
+        {% endif %}
+
+        <h3>Platform Access</h3>
+        {% if platform_access %}
+        <div>
+            {{ platform_access.text | markdown | safe }}
+        </div>
+        {% endif %}
 
         <h2>Grading</h2>
 

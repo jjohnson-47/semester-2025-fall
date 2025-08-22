@@ -123,6 +123,52 @@
                            placeholder="🔍 Search tasks... (/ to focus)">
                 </div>
 
+                {% if now_queue %}
+                <div class="alert alert-info mt-3">
+                    <h5 class="alert-heading">🎯 Now Queue - Focus on These Tasks</h5>
+                    <p class="mb-2">The most impactful tasks to work on right now:</p>
+                    <div class="row">
+                        {% for task in now_queue[:7] %}
+                        <div class="col-md-12 mb-2">
+                            <div class="card border-primary">
+                                <div class="card-body p-2">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>
+                                                {% if task.is_chain_head %}➜{% else %}○{% endif %}
+                                                [{{ task.course }}] {{ task.title }}
+                                            </strong>
+                                            {% if task.smart_score %}
+                                                <span class="badge bg-primary ms-2">Score: {{ "%.1f"|format(task.smart_score) }}</span>
+                                            {% endif %}
+                                            {% if task.unblock_count > 0 %}
+                                                <span class="badge bg-success ms-1">Unblocks: {{ task.unblock_count }}</span>
+                                            {% endif %}
+                                            {% if task.chain_anchor %}
+                                                <span class="text-muted ms-2">→ {{ task.chain_anchor.split('-')[-1] }}</span>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            {% if task.due_date %}
+                                                <span class="badge bg-secondary">Due: {{ task.due_date[:10] }}</span>
+                                            {% endif %}
+                                            <button class="btn btn-sm btn-outline-primary ms-2"
+                                                    onclick="updateStatus('{{ task.id }}', 'doing')">
+                                                Start ⚡
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {% if task.description %}
+                                    <small class="text-muted d-block mt-1">{{ task.description[:100] }}{% if task.description|length > 100 %}...{% endif %}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
                 {% for course, course_tasks in by_course.items() %}
                 <div class="course-section mb-4">
                     <h4 class="border-bottom pb-2">
@@ -141,7 +187,13 @@
                                 <div class="col-md-8">
                                     <h6 class="card-title">
                                         <span class="status-icon">{{ task.status|status_icon }}</span>
+                                        {% if task.is_chain_head %}
+                                            <span class="badge bg-warning" title="Chain Head - Ready to Start">➜</span>
+                                        {% endif %}
                                         {{ task.title }}
+                                        {% if task.smart_score %}
+                                            <small class="text-muted">({{ "%.0f"|format(task.smart_score) }})</small>
+                                        {% endif %}
                                     </h6>
                                     <p class="card-text text-muted small">{{ task.description }}</p>
 

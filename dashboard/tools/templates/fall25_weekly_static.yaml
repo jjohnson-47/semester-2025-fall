@@ -1,0 +1,249 @@
+# Fall 2025 — Weekly Scaffold for first 3 weeks (static version)
+applies_to: [MATH221, MATH251, STAT253]
+
+defaults:
+  weight: 2
+
+tasks:
+  # ───────────────────────────── Week 1
+  - key: W01-ROLLUP
+    id: "{{course.code}}-2025F-W01-ROLLUP"
+    title: "{{course.code}} — Week 1 Complete"
+    category: content
+    description: "All Week 1 tasks completed and verified"
+    due_offset: { days: 6, from: semester.first_day }
+    blocked_by:
+      - "{{course.code}}-2025F-W01-EDITORIAL"
+      - "{{course.code}}-2025F-W01-LTI-HW"
+      - "{{course.code}}-2025F-W01-QUIZ-DISCUSS"
+      - "{{course.code}}-2025F-W01-ACCESSIBILITY"
+      - "{{course.code}}-2025F-W01-ANNOUNCE"
+      - "{{course.code}}-2025F-W01-GRADE-ANALYTICS"
+    weight: 1
+
+  - key: W01-EDITORIAL
+    id: "{{course.code}}-2025F-W01-EDITORIAL"
+    title: "{{course.code}} — W01 Editorial (titles, bodies, dates, links)"
+    category: content
+    description: "Review and update all content items for Week 1"
+    parent_id: "{{course.code}}-2025F-W01-ROLLUP"
+    due_offset: { days: -3, from: semester.first_day }
+    blocked_by: 
+      - "{{course.code}}-2025F-WEEKLY-MODULES-TEMPLATE"
+      - "{{course.code}}-2025F-COPY-PRIOR-CONTENT"
+    weight: 3
+
+  - key: W01-LTI-HW
+    id: "{{course.code}}-2025F-W01-LTI-HW"
+    title: "{{course.code}} — W01 LTI/HW mapping & grade sync"
+    category: technical
+    description: "Verify Week 1 homework sets aligned with LMS"
+    parent_id: "{{course.code}}-2025F-W01-ROLLUP"
+    due_offset: { days: -2, from: semester.first_day }
+    blocked_by:
+      - "{{course.code}}-2025F-LTI-RELINK"
+      - "{{course.code}}-2025F-HOMEWORK-WINDOWS"
+      - "{{course.code}}-2025F-GRADEBOOK-STRUCTURE"
+    weight: 3
+
+  - key: W01-QUIZ-DISCUSS
+    id: "{{course.code}}-2025F-W01-QUIZ-DISCUSS"
+    title: "{{course.code}} — W01 Quiz/Discussion config"
+    category: assessment
+    description: "Configure Week 1 quiz settings and discussion prompts"
+    parent_id: "{{course.code}}-2025F-W01-ROLLUP"
+    due_offset: { days: -2, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-QUIZZES-TESTS-SETTINGS"]
+    weight: 2
+
+  - key: W01-ACCESSIBILITY
+    id: "{{course.code}}-2025F-W01-ACCESSIBILITY"
+    title: "{{course.code}} — W01 Accessibility check"
+    category: materials
+    description: "Fix Week 1 Ally issues and verify accessibility"
+    parent_id: "{{course.code}}-2025F-W01-ROLLUP"
+    due_offset: { days: -1, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-CONTENT-DESCRIPTIONS-UPDATE"]
+    weight: 2
+
+  - key: W01-ANNOUNCE
+    id: "{{course.code}}-2025F-W01-ANNOUNCE"
+    title: "{{course.code}} — W01 Post 'This Week' announcement"
+    category: communication
+    description: "Post Week 1 announcement"
+    parent_id: "{{course.code}}-2025F-W01-ROLLUP"
+    due_offset: { days: 0, from: semester.first_day }
+    blocked_by:
+      - "{{course.code}}-2025F-ANNOUNCEMENTS-TEMPLATE"
+      - "{{course.code}}-2025F-OPEN-COURSE"
+    weight: 1
+
+  - key: W01-GRADE-ANALYTICS
+    id: "{{course.code}}-2025F-W01-GRADE-ANALYTICS"
+    title: "{{course.code}} — W01 Grade/analytics"
+    category: assessment
+    description: "Review Week 1 analytics and engagement"
+    parent_id: "{{course.code}}-2025F-W01-ROLLUP"
+    due_offset: { days: 5, from: semester.first_day }
+    blocked_by: []
+    weight: 2
+
+  # ───────────────────────────── Week 2
+  - key: W02-ROLLUP
+    id: "{{course.code}}-2025F-W02-ROLLUP"
+    title: "{{course.code}} — Week 2 Complete"
+    category: content
+    description: "All Week 2 tasks completed and verified"
+    due_offset: { days: 13, from: semester.first_day }
+    blocked_by:
+      - "{{course.code}}-2025F-W02-EDITORIAL"
+      - "{{course.code}}-2025F-W02-LTI-HW"
+      - "{{course.code}}-2025F-W02-QUIZ-DISCUSS"
+      - "{{course.code}}-2025F-W02-ACCESSIBILITY"
+      - "{{course.code}}-2025F-W02-ANNOUNCE"
+      - "{{course.code}}-2025F-W02-GRADE-ANALYTICS"
+    weight: 1
+
+  - key: W02-EDITORIAL
+    id: "{{course.code}}-2025F-W02-EDITORIAL"
+    title: "{{course.code}} — W02 Editorial"
+    category: content
+    description: "Review and update all content items for Week 2"
+    parent_id: "{{course.code}}-2025F-W02-ROLLUP"
+    due_offset: { days: 4, from: semester.first_day }
+    blocked_by: 
+      - "{{course.code}}-2025F-WEEKLY-MODULES-TEMPLATE"
+      - "{{course.code}}-2025F-COPY-PRIOR-CONTENT"
+    weight: 3
+
+  - key: W02-LTI-HW
+    id: "{{course.code}}-2025F-W02-LTI-HW"
+    title: "{{course.code}} — W02 LTI/HW mapping"
+    category: technical
+    description: "Verify Week 2 homework sets"
+    parent_id: "{{course.code}}-2025F-W02-ROLLUP"
+    due_offset: { days: 5, from: semester.first_day }
+    blocked_by:
+      - "{{course.code}}-2025F-LTI-RELINK"
+      - "{{course.code}}-2025F-HOMEWORK-WINDOWS"
+    weight: 3
+
+  - key: W02-QUIZ-DISCUSS
+    id: "{{course.code}}-2025F-W02-QUIZ-DISCUSS"
+    title: "{{course.code}} — W02 Quiz/Discussion"
+    category: assessment
+    description: "Configure Week 2 assessments"
+    parent_id: "{{course.code}}-2025F-W02-ROLLUP"
+    due_offset: { days: 5, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-QUIZZES-TESTS-SETTINGS"]
+    weight: 2
+
+  - key: W02-ACCESSIBILITY
+    id: "{{course.code}}-2025F-W02-ACCESSIBILITY"
+    title: "{{course.code}} — W02 Accessibility"
+    category: materials
+    description: "Fix Week 2 accessibility issues"
+    parent_id: "{{course.code}}-2025F-W02-ROLLUP"
+    due_offset: { days: 6, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-CONTENT-DESCRIPTIONS-UPDATE"]
+    weight: 2
+
+  - key: W02-ANNOUNCE
+    id: "{{course.code}}-2025F-W02-ANNOUNCE"
+    title: "{{course.code}} — W02 Announcement"
+    category: communication
+    description: "Post Week 2 announcement"
+    parent_id: "{{course.code}}-2025F-W02-ROLLUP"
+    due_offset: { days: 7, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-ANNOUNCEMENTS-TEMPLATE"]
+    weight: 1
+
+  - key: W02-GRADE-ANALYTICS
+    id: "{{course.code}}-2025F-W02-GRADE-ANALYTICS"
+    title: "{{course.code}} — W02 Grading"
+    category: assessment
+    description: "Grade Week 1 work, review Week 2 analytics"
+    parent_id: "{{course.code}}-2025F-W02-ROLLUP"
+    due_offset: { days: 12, from: semester.first_day }
+    blocked_by: []
+    weight: 2
+
+  # ───────────────────────────── Week 3
+  - key: W03-ROLLUP
+    id: "{{course.code}}-2025F-W03-ROLLUP"
+    title: "{{course.code}} — Week 3 Complete"
+    category: content
+    description: "All Week 3 tasks completed"
+    due_offset: { days: 20, from: semester.first_day }
+    blocked_by:
+      - "{{course.code}}-2025F-W03-EDITORIAL"
+      - "{{course.code}}-2025F-W03-LTI-HW"
+      - "{{course.code}}-2025F-W03-QUIZ-DISCUSS"
+      - "{{course.code}}-2025F-W03-ACCESSIBILITY"
+      - "{{course.code}}-2025F-W03-ANNOUNCE"
+      - "{{course.code}}-2025F-W03-GRADE-ANALYTICS"
+    weight: 1
+
+  - key: W03-EDITORIAL
+    id: "{{course.code}}-2025F-W03-EDITORIAL"
+    title: "{{course.code}} — W03 Editorial"
+    category: content
+    description: "Review Week 3 content"
+    parent_id: "{{course.code}}-2025F-W03-ROLLUP"
+    due_offset: { days: 11, from: semester.first_day }
+    blocked_by: 
+      - "{{course.code}}-2025F-WEEKLY-MODULES-TEMPLATE"
+      - "{{course.code}}-2025F-COPY-PRIOR-CONTENT"
+    weight: 3
+
+  - key: W03-LTI-HW
+    id: "{{course.code}}-2025F-W03-LTI-HW"
+    title: "{{course.code}} — W03 LTI/HW"
+    category: technical
+    description: "Week 3 homework setup"
+    parent_id: "{{course.code}}-2025F-W03-ROLLUP"
+    due_offset: { days: 12, from: semester.first_day }
+    blocked_by:
+      - "{{course.code}}-2025F-LTI-RELINK"
+      - "{{course.code}}-2025F-HOMEWORK-WINDOWS"
+    weight: 3
+
+  - key: W03-QUIZ-DISCUSS
+    id: "{{course.code}}-2025F-W03-QUIZ-DISCUSS"
+    title: "{{course.code}} — W03 Quiz/Discussion"
+    category: assessment
+    description: "Week 3 assessments"
+    parent_id: "{{course.code}}-2025F-W03-ROLLUP"
+    due_offset: { days: 12, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-QUIZZES-TESTS-SETTINGS"]
+    weight: 2
+
+  - key: W03-ACCESSIBILITY
+    id: "{{course.code}}-2025F-W03-ACCESSIBILITY"
+    title: "{{course.code}} — W03 Accessibility"
+    category: materials
+    description: "Week 3 accessibility"
+    parent_id: "{{course.code}}-2025F-W03-ROLLUP"
+    due_offset: { days: 13, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-CONTENT-DESCRIPTIONS-UPDATE"]
+    weight: 2
+
+  - key: W03-ANNOUNCE
+    id: "{{course.code}}-2025F-W03-ANNOUNCE"
+    title: "{{course.code}} — W03 Announcement"
+    category: communication
+    description: "Week 3 announcement"
+    parent_id: "{{course.code}}-2025F-W03-ROLLUP"
+    due_offset: { days: 14, from: semester.first_day }
+    blocked_by: ["{{course.code}}-2025F-ANNOUNCEMENTS-TEMPLATE"]
+    weight: 1
+
+  - key: W03-GRADE-ANALYTICS
+    id: "{{course.code}}-2025F-W03-GRADE-ANALYTICS"
+    title: "{{course.code}} — W03 Grading"
+    category: assessment
+    description: "Grade Week 2 work"
+    parent_id: "{{course.code}}-2025F-W03-ROLLUP"
+    due_offset: { days: 19, from: semester.first_day }
+    blocked_by: []
+    weight: 2

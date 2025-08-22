@@ -1,10 +1,10 @@
 # {{ course_code }} - {{ course_name_full }}
 
-**{{ course_code }} Section 901**
+**{{ course_code }} Section {{ course_section | default('901') }}**
 **{{ semester }} {{ year }}**
 **CRN: {{ course_crn | default('TBD') }}**
 **Credits: {{ course_credits | default(3) }}**
-**Format: Online Asynchronous**
+**Format: {{ course_format | default('Online Asynchronous') }}**
 
 ---
 
@@ -81,6 +81,12 @@ Textbook information will be provided in Blackboard.
 - Webcam and microphone for proctored exams
 {% if calculators_and_technology -%}
 {{ calculators_and_technology.requirements | markdown }}
+{% endif %}
+
+### Platform Access
+
+{% if platform_access -%}
+{{ platform_access.text | markdown }}
 {% endif %}
 
 ---

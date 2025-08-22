@@ -63,8 +63,17 @@ Config.AUTO_SNAPSHOT   # Boolean for auto-snapshot
 
 #### GET /
 
-**Description:** Main dashboard interface
-**Response:** HTML dashboard with task lists organized by course
+**Description:** Main dashboard interface with smart prioritization
+**Response:** HTML dashboard featuring:
+- Now Queue with 3-7 highest priority tasks
+- Task lists organized by course
+- Smart scores and chain head indicators
+- Unblock counts showing task impact
+
+**Features:**
+- Automatically loads `now_queue.json` if available
+- Displays tasks sorted by `smart_score` when present
+- Falls back to basic priority calculation if not prioritized
 
 #### GET /syllabi/<course_code>
 
@@ -112,6 +121,36 @@ Config.AUTO_SNAPSHOT   # Boolean for auto-snapshot
 }
 ```
 
+#### POST /api/tasks
+
+Create a new task.
+
+Request:
+
+```json
+{
+  "course": "MATH221",
+  "title": "Create syllabus",
+  "status": "todo",
+  "priority": "high",
+  "category": "setup"
+}
+```
+
+Response:
+
+```json
+{ "id": "MATH221-001" }
+```
+
+Example:
+
+```bash
+curl -X POST http://127.0.0.1:5055/api/tasks \
+  -H 'Content-Type: application/json' \
+  -d '{"course":"MATH221","title":"Create syllabus","status":"todo","priority":"high","category":"setup"}'
+```
+
 #### PUT /api/tasks/<task_id>
 
 **Description:** Update task status or properties
@@ -128,13 +167,29 @@ Config.AUTO_SNAPSHOT   # Boolean for auto-snapshot
 }
 ```
 
-**Response:**
+Response includes success and the updated task object:
+
+```json
+{ "success": true, "task": { /* ... */ } }
+```
+
+#### POST /api/tasks/bulk-update
+
+Bulk update tasks matching a simple filter.
+
+Request:
 
 ```json
 {
-  "success": true,
-  "task": { /* updated task object */ }
+  "filter": { "course": "MATH221", "status": "todo" },
+  "update": { "status": "in_progress" }
 }
+```
+
+Response:
+
+```json
+{ "success": true, "updated_count": 3 }
 ```
 
 ### Statistics API
@@ -362,3 +417,28 @@ Add fields to task structure and update:
    - CSV/Excel export
    - PDF reports
    - Calendar integration
+## Export API
+
+#### GET /api/export
+
+Export tasks in various formats.
+
+Query parameters:
+- `format`: `csv` | `json` | `ics` (default: `csv`)
+- `course` (optional): filter by course code
+- `status` (optional): filter by task status
+
+Examples:
+
+```bash
+# JSON export
+curl 'http://127.0.0.1:5055/api/export?format=json&course=MATH221'
+
+# CSV export
+curl -OJ 'http://127.0.0.1:5055/api/export?format=csv'
+
+# ICS export (calendar)
+curl -OJ 'http://127.0.0.1:5055/api/export?format=ics'
+```
+
+The ICS export emits a VCALENDAR with a VEVENT for each task having a `due_date`.

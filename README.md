@@ -85,32 +85,54 @@ semester-2025-fall/
 | `make dash-gen` | Generate tasks from templates |
 | `make dash-validate` | Validate task dependencies |
 | `make dash-snapshot` | Create git snapshot of tasks |
+| `make dash-open` | Open dashboard in your browser |
 
-## 📊 Task Dashboard
+## 📊 Task Dashboard with Smart Prioritization
 
-The integrated task dashboard helps track semester preparation:
+The integrated task dashboard features an AI-driven prioritization system that identifies the most impactful work:
 
 - **URL:** <http://127.0.0.1:5055> (when running)
-- **Features:**
-  - Visual task tracking with 5 status levels
-  - Automatic dependency resolution
-  - Due date monitoring and alerts
-  - Checklist support for complex tasks
-  - Git-backed task history
+- **Smart Features:**
+  - **Now Queue** - Shows 3-7 most critical tasks across all courses
+  - **Chain Head Detection** - Identifies immediately actionable tasks (➜ marker)
+  - **Unblock Impact** - Shows how many downstream tasks each action enables
+  - **Smart Scoring** - Combines urgency, impact, and strategic value
+  - **Phase-Aware** - Adjusts priorities based on semester timeline
+
+### Smart Prioritization System
+
+The system uses multiple signals to identify high-impact work:
+
+1. **Critical Chain Analysis** - Weights tasks by their path to key milestones
+2. **Dependency Resolution** - Prioritizes tasks that unblock the most work
+3. **Phase Optimization** - Adjusts focus based on pre-launch/launch/in-term phase
+4. **Due Date Integration** - Incorporates traditional deadline urgency
+
+Run prioritization:
+```bash
+make reprioritize
+# Or manually:
+python dashboard/tools/reprioritize.py \
+  --tasks dashboard/state/tasks.json \
+  --contracts dashboard/tools/priority_contracts.yaml \
+  --semester-first-day 2025-08-25 \
+  --write
+```
 
 ### Task Workflow
 
 ```
-blocked → todo → doing → review → done
+blocked → todo → in_progress → done
 ```
 
 ### Dashboard Views
 
+- **Now Queue** - AI-prioritized immediate actions
 - **Today** - Tasks due today
 - **This Week** - Upcoming 7 days
 - **Overdue** - Past due tasks
 - **Blocked** - Tasks waiting on dependencies
-- **All Tasks** - Complete task list
+- **All Tasks** - Complete task list with smart scores
 
 ## 📝 Course Configuration
 
@@ -147,34 +169,57 @@ Course data is stored in JSON files under `content/courses/[COURSE_CODE]/`:
 
 ### Prerequisites
 
-- Python 3.9+
-- Git
-- Make
+- Python 3.13+
+- Git and Make
 - Pandoc (optional, for PDF generation)
 
 ### Installation
 
-```bash
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
+We use `uv` to manage environments and sync dependencies defined in `pyproject.toml`.
 
-# Install dependencies
-pip install -r requirements.txt
-pip install -r dashboard/requirements.txt
+```bash
+# Install Python and sync deps
+make init
+
+# Check toolchain
+make check-deps
 ```
 
 ### Testing
 
 ```bash
-# Validate all JSON files
+# Validate repository data
 make validate
 
-# Run dashboard validation
-make dash-validate
+# Run full test suite with coverage
+make test
 
-# Check dependencies
-make check-deps
+# Lint and format
+make lint
+make format
+```
+
+### API Quick Reference
+
+Base URL (default dev): `http://127.0.0.1:5055`
+
+- `GET /api/tasks?course=MATH221&status=todo` — list/filter tasks
+- `POST /api/tasks` — create task (JSON: course, title, status, priority, category)
+- `PUT /api/tasks/<id>` — update a task’s status via `{ "status": "in_progress" }`
+- `POST /api/tasks/bulk-update` — bulk update tasks `{ filter, update }`
+- `GET /api/stats` — high-level stats
+- `GET /api/export?format=csv|json|ics` — export tasks
+
+Examples:
+
+```bash
+curl 'http://127.0.0.1:5055/api/tasks?course=MATH221'
+curl -X POST 'http://127.0.0.1:5055/api/tasks' -H 'Content-Type: application/json' \
+  -d '{"course":"MATH221","title":"Create syllabus","status":"todo","priority":"high","category":"setup"}'
+curl -X PUT  'http://127.0.0.1:5055/api/tasks/MATH221-001' -H 'Content-Type: application/json' -d '{"status":"completed"}'
+curl -X POST 'http://127.0.0.1:5055/api/tasks/bulk-update' -H 'Content-Type: application/json' \
+  -d '{"filter":{"course":"MATH221","status":"todo"},"update":{"status":"in_progress"}}'
+curl 'http://127.0.0.1:5055/api/export?format=ics'
 ```
 
 ## 📚 Documentation
@@ -188,7 +233,7 @@ make check-deps
 
 1. Create a feature branch
 2. Make changes and test thoroughly
-3. Run `make validate` before committing
+3. Run `make validate`, `make lint`, `make test` before committing
 4. Submit pull request with clear description
 
 ## 📄 License
