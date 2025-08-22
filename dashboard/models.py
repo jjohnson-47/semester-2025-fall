@@ -330,7 +330,7 @@ class TaskGraph:
         paths: dict[str, list[Task]] = {}
 
         for task in sorted_tasks:
-            max_weight = 0
+            max_weight: float = 0.0
             predecessor = None
 
             for dep_id in task.depends_on:

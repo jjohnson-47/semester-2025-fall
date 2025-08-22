@@ -24,18 +24,20 @@ class TaskGenerator:
     def __init__(self, courses_file: str, templates_dir: str):
         self.courses = self._load_json(courses_file)
         self.templates_dir = Path(templates_dir)
-        self.tasks = []
+        self.tasks: list[dict[str, Any]] = []
         self.task_counter = 0
 
     def _load_json(self, filepath: str) -> dict[str, Any]:
         """Load JSON file."""
         with open(filepath) as f:
-            return json.load(f)
+            data: dict[str, Any] = json.load(f)
+            return data
 
     def _load_yaml(self, filepath: str) -> dict[str, Any]:
         """Load YAML file."""
         with open(filepath) as f:
-            return yaml.safe_load(f)
+            data: dict[str, Any] = yaml.safe_load(f)
+            return data
 
     def generate(self) -> dict[str, Any]:
         """Generate all tasks from templates."""

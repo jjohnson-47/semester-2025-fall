@@ -67,9 +67,10 @@ def _is_bullet(line: str) -> bool:
 
     Supports ``- ``, ``* ``, and numbered bullets like ``1. ``.
     """
-    return line.strip().startswith(("-", "*")) or (
-        line.strip() and line.strip()[0].isdigit() and "." in line.strip()[:3]
-    )
+    stripped = line.strip()
+    if stripped.startswith(("-", "*")):
+        return True
+    return bool(stripped and stripped[0].isdigit() and "." in stripped[:3])
 
 
 def _normalize_bullets(lines: list[str]) -> list[str]:

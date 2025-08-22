@@ -106,10 +106,12 @@ def main() -> None:
     print("✓ Generated dashboard/state/courses.json")
     print(f"  - Semester: {courses_data['semester']}")
     courses = courses_data.get("courses", [])
-    if courses:
-        print(f"  - Courses: {', '.join(c['code'] for c in courses)}")
+    if courses and isinstance(courses, list):
+        print(
+            f"  - Courses: {', '.join(c['code'] for c in courses if isinstance(c, dict) and 'code' in c)}"
+        )
     dates = courses_data.get("important_dates", {})
-    if dates:
+    if dates and isinstance(dates, dict):
         print(f"  - First day: {dates.get('first_day', 'N/A')}")
         print(f"  - Last day: {dates.get('last_day', 'N/A')}")
 

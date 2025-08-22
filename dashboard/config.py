@@ -12,6 +12,7 @@ from typing import Any
 # Load .env file if available
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     pass  # dotenv not available, use system env vars
@@ -36,18 +37,18 @@ class Config:
     # File paths - use env vars with sensible defaults
     PROJECT_ROOT = Path(os.environ.get("PROJECT_ROOT", Path(__file__).parent.parent))
     BASE_DIR = PROJECT_ROOT
-    
+
     # Dashboard specific paths
     DASHBOARD_DIR = PROJECT_ROOT / "dashboard"
     STATE_DIR = PROJECT_ROOT / os.environ.get("DASHBOARD_STATE_DIR", "dashboard/state")
     TASKS_FILE = STATE_DIR / "tasks.json"
     COURSES_FILE = STATE_DIR / "courses.json"
-    
+
     # Build output paths
     BUILD_DIR = PROJECT_ROOT / os.environ.get("BUILD_DIR", "build")
     SYLLABI_DIR = BUILD_DIR / "syllabi"
     SCHEDULES_DIR = BUILD_DIR / "schedules"
-    
+
     # Content source paths
     CONTENT_DIR = PROJECT_ROOT / os.environ.get("DATA_DIR", "content")
     TEMPLATE_DIR = PROJECT_ROOT / os.environ.get("TEMPLATE_DIR", "templates")

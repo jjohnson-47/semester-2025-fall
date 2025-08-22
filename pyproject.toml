@@ -40,7 +40,11 @@ dev = [
 [tool.uv]
 package = false
 dev-dependencies = [
+    "bandit>=1.8.6",
     "pre-commit>=4.0.0",
+    "types-markdown>=3.8.0.20250809",
+    "types-pytz>=2025.2.0.20250809",
+    "types-pyyaml>=6.0.12.20250822",
 ]
 
 [tool.ruff]

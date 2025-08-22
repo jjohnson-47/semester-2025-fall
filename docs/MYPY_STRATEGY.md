@@ -8,7 +8,7 @@ The project has ~112 MyPy errors across 20 files. These are primarily missing ty
 
 ### Error Categories
 
-1. **Missing Type Annotations (60%)** 
+1. **Missing Type Annotations (60%)**
    - Function return types not specified
    - Function parameters missing types
    - Class methods without annotations
@@ -28,9 +28,11 @@ The project has ~112 MyPy errors across 20 files. These are primarily missing ty
 ## High-Level Strategy
 
 ### Phase 1: Foundation (Immediate)
+
 **Goal:** Fix critical type errors that affect runtime behavior
 
 1. **Install Missing Type Stubs**
+
    ```bash
    uv add --dev types-pytz types-PyYAML types-Markdown
    ```
@@ -41,16 +43,18 @@ The project has ~112 MyPy errors across 20 files. These are primarily missing ty
    - `scripts/generate_dashboard_config.py` - Collection type issues
 
 3. **Create Type Alias Module**
+
    ```python
    # dashboard/types.py
    from typing import TypeAlias, Any
-   
+
    TaskDict: TypeAlias = dict[str, Any]
    TaskList: TypeAlias = list[TaskDict]
    ConfigDict: TypeAlias = dict[str, Any]
    ```
 
 ### Phase 2: Core Components (Week 1)
+
 **Goal:** Type-safe core functionality
 
 1. **Models Layer** (`dashboard/models.py`)
@@ -69,6 +73,7 @@ The project has ~112 MyPy errors across 20 files. These are primarily missing ty
    - Add overload signatures where needed
 
 ### Phase 3: API Layer (Week 2)
+
 **Goal:** Type-safe API endpoints
 
 1. **Route Handlers** (`dashboard/api/`)
@@ -82,6 +87,7 @@ The project has ~112 MyPy errors across 20 files. These are primarily missing ty
    - Type decorator factories
 
 ### Phase 4: Scripts & Tools (Week 3)
+
 **Goal:** Type-safe build scripts
 
 1. **Build Scripts** (`scripts/`)
@@ -97,6 +103,7 @@ The project has ~112 MyPy errors across 20 files. These are primarily missing ty
 ## Implementation Patterns
 
 ### Pattern 1: Gradual Typing
+
 ```python
 # Start with Any, refine later
 def process_data(data: Any) -> dict[str, Any]:
@@ -105,11 +112,12 @@ def process_data(data: Any) -> dict[str, Any]:
 
 # Refine to specific types
 def process_data(data: TaskDict) -> ProcessedResult:
-    # Implementation  
+    # Implementation
     return ProcessedResult(...)
 ```
 
 ### Pattern 2: Type Guards
+
 ```python
 from typing import TypeGuard
 
@@ -122,6 +130,7 @@ def is_valid_task(data: Any) -> TypeGuard[TaskDict]:
 ```
 
 ### Pattern 3: Protocol Classes
+
 ```python
 from typing import Protocol
 
@@ -133,6 +142,7 @@ class TaskService(Protocol):
 ## Automation & Tooling
 
 ### Pre-commit Integration
+
 ```yaml
 # Add to .pre-commit-config.yaml
 - repo: local
@@ -145,6 +155,7 @@ class TaskService(Protocol):
 ```
 
 ### Auto-fix Script
+
 ```python
 # scripts/fix_types.py
 #!/usr/bin/env python3
@@ -160,6 +171,7 @@ def add_parameter_hints():
 ```
 
 ### CI Configuration
+
 ```yaml
 # .github/workflows/ci.yml
 - name: Type Check
@@ -172,7 +184,7 @@ def add_parameter_hints():
 ## Success Metrics
 
 1. **Week 1:** Reduce errors to < 80 (30% reduction)
-2. **Week 2:** Reduce errors to < 40 (65% reduction)  
+2. **Week 2:** Reduce errors to < 40 (65% reduction)
 3. **Week 3:** Reduce errors to < 10 (90% reduction)
 4. **Week 4:** Full type coverage with strict mode
 

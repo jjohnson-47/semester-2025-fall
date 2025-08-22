@@ -1,7 +1,39 @@
 #!/usr/bin/env python3
-"""
-Course Setup Dashboard - Flask Application
-Task management system for semester course preparation
+"""Course Setup Dashboard - Flask Application.
+
+A comprehensive task management system for semester course preparation that integrates
+with the syllabus generation system. Provides a web interface for tracking course
+setup tasks, viewing generated syllabi, and managing semester preparation workflow.
+
+Architecture:
+    - Flask web framework with Jinja2 templating
+    - JSON file-based storage with file locking for concurrent access
+    - Environment-based configuration with python-dotenv
+    - Integration with build system for syllabus serving
+    - Optional git snapshots for state history
+
+Main Components:
+    - TaskManager: Core class for task CRUD operations
+    - Routes: Dashboard views and API endpoints
+    - Templates: Bootstrap-based responsive UI
+    - Config: Environment-aware configuration
+
+Usage:
+    From project root:
+        uv run python dashboard/app.py
+
+    Or using make:
+        make dash
+
+Environment Variables:
+    DASH_PORT (int): Server port (default: 5055)
+    DASH_HOST (str): Server host (default: 127.0.0.1)
+    DASH_AUTO_SNAPSHOT (bool): Enable git snapshots (default: true)
+    PROJECT_ROOT (str): Project root path (auto-detected)
+    BUILD_DIR (str): Build output directory (default: build)
+    SYLLABI_DIR (str): Syllabi directory (default: build/syllabi)
+
+See dashboard/API_DOCUMENTATION.md for complete API reference.
 """
 
 import fcntl
@@ -11,12 +43,13 @@ import json
 import logging
 import os
 from datetime import datetime, timedelta
-from pathlib import Path
 from typing import Any
 
 import pytz
+
+# Import config from same package
+from config import Config
 from flask import Flask, jsonify, render_template, request
-from dashboard.config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -80,6 +113,35 @@ class TaskManager:
 
         return False
 
+    @staticmethod
+    def validate_task_data(task: dict[str, Any]) -> bool:
+        """Validate task data has required fields."""
+        required_fields = ["course", "title", "status", "priority"]
+        return all(field in task for field in required_fields)
+
+    @staticmethod
+    def git_snapshot() -> None:
+        """Create git snapshot of current state."""
+        try:
+            import subprocess
+
+            subprocess.run(["git", "add", str(TASKS_FILE)], capture_output=True)
+            subprocess.run(
+                ["git", "commit", "-m", f"dashboard: snapshot {datetime.now().isoformat()}"],
+                capture_output=True,
+            )
+        except Exception:
+            pass  # Silently fail if git is not available
+
+    @staticmethod
+    def load_courses() -> dict[str, Any]:
+        """Load course configuration."""
+        if not COURSES_FILE.exists():
+            return {"courses": [], "semester": "2025-fall"}
+
+        with open(COURSES_FILE) as f:
+            return json.load(f)
+
 
 def calculate_progress(tasks: list[dict[str, Any]]) -> dict[str, Any]:
     """Calculate overall progress statistics."""
@@ -108,35 +170,6 @@ def get_upcoming_deadlines(tasks: list[dict[str, Any]], days: int = 7) -> list[d
                 continue
 
     return sorted(upcoming, key=lambda t: t["due_date"])
-
-
-def validate_task_data(task: dict[str, Any]) -> bool:
-    """Validate task data has required fields."""
-    required_fields = ["course", "title", "status", "priority"]
-    return all(field in task for field in required_fields)
-
-    @staticmethod
-    def git_snapshot() -> None:
-        """Create git snapshot of current state."""
-        try:
-            import subprocess
-
-            subprocess.run(["git", "add", str(TASKS_FILE)], capture_output=True)
-            subprocess.run(
-                ["git", "commit", "-m", f"dashboard: snapshot {datetime.now().isoformat()}"],
-                capture_output=True,
-            )
-        except Exception:
-            pass  # Silently fail if git is not available
-
-    @staticmethod
-    def load_courses() -> dict[str, Any]:
-        """Load course configuration."""
-        if not COURSES_FILE.exists():
-            return {"courses": [], "semester": "2025-fall"}
-
-        with open(COURSES_FILE) as f:
-            return json.load(f)
 
 
 def calculate_priority(task: dict[str, Any]) -> int:
@@ -424,8 +457,8 @@ def get_relative_time(dt: datetime) -> str:
 @app.route("/syllabi/<course_code>")
 def view_syllabus(course_code: str):
     """Serve generated syllabus for a course."""
+    from config import Config
     from flask import abort, send_from_directory
-    from dashboard.config import Config
 
     # Use configured paths
     syllabi_dir = Config.SYLLABI_DIR
@@ -478,4 +511,5 @@ def status_icon(status: str) -> str:
 if __name__ == "__main__":
     port = int(os.environ.get("DASH_PORT", 5055))
     host = os.environ.get("DASH_HOST", "127.0.0.1")
-    app.run(host=host, port=port, debug=True)
+    debug_mode = os.environ.get("FLASK_ENV", "development") == "development"
+    app.run(host=host, port=port, debug=debug_mode)

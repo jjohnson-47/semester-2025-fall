@@ -13,13 +13,13 @@ from typing import Any
 
 # Optional dependencies; fall back gracefully if missing
 try:  # pragma: no cover - trivial import shim
-    import pytz  # type: ignore
+    import pytz
 except Exception:  # pragma: no cover
-    pytz = None
+    pytz = None  # type: ignore[assignment]
 try:  # pragma: no cover - trivial import shim
-    from dateutil import parser as date_parser  # type: ignore
+    from dateutil import parser as date_parser  # type: ignore[import-not-found]
 except Exception:  # pragma: no cover
-    date_parser = None
+    date_parser = None  # type: ignore[assignment]
 
 
 class SemesterCalendar:
@@ -50,13 +50,15 @@ class SemesterCalendar:
         # Try project root first
         if self.calendar_file.exists():
             with open(self.calendar_file, encoding="utf-8") as f:
-                return json.load(f)
+                data: dict[str, Any] = json.load(f)
+                return data
 
         # Try parent directory (where the original files are)
         parent_calendar = Path("..") / self.calendar_file
         if parent_calendar.exists():
             with open(parent_calendar, encoding="utf-8") as f:
-                return json.load(f)
+                data: dict[str, Any] = json.load(f)
+                return data
 
         # Return minimal calendar if not found
         return {
@@ -274,7 +276,7 @@ class SemesterCalendar:
         return ics_string
 
 
-def main():
+def main() -> None:
     """Test calendar generation."""
     calendar = SemesterCalendar()
 
