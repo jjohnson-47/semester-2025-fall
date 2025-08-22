@@ -103,7 +103,7 @@ class TaskGenerator:
         """Get course by code."""
         for course in self.courses.get("courses", []):
             if course["code"] == course_code:
-                return course
+                return dict(course)
         return None
 
     def _create_task(

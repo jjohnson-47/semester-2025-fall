@@ -183,8 +183,11 @@ def validate_task_structure(task: dict[str, Any]) -> bool:
             return False
     # If due_date present, verify format
     if "due_date" in task:
+        due_date = task["due_date"]
+        if not isinstance(due_date, str):
+            return False
         try:
-            datetime.fromisoformat(task["due_date"])  # type: ignore[arg-type]
+            datetime.fromisoformat(due_date)
         except Exception:
             return False
     return True
@@ -195,10 +198,14 @@ def validate_dates(tasks: list[dict[str, Any]]) -> list[str]:
     errors: list[str] = []
     for t in tasks:
         if "due_date" in t:
+            due_date = t["due_date"]
+            if not isinstance(due_date, str):
+                errors.append(f"Task {t.get('id')} has non-string due_date: {due_date}")
+                continue
             try:
-                datetime.fromisoformat(t["due_date"])  # type: ignore[arg-type]
+                datetime.fromisoformat(due_date)
             except Exception:
-                errors.append(f"Task {t.get('id')} has invalid due_date: {t.get('due_date')}")
+                errors.append(f"Task {t.get('id')} has invalid due_date: {due_date}")
     return errors
 
 
@@ -208,10 +215,11 @@ def check_duplicates(tasks: list[dict[str, Any]]) -> list[str]:
     dups: list[str] = []
     for t in tasks:
         tid = t.get("id")
-        if tid in seen:
-            dups.append(tid)  # type: ignore[arg-type]
-        if tid is not None:
-            seen.add(tid)
+        if tid is not None and isinstance(tid, str):
+            if tid in seen:
+                dups.append(tid)
+            else:
+                seen.add(tid)
     return dups
 
 

@@ -17,7 +17,7 @@ try:  # pragma: no cover - trivial import shim
 except Exception:  # pragma: no cover
     pytz = None  # type: ignore[assignment]
 try:  # pragma: no cover - trivial import shim
-    from dateutil import parser as date_parser  # type: ignore[import-not-found]
+    from dateutil import parser as date_parser
 except Exception:  # pragma: no cover
     date_parser = None  # type: ignore[assignment]
 
@@ -57,8 +57,8 @@ class SemesterCalendar:
         parent_calendar = Path("..") / self.calendar_file
         if parent_calendar.exists():
             with open(parent_calendar, encoding="utf-8") as f:
-                data: dict[str, Any] = json.load(f)
-                return data
+                parent_data: dict[str, Any] = json.load(f)
+                return parent_data
 
         # Return minimal calendar if not found
         return {

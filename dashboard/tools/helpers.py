@@ -90,7 +90,8 @@ def load_templates(template_file: str | Path) -> list[Any]:
 
     with open(template_file) as f:
         data = json.load(f)
-    return data.get("templates", [])
+    templates = data.get("templates", [])
+    return list(templates) if templates else []
 
 
 def generate_task_from_template(

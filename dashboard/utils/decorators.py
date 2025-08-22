@@ -4,18 +4,22 @@ Custom decorators for Flask routes.
 """
 
 from functools import wraps
+from typing import Any, Callable, TypeVar, cast
 
 from flask import current_app, jsonify, request
+from flask.wrappers import Response
+
+F = TypeVar('F', bound=Callable[..., Any])
 
 
-def validate_json(f):
+def validate_json(f: F) -> F:
     """
     Decorator to validate JSON request body.
     Returns 400 if request doesn't contain valid JSON.
     """
 
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated_function(*args: Any, **kwargs: Any) -> Any:
         if not request.is_json:
             return jsonify({"error": "Content-Type must be application/json"}), 400
 
@@ -27,17 +31,17 @@ def validate_json(f):
 
         return f(*args, **kwargs)
 
-    return decorated_function
+    return cast(F, decorated_function)
 
 
-def require_api_key(f):
+def require_api_key(f: F) -> F:
     """
     Decorator to require API key for access.
     Checks for X-API-Key header.
     """
 
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated_function(*args: Any, **kwargs: Any) -> Any:
         api_key = request.headers.get("X-API-Key")
 
         if not api_key:
@@ -50,18 +54,18 @@ def require_api_key(f):
 
         return f(*args, **kwargs)
 
-    return decorated_function
+    return cast(F, decorated_function)
 
 
-def paginate(default_per_page=20, max_per_page=100):
+def paginate(default_per_page: int = 20, max_per_page: int = 100) -> Callable[[F], F]:
     """
     Decorator to add pagination parameters to routes.
     Adds 'page' and 'per_page' to kwargs.
     """
 
-    def decorator(f):
+    def decorator(f: F) -> F:
         @wraps(f)
-        def decorated_function(*args, **kwargs):
+        def decorated_function(*args: Any, **kwargs: Any) -> Any:
             page = request.args.get("page", 1, type=int)
             per_page = request.args.get("per_page", default_per_page, type=int)
 
@@ -74,6 +78,6 @@ def paginate(default_per_page=20, max_per_page=100):
 
             return f(*args, **kwargs)
 
-        return decorated_function
+        return cast(F, decorated_function)
 
     return decorator

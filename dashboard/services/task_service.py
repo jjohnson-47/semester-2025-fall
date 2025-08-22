@@ -19,7 +19,8 @@ class TaskService:
     @staticmethod
     def _get_tasks_file() -> Path:
         """Get the tasks file path from config."""
-        return current_app.config["TASKS_FILE"]
+        tasks_file = current_app.config["TASKS_FILE"]
+        return Path(tasks_file)
 
     @staticmethod
     def _load_tasks_data() -> dict[str, Any]:
@@ -39,7 +40,7 @@ class TaskService:
             finally:
                 fcntl.flock(f, fcntl.LOCK_UN)
 
-        return data
+        return dict(data)
 
     @staticmethod
     def _save_tasks_data(data: dict[str, Any]) -> None:
@@ -108,7 +109,7 @@ class TaskService:
         data = TaskService._load_tasks_data()
         for task in data.get("tasks", []):
             if task.get("id") == task_id:
-                return task
+                return dict(task)
         return None
 
     @staticmethod
@@ -156,7 +157,7 @@ class TaskService:
                 task.update(updates)
                 task["updated_at"] = datetime.now().isoformat()
                 TaskService._save_tasks_data(data)
-                return task
+                return dict(task)
 
         return None
 

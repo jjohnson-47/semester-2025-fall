@@ -130,7 +130,11 @@ class TaskGraph:
                         new_weight = path_weight + dep_task.get("weight", 1)
                         queue.append((dependent_id, distance + 1, new_weight))
 
-        return (best_weight, best_distance if best_distance != float("inf") else 999, best_anchor)
+        return (
+            float(best_weight),
+            best_distance if best_distance != float("inf") else 999,
+            best_anchor
+        )
 
     def is_chain_head(self, task_id: str) -> bool:
         """Check if task is a chain head (all dependencies completed)."""
@@ -197,7 +201,7 @@ class SmartPrioritizer:
 
             # Check if today falls within this phase window
             if start_days <= days_since_start <= end_days:
-                return phase
+                return dict(phase)
 
         return None
 
@@ -244,7 +248,7 @@ class SmartPrioritizer:
             penalty = days_stale * self.staleness.get("stale_penalty", -5.0)
             max_penalty = self.staleness.get("max_penalty", -50.0)
 
-            return max(penalty, max_penalty)
+            return float(max(penalty, max_penalty))
         except (ValueError, TypeError):
             return 0
 
@@ -280,7 +284,6 @@ class SmartPrioritizer:
         chain_weight, chain_distance, chain_anchor = self.graph.compute_chain_weight(
             task_id,
             self.anchors,
-            self.critical_path_config.get("method", "sum"),
             self.critical_path_config.get("distance_decay", 0.95),
         )
         scores["chain_weight"] = chain_weight * self.coefficients.get("beta_critical", 2.5)
@@ -386,7 +389,7 @@ class SmartPrioritizer:
                 continue
 
             course = task.get("course")
-            if course_counts.get(course, 0) >= per_course_limit:
+            if course and course_counts.get(course, 0) >= per_course_limit:
                 continue
 
             # Boost chain heads for queue selection
@@ -396,7 +399,8 @@ class SmartPrioritizer:
 
             # Add to queue
             queue.append(task)
-            course_counts[course] += 1
+            if course:
+                course_counts[course] = course_counts.get(course, 0) + 1
 
         # Sort queue by score for display
         queue.sort(key=lambda t: t.get("smart_score", 0), reverse=True)
@@ -504,10 +508,13 @@ def main() -> None:
             print("=" * 60)
             for i, task in enumerate(now_queue[:10], 1):
                 status_icon = "➜" if task.get("is_chain_head") else "○"
+                title = task.get('title', '')[:50] if task.get('title') else 'No title'
+                due_date = task.get('due_date', 'N/A')
+                due_date_str = due_date[:10] if due_date != 'N/A' else 'N/A'
                 print(
-                    f"{i:2}. {status_icon} [{task.get('course')}] {task.get('title')[:50]}"
+                    f"{i:2}. {status_icon} [{task.get('course')}] {title}"
                     f"\n     Score: {task.get('smart_score', 0):.1f} | "
-                    f"Due: {task.get('due_date', 'N/A')[:10]} | "
+                    f"Due: {due_date_str} | "
                     f"Unblocks: {task.get('unblock_count', 0)}"
                 )
                 if task.get("chain_anchor"):

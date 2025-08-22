@@ -77,7 +77,8 @@ class SyllabusBuilder:
         self._load_instructor_data(data)
 
         # Map course meta to top-level header fields
-        meta = data.get("course_meta", {}) if isinstance(data.get("course_meta"), dict) else {}
+        course_meta = data.get("course_meta", {})
+        meta: dict[str, Any] = course_meta if isinstance(course_meta, dict) else {}
         data["course_crn"] = meta.get("course_crn", data.get("course_crn"))
         data["course_credits"] = meta.get("course_credits", data.get("course_credits"))
         data["course_section"] = meta.get("section", os.getenv(f"{course_code}_SECTION"))

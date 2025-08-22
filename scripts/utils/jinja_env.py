@@ -51,7 +51,8 @@ def markdown_filter(text: str) -> str:
         "markdown.extensions.smarty",
     ]
 
-    return md.markdown(text, extensions=extensions)
+    result = md.markdown(text, extensions=extensions)
+    return str(result)
 
 
 def date_filter(date_input: Any, format: str = "%B %d, %Y") -> str:

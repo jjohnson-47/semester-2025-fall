@@ -253,7 +253,7 @@ config = {
 }
 
 
-def get_config(config_name=None):
+def get_config(config_name: str | None = None) -> type[Config]:
     """Get configuration class by name."""
     if config_name is None:
         config_name = os.environ.get("FLASK_ENV", "development")
