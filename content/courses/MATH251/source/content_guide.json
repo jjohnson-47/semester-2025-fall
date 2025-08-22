@@ -1,0 +1,19 @@
+{
+  "from_markdown": "docs/reference/course-guides/math251.md",
+  "description": "A first course in single-variable calculus. Topics include limits; continuity and differentiation of functions; applications of the derivative to graphing, optimization and rates of change; definite and indefinite integration; and the fundamental theorem of calculus.",
+  "prerequisites": "(MATH A151 with a minimum grade of C and MATH A152 with a minimum grade of C) or MATH A155 with a minimum grade of C or MATH A211 with a minimum grade of C or MATH A212 with a minimum grade of C or MATH A221 with a minimum grade of C or MATH A251F with a minimum grade of C or MATH A252 with a minimum grade of C or MATH A252F with a minimum grade of C or MATH A253 with a minimum grade of C or ALEKS Overall Test 1 with a score of 078 or ALEKS Overall Test 2 with a score of 078 or ALEKS Overall Test 3 with a score of 078 or ALEKS Overall Test 4 with a score of 078 or ALEKS Overall Test 5 with a score of 078\n\n**Registration Restrictions:** If the prerequisite is not satisfied, an approved UAA placement test is required.",
+  "goals": [
+    "Introduce students to the concept of limit, its notation and computation",
+    "Present to students the concept of differentiation, its notation, calculation, and application",
+    "Introduce students to the concept of integration, its notation and calculation",
+    "Present proper terminology and notation."
+  ],
+  "outcomes": [
+    "Oral Assignments",
+    "Presentations",
+    "Understand and apply the concept of a limit",
+    "Understand and apply the concepts of differentiation and integration, and their relationship as expressed by the Fundamental Theorem of Calculus",
+    "Proficiently calculate derivatives, and definite and indefinite integrals by means of substitution",
+    "Apply the derivative in modeling settings, such as for graphing, optimization, and related rates problems"
+  ]
+}

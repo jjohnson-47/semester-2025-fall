@@ -1,0 +1,149 @@
+{
+  "name": "KPC Fall 2025 Semester Management",
+  "description": "Academic course management system with automated syllabus generation and task tracking",
+  
+  "model": {
+    "default": "claude-sonnet-4-20250514",
+    "architecture": "claude-opus-4-1-20250805",
+    "quickTasks": "claude-haiku-4-20250514"
+  },
+
+  "environment": {
+    "SEMESTER": "fall-2025",
+    "INSTITUTION": "Kenai Peninsula College",
+    "BUILD_DIR": "build",
+    "DASHBOARD_PORT": "5055",
+    "UV_SYSTEM_PYTHON": "1",
+    "UV_PREVIEW": "1"
+  },
+
+  "permissions": {
+    "allow": [
+      "Bash(uv:*)",
+      "Bash(make:*)",
+      "Bash(git:*)",
+      "Bash(python:*)",
+      "Edit(templates/*)",
+      "Edit(content/*)",
+      "Edit(scripts/*)",
+      "Edit(dashboard/*)",
+      "Write(build/*)",
+      "Write(dashboard/state/*)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Edit(.env)",
+      "Write(uv.lock)",
+      "Edit(.git/*)"
+    ],
+    "ask": [
+      "Bash(gh:*)",
+      "Bash(pip:*)",
+      "Bash(npm:*)",
+      "Write(*.pdf)"
+    ]
+  },
+
+  "tools": {
+    "preferredTools": {
+      "search": "Grep",
+      "filePattern": "Glob",
+      "multiFileEdit": "MultiEdit",
+      "packageManager": "uv",
+      "taskRunner": "make"
+    },
+    "batchOperations": true,
+    "parallelExecution": true,
+    "autoSave": true
+  },
+
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "targetPattern": "*.json",
+        "hooks": [{
+          "type": "command",
+          "command": "uv run python scripts/validate_json.py --file ${FILE_PATH} 2>/dev/null || true"
+        }]
+      },
+      {
+        "matcher": "Edit",
+        "targetPattern": "scripts/*.py",
+        "hooks": [{
+          "type": "command",
+          "command": "echo 'Python script modified: ${FILE_PATH}'"
+        }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "targetPattern": "content/courses/*/schedule.json",
+        "hooks": [{
+          "type": "command",
+          "command": "make syllabi 2>/dev/null || echo 'Schedule changed - rebuild syllabi when ready'"
+        }]
+      }
+    ],
+    "UserPromptSubmit": [{
+      "hooks": [{
+        "type": "command",
+        "command": "echo '━━━ Working on: ${USER_PROMPT:0:60}... ━━━'"
+      }]
+    }],
+    "SessionStart": [{
+      "hooks": [
+        {
+          "type": "command",
+          "command": "uv sync --quiet 2>/dev/null || echo 'UV sync needed'"
+        },
+        {
+          "type": "command",
+          "command": "test -f dashboard/state/tasks.json && echo 'Dashboard tasks found' || echo 'Run make dash-gen to generate tasks'"
+        }
+      ]
+    }],
+    "Stop": [{
+      "hooks": [{
+        "type": "command",
+        "command": "echo '✓ Session complete. Run \"make help\" to see available commands.'"
+      }]
+    }]
+  },
+
+  "workflow": {
+    "autoValidation": true,
+    "lintOnSave": false,
+    "formatOnSave": false,
+    "testOnBuild": true,
+    "gitAutoStage": false
+  },
+
+  "dashboard": {
+    "autoLaunch": false,
+    "port": 5055,
+    "host": "127.0.0.1",
+    "taskRefreshInterval": 30
+  },
+
+  "academic": {
+    "courses": ["MATH221", "MATH251", "STAT253"],
+    "defaultTemplate": "templates/syllabus.html.j2",
+    "pdfGeneration": false,
+    "blackboardIntegration": true
+  },
+
+  "notifications": {
+    "enabled": true,
+    "onBuildSuccess": true,
+    "onBuildFailure": true,
+    "onTaskCompletion": false
+  },
+
+  "memory": {
+    "autoLoad": true,
+    "maxImportDepth": 5,
+    "refreshInterval": 300
+  }
+}

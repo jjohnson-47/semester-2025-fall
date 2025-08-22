@@ -194,11 +194,13 @@
         
         <h3>Grade Distribution</h3>
         {% if evaluation_tools %}
+        {% set total_points = grading_policy.points_total | default(1000) %}
         <table>
             <thead>
                 <tr>
                     <th>Category</th>
                     <th>Weight</th>
+                    <th>Points (out of {{ total_points }})</th>
                 </tr>
             </thead>
             <tbody>
@@ -206,11 +208,13 @@
                 <tr>
                     <td>{{ category.name }}</td>
                     <td>{{ category.weight }}%</td>
+                    <td>{{ ((category.weight | float) * (total_points | float) / 100) | round(0, 'common') | int }}</td>
                 </tr>
                 {% endfor %}
                 <tr>
                     <td><strong>Total</strong></td>
                     <td><strong>100%</strong></td>
+                    <td><strong>{{ total_points }}</strong></td>
                 </tr>
             </tbody>
         </table>
@@ -225,7 +229,7 @@
                 <tr>
                     <th>Grade</th>
                     <th>Percentage</th>
-                    <th>Points (1000 total)</th>
+                    <th>Points (out of {{ grading_policy.points_total | default(1000) }})</th>
                 </tr>
             </thead>
             <tbody>

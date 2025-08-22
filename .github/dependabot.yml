@@ -1,0 +1,52 @@
+version: 2
+updates:
+  # Python dependencies via UV
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+    reviewers:
+      - "jjohnson-47"
+    groups:
+      testing:
+        patterns:
+          - "pytest*"
+          - "coverage*"
+          - "faker"
+          - "hypothesis"
+      dashboard:
+        patterns:
+          - "flask*"
+          - "watchdog"
+          - "python-dotenv"
+      dev-tools:
+        patterns:
+          - "black"
+          - "ruff"
+          - "mypy"
+          - "pylint"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+    reviewers:
+      - "jjohnson-47"

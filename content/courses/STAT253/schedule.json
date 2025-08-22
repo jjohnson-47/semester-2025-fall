@@ -1,0 +1,21 @@
+{
+  "weeks": [
+    {"week": 1, "topic": "Statistics, Data, and Statistical Thinking", "readings": ["Chapter 1"], "assignments": ["Install R/RStudio", "Homework 1"], "assessments": [], "notes": ""},
+    {"week": 2, "topic": "Methods for Describing Sets of Data", "readings": ["Chapter 2"], "assignments": ["Homework 2", "R Assignment 1"], "assessments": ["Chapter 1 Test", "Chapter 2 Test"], "notes": ""},
+    {"week": 3, "topic": "Probability", "readings": ["Chapter 3"], "assignments": ["Homework 3"], "assessments": ["Chapter 3 Test"], "notes": ""},
+    {"week": 4, "topic": "Discrete Random Variables", "readings": ["Chapter 4"], "assignments": ["Homework 4"], "assessments": [], "notes": ""},
+    {"week": 5, "topic": "Discrete Random Variables (continued)", "readings": ["Chapter 4"], "assignments": ["Homework 5", "Final Report Draft 1"], "assessments": ["Chapter 4 Test"], "notes": ""},
+    {"week": 6, "topic": "Continuous Random Variables", "readings": ["Chapter 5"], "assignments": ["Homework 6"], "assessments": ["Chapter 5 Test"], "notes": ""},
+    {"week": 7, "topic": "Sampling Distributions", "readings": ["Chapter 6"], "assignments": ["Homework 7", "R Assignment 2"], "assessments": [], "notes": ""},
+    {"week": 8, "topic": "Sampling Distributions (continued)", "readings": ["Chapter 6"], "assignments": ["Homework 8"], "assessments": ["Chapter 6 Test"], "notes": ""},
+    {"week": 9, "topic": "Project Work and Review", "readings": [], "assignments": ["Project Work"], "assessments": [], "notes": "No new content"},
+    {"week": 10, "topic": "Inferences Based on a Single Sample (CI)", "readings": ["Chapter 7"], "assignments": ["Homework 9", "R Assignment 3"], "assessments": ["Chapter 7 Test"], "notes": ""},
+    {"week": 11, "topic": "Inferences Based on a Single Sample (HT)", "readings": ["Chapter 8"], "assignments": ["Homework 10", "Final Report Draft 2"], "assessments": ["Chapter 8 Test"], "notes": ""},
+    {"week": 12, "topic": "Inferences Based on Two Samples", "readings": ["Chapter 9"], "assignments": ["Homework 11", "R Assignment 4"], "assessments": ["Chapter 9 Test"], "notes": ""},
+    {"week": 13, "topic": "Analysis of Variance (ANOVA)", "readings": ["Chapter 10"], "assignments": ["Homework 12"], "assessments": [], "notes": ""},
+    {"week": 14, "topic": "ANOVA (continued)", "readings": ["Chapter 10"], "assignments": ["Homework 13", "R Assignment 5"], "assessments": ["Chapter 10 Test"], "notes": ""},
+    {"week": 15, "topic": "Linear Regression", "readings": ["Chapter 11"], "assignments": ["Homework 14"], "assessments": [], "notes": ""},
+    {"week": 16, "topic": "Linear Regression and Review", "readings": ["Chapter 11"], "assignments": ["Homework 15", "Final Report"], "assessments": [], "notes": "Finals Week"}
+  ],
+  "finals": {"topic": "Final Test", "assessments": ["Final Test (Comprehensive)"], "notes": "All assignments must be submitted"}
+}

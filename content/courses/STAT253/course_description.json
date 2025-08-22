@@ -1,5 +1,3 @@
 {
-  "text": "Introduction to statistical reasoning and methods. Topics include descriptive statistics, probability, discrete and continuous distributions, sampling distributions, confidence intervals, hypothesis testing, regression and correlation. Emphasis on applications in the sciences with extensive use of statistical software.",
-  "credits": 4,
-  "course_crn": "74688"
+  "text": "Intensive survey course with applications for the sciences. Topics include descriptive statistics, probability, random variables, binomial, Poisson and normal distributions, estimation and hypothesis testing of common parameters, analysis of variance for single factor and two factors, correlation, and simple linear regression. A major statistical software package will be utilized."
 }

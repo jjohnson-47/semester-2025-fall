@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+
+{% block title %}Tasks - Fall 2025 Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Task hierarchy styles */
+    .task-row { transition: all 0.2s ease; }
+    .task-row:hover { background-color: #f9fafb; }
+    .task-child { padding-left: 2rem; }
+    .task-blocked { opacity: 0.7; background-color: #f3f4f6; }
+    .task-done { opacity: 0.6; }
+    .task-done .task-title { text-decoration: line-through; }
+    
+    /* Chevron animation */
+    .chevron { 
+        transition: transform 0.2s ease; 
+        cursor: pointer;
+        user-select: none;
+    }
+    .chevron.expanded { transform: rotate(90deg); }
+    
+    /* Status badges */
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+    .status-blocked { background: #fee2e2; color: #991b1b; }
+    .status-todo { background: #e5e7eb; color: #374151; }
+    .status-in-progress { background: #dbeafe; color: #1e40af; }
+    .status-done { background: #d1fae5; color: #065f46; }
+    
+    /* Priority indicators */
+    .priority-critical { border-left: 4px solid #dc2626; }
+    .priority-high { border-left: 4px solid #f59e0b; }
+    .priority-medium { border-left: 4px solid #3b82f6; }
+    .priority-low { border-left: 4px solid #6b7280; }
+    
+    /* Dependency lock */
+    .lock-icon {
+        cursor: help;
+        color: #6b7280;
+    }
+    
+    /* Command palette */
+    .command-palette {
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 600px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        display: none;
+    }
+    .command-palette.active { display: block; }
+    
+    /* Kanban columns */
+    .kanban-column {
+        min-height: 400px;
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    .kanban-card {
+        background: white;
+        border-radius: 6px;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        cursor: move;
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
+    }
+    .kanban-card:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4">
+    <!-- Header with filters and view toggle -->
+    <div class="mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold">Task Management</h1>
+            <div class="flex gap-2">
+                <button onclick="toggleView('list')" 
+                        class="px-4 py-2 bg-blue-500 text-white rounded view-btn"
+                        data-view="list">
+                    📋 List View
+                </button>
+                <button onclick="toggleView('kanban')" 
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded view-btn"
+                        data-view="kanban">
+                    📊 Board View
+                </button>
+                <button onclick="openCommandPalette()" 
+                        class="px-4 py-2 bg-purple-500 text-white rounded"
+                        title="Press Cmd+K or Ctrl+K">
+                    ⌘ Command
+                </button>
+            </div>
+        </div>
+        
+        <!-- Filter bar -->
+        <div class="bg-white p-4 rounded-lg shadow mb-4"
+             hx-get="/api/tasks/filtered"
+             hx-trigger="change"
+             hx-target="#task-container"
+             hx-include="[name='course'], [name='status'], [name='category'], [name='assignee']">
+            <div class="grid grid-cols-5 gap-4">
+                <select name="course" class="border rounded px-3 py-2">
+                    <option value="">All Courses</option>
+                    <option value="MATH221">MATH221</option>
+                    <option value="MATH251">MATH251</option>
+                    <option value="STAT253">STAT253</option>
+                </select>
+                
+                <select name="status" class="border rounded px-3 py-2">
+                    <option value="">All Statuses</option>
+                    <option value="blocked">Blocked</option>
+                    <option value="todo">To Do</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="done">Done</option>
+                </select>
+                
+                <select name="category" class="border rounded px-3 py-2">
+                    <option value="">All Categories</option>
+                    <option value="setup">Setup</option>
+                    <option value="content">Content</option>
+                    <option value="technical">Technical</option>
+                    <option value="assessment">Assessment</option>
+                </select>
+                
+                <input type="text" name="assignee" placeholder="Assignee..." 
+                       class="border rounded px-3 py-2">
+                
+                <button type="button" 
+                        hx-get="/api/tasks"
+                        hx-target="#task-container"
+                        class="bg-gray-500 text-white rounded px-4 py-2">
+                    Clear Filters
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Task container (List or Kanban) -->
+    <div id="task-container">
+        <!-- Default list view will be loaded here -->
+        {% include '_task_list.html' %}
+    </div>
+</div>
+
+<!-- Command Palette Modal -->
+<div id="command-palette" class="command-palette" x-data="commandPalette()">
+    <input type="text" 
+           x-model="query"
+           @keydown.escape="close()"
+           @keydown.enter="executeCommand()"
+           placeholder="Type a command... (+ add task, j jump to, f filter)"
+           class="w-full px-4 py-3 text-lg border-b">
+    
+    <div class="max-h-96 overflow-y-auto">
+        <template x-for="result in filteredResults" :key="result.id">
+            <div @click="selectResult(result)" 
+                 class="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                <span x-text="result.icon"></span>
+                <span x-text="result.text"></span>
+            </div>
+        </template>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Alpine.js for interactive components -->
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+<!-- HTMX for dynamic updates -->
+<script src="https://unpkg.com/htmx.org@2.0.0"></script>
+
+<script>
+// View toggle
+function toggleView(view) {
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.classList.remove('bg-blue-500', 'text-white');
+        btn.classList.add('bg-gray-300', 'text-gray-700');
+    });
+    
+    const activeBtn = document.querySelector(`[data-view="${view}"]`);
+    activeBtn.classList.remove('bg-gray-300', 'text-gray-700');
+    activeBtn.classList.add('bg-blue-500', 'text-white');
+    
+    // Load the appropriate view
+    if (view === 'kanban') {
+        htmx.ajax('GET', '/api/tasks/kanban', '#task-container');
+    } else {
+        htmx.ajax('GET', '/api/tasks/list', '#task-container');
+    }
+}
+
+// Command palette
+function openCommandPalette() {
+    document.getElementById('command-palette').classList.add('active');
+    document.querySelector('#command-palette input').focus();
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        openCommandPalette();
+    }
+});
+
+// Alpine.js component for command palette
+function commandPalette() {
+    return {
+        query: '',
+        results: [],
+        
+        get filteredResults() {
+            if (!this.query) return [];
+            
+            // Parse command
+            if (this.query.startsWith('+')) {
+                return [{
+                    id: 'add',
+                    icon: '➕',
+                    text: `Add task: ${this.query.substring(1).trim()}`,
+                    action: 'add'
+                }];
+            } else if (this.query.startsWith('j ')) {
+                const course = this.query.substring(2).trim().toUpperCase();
+                return [{
+                    id: 'jump',
+                    icon: '🎯',
+                    text: `Jump to ${course}`,
+                    action: 'jump',
+                    target: course
+                }];
+            } else if (this.query.startsWith('f:')) {
+                const filter = this.query.substring(2).trim();
+                return [{
+                    id: 'filter',
+                    icon: '🔍',
+                    text: `Filter: ${filter}`,
+                    action: 'filter',
+                    filter: filter
+                }];
+            }
+            
+            return [];
+        },
+        
+        executeCommand() {
+            const result = this.filteredResults[0];
+            if (!result) return;
+            
+            if (result.action === 'add') {
+                // Quick add task
+                const taskData = {
+                    title: this.query.substring(1).trim(),
+                    status: 'todo'
+                };
+                htmx.ajax('POST', '/api/tasks/quick-add', {
+                    target: '#task-container',
+                    values: taskData
+                });
+            } else if (result.action === 'jump') {
+                // Jump to course
+                document.querySelector(`[name="course"]`).value = result.target;
+                htmx.trigger(document.querySelector(`[name="course"]`), 'change');
+            } else if (result.action === 'filter') {
+                // Apply filter
+                if (result.filter === 'overdue') {
+                    htmx.ajax('GET', '/api/tasks?filter=overdue', '#task-container');
+                }
+            }
+            
+            this.close();
+        },
+        
+        close() {
+            this.query = '';
+            document.getElementById('command-palette').classList.remove('active');
+        },
+        
+        selectResult(result) {
+            this.filteredResults = [result];
+            this.executeCommand();
+        }
+    };
+}
+
+// Task row expansion
+function toggleChildren(taskId) {
+    const childrenContainer = document.getElementById(`children-${taskId}`);
+    const chevron = document.getElementById(`chevron-${taskId}`);
+    
+    if (childrenContainer.style.display === 'none') {
+        childrenContainer.style.display = 'table-row-group';
+        chevron.classList.add('expanded');
+        
+        // Load children if not already loaded
+        if (!childrenContainer.dataset.loaded) {
+            htmx.ajax('GET', `/api/tasks/${taskId}/children`, `#children-${taskId}`);
+            childrenContainer.dataset.loaded = 'true';
+        }
+    } else {
+        childrenContainer.style.display = 'none';
+        chevron.classList.remove('expanded');
+    }
+}
+
+// Handle HTMX after swap for animations
+document.body.addEventListener('htmx:afterSwap', (event) => {
+    // Animate newly unblocked tasks
+    if (event.detail.target.classList.contains('task-row')) {
+        const wasBlocked = event.detail.target.classList.contains('task-blocked');
+        const isBlocked = event.detail.xhr.response.includes('task-blocked');
+        
+        if (wasBlocked && !isBlocked) {
+            // Task was unblocked - add animation
+            event.detail.target.style.backgroundColor = '#fef3c7';
+            setTimeout(() => {
+                event.detail.target.style.backgroundColor = '';
+            }, 1000);
+        }
+    }
+});
+</script>
+{% endblock %}

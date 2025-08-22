@@ -5,8 +5,8 @@
 .DEFAULT_GOAL := help
 
 # Configuration
-PYTHON := python3
-VENV := venv
+UV := uv
+PYTHON := uv run python
 SEMESTER := fall-2025
 BUILD_DIR := build
 COURSES := MATH221 MATH251 STAT253
@@ -18,6 +18,28 @@ YELLOW := \033[0;33m
 RED := \033[0;31m
 NC := \033[0m # No Color
 
+# Documentation targets
+docs: ## Download all project documentation
+	@echo "$(BLUE)Downloading project documentation...$(NC)"
+	@bash scripts/fetch-all-docs.sh
+	@echo "$(GREEN)✓ Documentation downloaded$(NC)"
+
+docs-flask: ## Download Flask documentation only
+	@echo "$(BLUE)Downloading Flask documentation...$(NC)"
+	@bash scripts/get-flask-docs-quick.sh
+	@echo "$(GREEN)✓ Flask documentation downloaded$(NC)"
+
+docs-api: ## Generate API documentation from docstrings
+	@echo "$(BLUE)Generating API documentation...$(NC)"
+	@$(UV) run --with sphinx,sphinx-rtd-theme,myst-parser sphinx-build -b html docs docs/_build/html
+	@echo "$(GREEN)✓ API documentation generated at docs/_build/html$(NC)"
+
+docs-coverage: ## Check documentation coverage
+	@echo "$(BLUE)Checking documentation coverage...$(NC)"
+	@$(UV) run --with sphinx,sphinx-rtd-theme sphinx-build -b coverage docs docs/_build/coverage
+	@cat docs/_build/coverage/python.txt
+	@echo "$(GREEN)✓ Documentation coverage report generated$(NC)"
+
 # Help target
 help: ## Show this help message
 	@echo "$(BLUE)Fall 2025 Semester Build System$(NC)"
@@ -28,54 +50,50 @@ help: ## Show this help message
 	@echo "  $(YELLOW)make course COURSE=MATH221$(NC)  Build specific course materials"
 
 # Initialize environment
-init: ## Create virtualenv and install dependencies
+init: ## Sync UV dependencies
 	@echo "$(BLUE)Initializing environment...$(NC)"
-	@if [ ! -d "$(VENV)" ]; then \
-		$(PYTHON) -m venv $(VENV); \
-		echo "$(GREEN)✓ Virtual environment created$(NC)"; \
-	fi
-	@. $(VENV)/bin/activate && pip install -q -r requirements.txt
+	@$(UV) sync
 	@echo "$(GREEN)✓ Dependencies installed$(NC)"
 	@$(MAKE) validate
 
 # Validate all JSON files
 validate: ## Validate JSON files against schemas
 	@echo "$(BLUE)Validating JSON files...$(NC)"
-	@. $(VENV)/bin/activate && $(PYTHON) scripts/validate_json.py
+	@$(PYTHON) scripts/validate_json.py
 	@echo "$(GREEN)✓ All JSON files valid$(NC)"
 
 # Generate semester calendar
 calendar: validate ## Generate semester calendar from variables
 	@echo "$(BLUE)Generating semester calendar...$(NC)"
-	@. $(VENV)/bin/activate && $(PYTHON) scripts/utils/calendar.py
+	@$(PYTHON) scripts/utils/semester_calendar.py
 	@echo "$(GREEN)✓ Calendar generated$(NC)"
 
 # Build all syllabi
 syllabi: calendar ## Generate syllabi for all courses
 	@echo "$(BLUE)Building syllabi...$(NC)"
 	@mkdir -p $(BUILD_DIR)/syllabi
-	@. $(VENV)/bin/activate && $(PYTHON) scripts/build_syllabi.py
+	@$(PYTHON) scripts/build_syllabi.py
 	@echo "$(GREEN)✓ Syllabi generated for: $(COURSES)$(NC)"
 
 # Generate schedules
 schedules: calendar ## Generate course schedules
 	@echo "$(BLUE)Building schedules...$(NC)"
 	@mkdir -p $(BUILD_DIR)/schedules
-	@. $(VENV)/bin/activate && $(PYTHON) scripts/build_schedules.py
+	@$(PYTHON) scripts/build_schedules.py
 	@echo "$(GREEN)✓ Schedules generated$(NC)"
 
 # Generate weekly folders
 weekly: calendar ## Create weekly overview pages
 	@echo "$(BLUE)Creating weekly folders...$(NC)"
 	@mkdir -p $(BUILD_DIR)/weekly
-	@. $(VENV)/bin/activate && $(PYTHON) scripts/weekgen.py
+	@$(PYTHON) scripts/weekgen.py
 	@echo "$(GREEN)✓ Weekly folders created$(NC)"
 
 # Build Blackboard packages
 packages: syllabi schedules weekly ## Create Blackboard import packages
 	@echo "$(BLUE)Building Blackboard packages...$(NC)"
 	@mkdir -p $(BUILD_DIR)/blackboard
-	@. $(VENV)/bin/activate && $(PYTHON) scripts/build_bb_packages.py
+	@$(PYTHON) scripts/build_bb_packages.py
 	@echo "$(GREEN)✓ Blackboard packages created$(NC)"
 
 # Build specific course
@@ -87,9 +105,9 @@ ifndef COURSE
 endif
 	@echo "$(BLUE)Building $(COURSE)...$(NC)"
 	@mkdir -p $(BUILD_DIR)/{syllabi,schedules,blackboard}
-	@. $(VENV)/bin/activate && $(PYTHON) scripts/build_syllabi.py --course $(COURSE)
-	@. $(VENV)/bin/activate && $(PYTHON) scripts/build_schedules.py --course $(COURSE)
-	@. $(VENV)/bin/activate && $(PYTHON) scripts/build_bb_packages.py --course $(COURSE)
+	@$(PYTHON) scripts/build_syllabi.py --course $(COURSE)
+	@$(PYTHON) scripts/build_schedules.py --course $(COURSE)
+	@$(PYTHON) scripts/build_bb_packages.py --course $(COURSE)
 	@echo "$(GREEN)✓ $(COURSE) build complete$(NC)"
 
 # Build everything
@@ -112,24 +130,44 @@ clean: ## Remove all generated files
 
 dev-server: ## Start development server for preview
 	@echo "$(BLUE)Starting preview server...$(NC)"
-	@cd $(BUILD_DIR) && $(PYTHON) -m http.server 8000
+	@cd $(BUILD_DIR) && uv run python -m http.server 8000
 
-lint: ## Run code linting
+lint: ## Run code linting with Ruff
 	@echo "$(BLUE)Running linters...$(NC)"
-	@. $(VENV)/bin/activate && pylint scripts/
+	@$(UV) run ruff check .
+	@$(UV) run mypy dashboard/ scripts/ --ignore-missing-imports
+	@echo "$(GREEN)✓ Linting complete$(NC)"
 
-format: ## Format Python code
+format: ## Format Python code with Ruff
 	@echo "$(BLUE)Formatting code...$(NC)"
-	@. $(VENV)/bin/activate && black scripts/
+	@$(UV) run ruff format .
+	@$(UV) run ruff check . --fix --unsafe-fixes
+	@echo "$(GREEN)✓ Code formatted$(NC)"
 
 test: validate ## Run tests
 	@echo "$(BLUE)Running tests...$(NC)"
-	@. $(VENV)/bin/activate && pytest tests/
+	@$(UV) run --with pytest pytest tests/
+
+sync-guides: ## Convert course guide Markdown into course JSON (description, prereqs, goals, outcomes)
+	@echo "$(BLUE)Syncing course guides into course JSON...$(NC)"
+	@$(PYTHON) scripts/utils/sync_course_guides.py --courses MATH221 MATH251 STAT253
+	@echo "$(GREEN)✓ Course guides synced$(NC)"
+
+# Scaffold course content
+scaffold: ## Scaffold content for a course (use COURSE=MATH221)
+ifndef COURSE
+	@echo "$(RED)Error: COURSE variable not set$(NC)"
+	@echo "Usage: make scaffold COURSE=MATH221"
+	@exit 1
+endif
+	@echo "$(BLUE)Scaffolding course $(COURSE)...$(NC)"
+	@$(PYTHON) scripts/utils/scaffold_course.py --course $(COURSE)
+	@echo "$(GREEN)✓ Scaffold complete$(NC)"
 
 # Installation check
 check-deps: ## Check required dependencies
 	@echo "$(BLUE)Checking dependencies...$(NC)"
-	@which $(PYTHON) > /dev/null && echo "$(GREEN)✓ Python3 found$(NC)" || echo "$(RED)✗ Python3 not found$(NC)"
+	@which uv > /dev/null && echo "$(GREEN)✓ UV found$(NC)" || echo "$(RED)✗ UV not found$(NC)"
 	@which pandoc > /dev/null && echo "$(GREEN)✓ Pandoc found$(NC)" || echo "$(YELLOW)⚠ Pandoc not found (optional for PDF)$(NC)"
 	@which git > /dev/null && echo "$(GREEN)✓ Git found$(NC)" || echo "$(RED)✗ Git not found$(NC)"
 
@@ -138,14 +176,14 @@ check-deps: ## Check required dependencies
 
 dash-init: init ## Initialize dashboard environment
 	@echo "$(BLUE)Setting up dashboard environment...$(NC)"
-	@. $(VENV)/bin/activate && pip install -q -r dashboard/requirements.txt
+	@$(UV) sync --extra dashboard
 	@mkdir -p dashboard/state dashboard/templates_src build/dashboard
-	@. $(VENV)/bin/activate && $(PYTHON) scripts/generate_dashboard_config.py
+	@$(PYTHON) scripts/generate_dashboard_config.py
 	@echo "$(GREEN)✓ Dashboard initialized$(NC)"
 
 dash-gen: dash-init ## Generate tasks from templates
 	@echo "$(BLUE)Generating tasks from templates...$(NC)"
-	@. $(VENV)/bin/activate && $(PYTHON) dashboard/tools/generate_tasks.py \
+	@$(PYTHON) dashboard/tools/generate_tasks.py \
 		--courses dashboard/state/courses.json \
 		--templates dashboard/templates_src \
 		--out dashboard/state/tasks.json
@@ -154,15 +192,14 @@ dash-gen: dash-init ## Generate tasks from templates
 
 dash-validate: ## Validate task data integrity
 	@echo "$(BLUE)Validating task data...$(NC)"
-	@. $(VENV)/bin/activate && $(PYTHON) dashboard/tools/validate.py
+	@$(PYTHON) dashboard/tools/validate.py
 	@echo "$(GREEN)✓ Validation passed$(NC)"
 
 dash: dash-gen ## Run dashboard server
 	@echo "$(BLUE)Starting dashboard server on http://127.0.0.1:5055$(NC)"
-	@. $(VENV)/bin/activate && \
-	FLASK_APP=dashboard/app.py FLASK_ENV=development \
+	@FLASK_APP=dashboard/app.py FLASK_ENV=development \
 	DASH_PORT=5055 DASH_HOST=127.0.0.1 \
-	flask run --host=127.0.0.1 --port=5055
+	$(UV) run flask run --host=127.0.0.1 --port=5055
 
 dash-open: ## Open dashboard in browser
 	@xdg-open http://127.0.0.1:5055 2>/dev/null || \
@@ -171,7 +208,7 @@ dash-open: ## Open dashboard in browser
 
 dash-export: ## Export dashboard data (ICS, CSV)
 	@echo "$(BLUE)Exporting dashboard data...$(NC)"
-	@. $(VENV)/bin/activate && $(PYTHON) dashboard/tools/export.py 2>/dev/null || echo "Export tool not yet implemented"
+	@$(PYTHON) dashboard/tools/export.py 2>/dev/null || echo "Export tool not yet implemented"
 	@echo "$(GREEN)✓ Export complete$(NC)"
 
 dash-snapshot: ## Create git snapshot of current state
@@ -181,17 +218,55 @@ dash-snapshot: ## Create git snapshot of current state
 
 dash-reset: ## Reset all task statuses for new semester
 	@echo "$(BLUE)Resetting all task statuses...$(NC)"
-	@. $(VENV)/bin/activate && $(PYTHON) dashboard/tools/reset.py 2>/dev/null || echo "Reset tool not yet implemented"
+	@$(PYTHON) dashboard/tools/reset.py 2>/dev/null || echo "Reset tool not yet implemented"
 	@$(MAKE) dash-snapshot --no-print-directory
 	@echo "$(GREEN)✓ All tasks reset to 'todo' status$(NC)"
 
 # CI/CD targets
-.PHONY: ci-validate ci-build
+.PHONY: ci-validate ci-build ci-test ci-lint ci-setup
+
+ci-setup: ## Setup CI environment
+	@echo "$(BLUE)Setting up CI environment...$(NC)"
+	@uv python install $(PYTHON_VERSION)
+	@uv python pin $(PYTHON_VERSION)
+	@uv sync --all-extras
+	@echo "$(GREEN)✓ CI environment ready$(NC)"
 
 ci-validate: ## CI validation step
-	@$(PYTHON) scripts/validate_json.py --strict
+	@$(UV) run python scripts/validate_json.py --strict
 
 ci-build: ## CI build step
-	@$(PYTHON) scripts/build_syllabi.py --ci
-	@$(PYTHON) scripts/build_schedules.py --ci
-	@$(PYTHON) scripts/build_bb_packages.py --ci
+	@$(UV) run python scripts/build_syllabi.py --ci
+	@$(UV) run python scripts/build_schedules.py --ci
+	@$(UV) run python scripts/build_bb_packages.py --ci
+
+ci-test: ## CI test step with coverage
+	@$(UV) run pytest tests/ -v --cov=dashboard --cov=scripts --cov-report=xml --cov-report=term
+
+ci-lint: ## CI linting and formatting check
+	@$(UV) run ruff format --check .
+	@$(UV) run ruff check .
+	@$(UV) run mypy dashboard/ scripts/ --ignore-missing-imports
+
+# Pre-commit setup
+.PHONY: pre-commit-install pre-commit-run
+
+pre-commit-install: ## Install pre-commit hooks
+	@echo "$(BLUE)Installing pre-commit hooks...$(NC)"
+	@$(UV) pip install pre-commit
+	@pre-commit install
+	@pre-commit install --hook-type commit-msg
+	@echo "$(GREEN)✓ Pre-commit hooks installed$(NC)"
+
+pre-commit-run: ## Run pre-commit on all files
+	@echo "$(BLUE)Running pre-commit checks...$(NC)"
+	@pre-commit run --all-files
+	@echo "$(GREEN)✓ Pre-commit checks complete$(NC)"
+
+# Development setup
+.PHONY: dev-setup
+
+dev-setup: init pre-commit-install ## Complete development environment setup
+	@echo "$(BLUE)Setting up development environment...$(NC)"
+	@bash scripts/setup-dev.sh
+	@echo "$(GREEN)✓ Development environment ready$(NC)"

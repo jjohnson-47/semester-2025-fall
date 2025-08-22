@@ -1,0 +1,20 @@
+{
+  "weeks": [
+    {"week": 1, "topic": "Measuring velocity and the notion of a limit", "readings": ["1.1", "1.2"], "assignments": ["Prerequisites Review", "Edfinity 1.1-1.2"], "assessments": ["Week 1 Quiz"], "notes": ""},
+    {"week": 2, "topic": "Finding limits and continuity", "readings": ["1.7"], "assignments": ["BB1 Evaluating Limits", "Edfinity 1.7"], "assessments": ["Week 2 Quiz"], "notes": "Labor Day week"},
+    {"week": 3, "topic": "The derivative of a function", "readings": ["1.3", "1.4"], "assignments": ["BB2 Derivative function", "Edfinity 1.3-1.4"], "assessments": ["Week 3 Quiz"], "notes": ""},
+    {"week": 4, "topic": "Interpreting derivatives and second derivatives", "readings": ["1.5", "1.6"], "assignments": ["BB3 Second derivatives", "Written Problems 1"], "assessments": ["Week 4 Quiz"], "notes": ""},
+    {"week": 5, "topic": "Tangent lines and derivative rules", "readings": ["1.8", "2.1"], "assignments": ["BB4 Linear approximations", "Edfinity 1.8-2.1"], "assessments": ["Week 5 Quiz"], "notes": ""},
+    {"week": 6, "topic": "Trig derivatives, product and quotient rules", "readings": ["2.2", "2.3"], "assignments": ["BB5 Trig derivatives", "Edfinity 2.2-2.3"], "assessments": ["Week 6 Quiz"], "notes": ""},
+    {"week": 7, "topic": "Chain rule and advanced derivatives", "readings": ["2.4", "2.5"], "assignments": ["BB6 Chain rule", "Written Problems 2"], "assessments": ["Week 7 Quiz"], "notes": ""},
+    {"week": 8, "topic": "Inverse and implicit functions", "readings": ["2.6", "2.7"], "assignments": ["BB7 Inverse Functions", "Edfinity 2.6-2.7"], "assessments": ["Week 8 Quiz", "Midterm Exam"], "notes": ""},
+    {"week": 9, "topic": "L'Hopital's Rule and extreme values", "readings": ["2.8", "3.1"], "assignments": ["BB8 L'Hopital's Rule", "Written Problems 3"], "assessments": [], "notes": ""},
+    {"week": 10, "topic": "Global optimization", "readings": ["3.2", "3.3"], "assignments": ["BB9 Optimization", "Edfinity 3.2-3.3"], "assessments": ["Week 10 Quiz"], "notes": ""},
+    {"week": 11, "topic": "Applied optimization and related rates", "readings": ["3.4", "3.5", "4.1"], "assignments": ["BB10 Related Rates", "Written Problems 4"], "assessments": ["Week 11 Quiz"], "notes": ""},
+    {"week": 12, "topic": "Riemann sums and definite integral", "readings": ["4.2", "4.3"], "assignments": ["BB11 Summation Notation", "Edfinity 4.1-4.3"], "assessments": ["Week 12 Quiz"], "notes": ""},
+    {"week": 13, "topic": "Fundamental Theorem of Calculus", "readings": ["4.4", "5.1", "5.2"], "assignments": ["BB12 Antiderivatives", "Written Problems 5"], "assessments": ["Week 13 Quiz"], "notes": ""},
+    {"week": 14, "topic": "Integration techniques", "readings": ["5.3", "5.4"], "assignments": ["BB13 Integration", "Edfinity 5.3-5.4"], "assessments": ["Week 14 Quiz"], "notes": "Thanksgiving week"},
+    {"week": 15, "topic": "Review week", "readings": [], "assignments": ["BB14 Looking Ahead"], "assessments": [], "notes": ""}
+  ],
+  "finals": {"topic": "Final Exam", "assessments": ["Final Exam (Proctored)"], "notes": "Comprehensive final exam"}
+}

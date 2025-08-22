@@ -43,6 +43,8 @@ htmlcov/
 
 # Documentation builds
 docs/_build/
+docs/flask-reference/
+docs/flask-stable/
 site/
 
 # Temporary files
@@ -93,3 +95,12 @@ secrets/
 # Local development
 local/
 scratch/
+
+# Claude Code
+.claude/settings.local.json
+.claude/task-log.txt
+.claude/memory-bank/
+.claude/.session/
+
+# UV
+uv.lock.local

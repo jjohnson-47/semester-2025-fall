@@ -1,0 +1,15 @@
+{
+  "from_markdown": "docs/reference/course-guides/math221.md",
+  "description": "Covers functions and graphs, differentiation, exponential and logarithmic functions, antidifferentiation and integration, and functions of several variables. Applies these mathematical concepts.",
+  "prerequisites": "MATH A121 with a minimum grade of C or MATH A151 with a minimum grade of C or MATH A152 with a minimum grade of C or MATH A155 with a minimum grade of C or MATH A211 with a minimum grade of C or MATH A212 with a minimum grade of C or MATH A251 with a minimum grade of C or MATH A251F with a minimum grade of C or MATH A252 with a minimum grade of C or MATH A252F with a minimum grade of C or MATH A253 with a minimum grade of C or ALEKS Overall Test 1 with a score of 078 or ALEKS Overall Test 2 with a score of 078 or ALEKS Overall Test 3 with a score of 078 or ALEKS Overall Test 4 with a score of 078 or ALEKS Overall Test 5 with a score of 078",
+  "goals": [
+    "Introduce techniques and rules of differentiation and integration.",
+    "Present applications of differentiation and integration.",
+    "Introduce partial derivatives and appropriate applications."
+  ],
+  "outcomes": [
+    "Differentiate functions involving rational, exponential and logarithmic functions and combinations of these functions.",
+    "Integrate functions using the power rule (substitution method) and integration by parts techniques.",
+    "Use differentiation and integration techniques to solve applied problems."
+  ]
+}

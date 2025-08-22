@@ -90,12 +90,13 @@ Textbook information will be provided in Blackboard.
 ### Grade Distribution
 
 {% if evaluation_tools -%}
-| Category | Weight |
-|----------|--------|
+{% set total_points = grading_policy.points_total | default(1000) %}
+| Category | Weight | Points (out of {{ total_points }}) |
+|----------|--------|-------------------------------|
 {% for category in evaluation_tools.categories -%}
-| {{ category.name }} | {{ category.weight }}% |
+| {{ category.name }} | {{ category.weight }}% | {{ ((category.weight | float) * (total_points | float) / 100) | round(0, 'common') | int }} |
 {% endfor -%}
-| **Total** | **100%** |
+| **Total** | **100%** | **{{ total_points }}** |
 {% else -%}
 Grade distribution will be provided in Blackboard.
 {% endif %}
@@ -103,7 +104,7 @@ Grade distribution will be provided in Blackboard.
 ### Grading Scale
 
 {% if grading_policy -%}
-| Grade | Percentage | Points (1000 total) |
+| Grade | Percentage | Points (out of {{ grading_policy.points_total | default(1000) }}) |
 |-------|------------|-------------------|
 {% for grade in grading_policy.scale -%}
 | {{ grade.letter }} | {{ grade.range }} | {{ grade.points }} |

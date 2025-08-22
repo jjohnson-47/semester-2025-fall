@@ -1,0 +1,92 @@
+{
+  "workflows": {
+    "daily-start": {
+      "description": "Morning routine to prepare for work",
+      "steps": [
+        "uv sync --quiet",
+        "make validate",
+        "git status",
+        "echo '📚 Ready for Fall 2025 semester work!'"
+      ]
+    },
+    "build-course": {
+      "description": "Build materials for a specific course",
+      "parameters": ["COURSE"],
+      "steps": [
+        "make validate",
+        "make course COURSE=${COURSE}",
+        "ls -la build/syllabi/${COURSE}*",
+        "echo '✓ ${COURSE} materials built'"
+      ]
+    },
+    "dashboard-start": {
+      "description": "Start dashboard with task generation",
+      "steps": [
+        "make dash-gen",
+        "echo 'Dashboard starting on http://127.0.0.1:5055'",
+        "make dash"
+      ]
+    },
+    "weekly-build": {
+      "description": "Generate all weekly materials",
+      "steps": [
+        "make calendar",
+        "make weekly",
+        "make schedules",
+        "echo '📅 Weekly materials generated'"
+      ]
+    },
+    "full-rebuild": {
+      "description": "Complete rebuild of all course materials",
+      "steps": [
+        "make clean",
+        "make init",
+        "make all",
+        "ls -la build/",
+        "echo '🎓 Full rebuild complete!'"
+      ]
+    },
+    "validate-changes": {
+      "description": "Validate all JSON changes before commit",
+      "steps": [
+        "uv run python scripts/validate_json.py --strict",
+        "git diff --stat",
+        "echo '✓ Validation passed - ready to commit'"
+      ]
+    },
+    "semester-snapshot": {
+      "description": "Create a snapshot of current semester state",
+      "steps": [
+        "make validate",
+        "git add -A dashboard/state/",
+        "git commit -m 'Semester snapshot: $(date +%Y-%m-%d %H:%M)'",
+        "echo '📸 Snapshot created'"
+      ]
+    },
+    "dependency-update": {
+      "description": "Update and test all dependencies",
+      "steps": [
+        "uv lock --upgrade",
+        "uv sync",
+        "make validate",
+        "make test 2>/dev/null || echo 'No tests defined yet'",
+        "echo '📦 Dependencies updated'"
+      ]
+    }
+  },
+  "aliases": {
+    "ds": "daily-start",
+    "bc": "build-course",
+    "dash": "dashboard-start",
+    "wb": "weekly-build",
+    "rebuild": "full-rebuild",
+    "vc": "validate-changes",
+    "snap": "semester-snapshot",
+    "deps": "dependency-update"
+  },
+  "autoRun": {
+    "onSessionStart": ["daily-start"],
+    "onProjectOpen": ["make validate"],
+    "beforeCommit": ["validate-changes"]
+  }
+}

@@ -1,12 +1,10 @@
 {
+  "points_total": 500,
   "scale": [
-    {"letter": "A", "range": "90-100%", "points": "900-1000"},
-    {"letter": "B", "range": "80-89%", "points": "800-899"},
-    {"letter": "C", "range": "70-79%", "points": "700-799"},
-    {"letter": "D", "range": "60-69%", "points": "600-699"},
-    {"letter": "F", "range": "Below 60%", "points": "0-599"}
-  ],
-  "late_policy": "Late assignments accepted with 10% penalty per day, up to 3 days late.",
-  "makeup_policy": "Makeup exams only with documented emergency or prior arrangement.",
-  "rounding": "Grades within 0.5% of the next letter grade will be rounded up at instructor discretion."
+    {"letter": "A", "range": "90-100%", "points": 450},
+    {"letter": "B", "range": "80-89%", "points": 400},
+    {"letter": "C", "range": "70-79%", "points": 350},
+    {"letter": "D", "range": "60-69%", "points": 300},
+    {"letter": "F", "range": "< 60%", "points": 0}
+  ]
 }

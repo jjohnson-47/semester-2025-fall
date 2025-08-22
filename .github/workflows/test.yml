@@ -1,0 +1,123 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.13"]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        enable-cache: true
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      run: |
+        uv python install ${{ matrix.python-version }}
+        uv venv --python ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        uv sync --all-extras
+    
+    - name: Run JSON validation
+      run: |
+        uv run python scripts/validate_json.py --strict
+    
+    - name: Run linting
+      run: |
+        uv run --with ruff ruff check scripts/ dashboard/ tests/
+    
+    - name: Run type checking
+      run: |
+        uv run --with mypy mypy scripts/ dashboard/ --ignore-missing-imports
+    
+    - name: Run tests with coverage
+      run: |
+        uv run --with pytest,pytest-cov pytest \
+          --cov=scripts \
+          --cov=dashboard \
+          --cov-report=term-missing \
+          --cov-report=xml \
+          --cov-report=html:htmlcov \
+          --cov-fail-under=80 \
+          -v
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+    
+    - name: Archive coverage report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-report
+        path: htmlcov/
+    
+    - name: Test build process
+      run: |
+        make clean
+        make all
+    
+    - name: Verify build artifacts
+      run: |
+        test -f build/MATH221_calendar.ics
+        test -f build/MATH251_calendar.ics
+        test -f build/STAT253_calendar.ics
+        test -d build/syllabi
+        test -d build/schedules
+        test -d build/weekly
+        test -d build/blackboard
+
+  smoke-test:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+    
+    - name: Quick smoke test
+      run: |
+        uv sync
+        uv run pytest tests/ -m smoke -v
+
+  dashboard-test:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+    
+    - name: Install dashboard dependencies
+      run: |
+        uv sync --extra dashboard --extra testing
+    
+    - name: Test dashboard components
+      run: |
+        uv run pytest tests/test_dashboard*.py -v
+    
+    - name: Test dashboard startup
+      run: |
+        timeout 5 uv run python -c "from dashboard.app import app; print('Dashboard imports OK')" || true

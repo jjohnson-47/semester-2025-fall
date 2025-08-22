@@ -1,0 +1,73 @@
+{
+  "snippets": {
+    "course-schedule": {
+      "description": "Template for course schedule.json",
+      "content": {
+        "course": "${1:COURSE_CODE}",
+        "weeks": [
+          {
+            "week": 1,
+            "topic": "${2:Introduction}",
+            "reading": "${3:Chapter 1}",
+            "assignments": ["${4:Homework 1}"],
+            "notes": "${5:First week notes}"
+          }
+        ]
+      }
+    },
+    "syllabus-section": {
+      "description": "Common syllabus section",
+      "content": {
+        "section": "${1:Section Name}",
+        "content": "${2:Section content}",
+        "policies": [],
+        "requirements": []
+      }
+    },
+    "task-template": {
+      "description": "Dashboard task template",
+      "content": {
+        "id": "${1:task-id}",
+        "course": "${2:MATH221}",
+        "title": "${3:Task Title}",
+        "category": "${4:preparation}",
+        "status": "todo",
+        "priority": "${5:medium}",
+        "due_date": "${6:2025-08-25}",
+        "dependencies": [],
+        "notes": ""
+      }
+    },
+    "makefile-target": {
+      "description": "New Makefile target",
+      "content": "${1:target-name}: ${2:dependencies} ## ${3:Description}\n\t@echo \"$(BLUE)${4:Action message}...$(NC)\"\n\t@${5:command}\n\t@echo \"$(GREEN)✓ ${6:Success message}$(NC)\""
+    },
+    "jinja-filter": {
+      "description": "Custom Jinja2 filter",
+      "content": "@app.template_filter('${1:filter_name}')\ndef ${1:filter_name}(value):\n    \"\"\"${2:Filter description}\"\"\"\n    ${3:return value}"
+    },
+    "json-schema": {
+      "description": "JSON schema template",
+      "content": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "${1:Schema Title}",
+        "type": "object",
+        "required": ["${2:required_field}"],
+        "properties": {
+          "${2:required_field}": {
+            "type": "${3:string}",
+            "description": "${4:Field description}"
+          }
+        }
+      }
+    }
+  },
+  "shortcuts": {
+    "cs": "course-schedule",
+    "ss": "syllabus-section", 
+    "tt": "task-template",
+    "mt": "makefile-target",
+    "jf": "jinja-filter",
+    "js": "json-schema"
+  }
+}

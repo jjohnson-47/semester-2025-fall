@@ -1,31 +1,10 @@
 {
   "categories": [
-    {
-      "name": "Homework",
-      "weight": 25,
-      "description": "Weekly homework assignments via MyLab Math"
-    },
-    {
-      "name": "Quizzes",
-      "weight": 15,
-      "description": "Weekly quizzes to assess understanding"
-    },
-    {
-      "name": "Midterm Exams",
-      "weight": 30,
-      "description": "Two midterm exams (15% each)"
-    },
-    {
-      "name": "Final Exam",
-      "weight": 25,
-      "description": "Comprehensive final examination"
-    },
-    {
-      "name": "Participation",
-      "weight": 5,
-      "description": "Discussion board participation and engagement"
-    }
-  ],
-  "total_points": 1000,
-  "notes": "All assignments must be submitted by 11:59 PM Alaska Time on the due date."
+    {"name": "Participation", "weight": 5},
+    {"name": "Homework", "weight": 23},
+    {"name": "Chapter Tests", "weight": 31},
+    {"name": "R Assignments", "weight": 16},
+    {"name": "Final Report", "weight": 12},
+    {"name": "Final Test", "weight": 13}
+  ]
 }

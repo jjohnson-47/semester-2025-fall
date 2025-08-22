@@ -1,0 +1,231 @@
+name: Scheduled Maintenance
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.13.6"
+  UV_VERSION: "0.5.14"
+
+jobs:
+  update-dependencies:
+    name: Update Dependencies
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up UV
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+          version: ${{ env.UV_VERSION }}
+
+      - name: Set up Python
+        run: |
+          uv python install ${{ env.PYTHON_VERSION }}
+          uv python pin ${{ env.PYTHON_VERSION }}
+
+      - name: Update dependencies
+        run: |
+          # Update all dependencies to latest compatible versions
+          uv lock --upgrade
+          
+          # Check if there are changes
+          if [[ -n $(git status --porcelain uv.lock) ]]; then
+            echo "dependencies_updated=true" >> $GITHUB_ENV
+          else
+            echo "dependencies_updated=false" >> $GITHUB_ENV
+          fi
+
+      - name: Run tests with updated dependencies
+        if: env.dependencies_updated == 'true'
+        run: |
+          uv sync --all-extras
+          uv run pytest tests/ -v
+
+      - name: Create Pull Request
+        if: env.dependencies_updated == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "deps: update dependencies to latest versions"
+          title: "Weekly dependency updates"
+          body: |
+            ## 📦 Dependency Updates
+            
+            This PR contains the weekly update of all dependencies to their latest compatible versions.
+            
+            ### Changes
+            - Updated `uv.lock` with latest dependency versions
+            - All tests have been run and are passing
+            
+            ### Review Checklist
+            - [ ] Review changelog of major updates
+            - [ ] Check for breaking changes
+            - [ ] Verify application still works as expected
+            
+            ---
+            *This is an automated pull request created by the scheduled maintenance workflow.*
+          branch: deps/weekly-update
+          delete-branch: true
+          labels: |
+            dependencies
+            automated
+
+  validate-content:
+    name: Validate Course Content
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up UV
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+          version: ${{ env.UV_VERSION }}
+
+      - name: Set up Python
+        run: |
+          uv python install ${{ env.PYTHON_VERSION }}
+          uv python pin ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          uv sync
+
+      - name: Validate all JSON files
+        run: |
+          uv run python scripts/validate_json.py --strict
+
+      - name: Check for date consistency
+        run: |
+          # Check that all dates in content are still future dates
+          uv run python -c "
+          import json
+          import os
+          from datetime import datetime, date
+          from pathlib import Path
+          
+          errors = []
+          for json_file in Path('content').rglob('*.json'):
+              with open(json_file) as f:
+                  data = json.load(f)
+                  # Check for past dates in schedule files
+                  if 'schedule' in str(json_file):
+                      for week in data.get('weeks', []):
+                          week_date = week.get('date')
+                          if week_date:
+                              if datetime.strptime(week_date, '%Y-%m-%d').date() < date.today():
+                                  errors.append(f'{json_file}: Week {week.get(\"week\")} has past date {week_date}')
+          
+          if errors:
+              print('⚠️ Found past dates in content:')
+              for error in errors:
+                  print(f'  - {error}')
+              exit(1)
+          else:
+              print('✅ All dates are valid')
+          "
+
+      - name: Create issue if validation fails
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '⚠️ Content Validation Failed',
+              body: `The weekly content validation has failed. Please review the [workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.
+              
+              Common issues:
+              - Past dates in schedule files
+              - Invalid JSON structure
+              - Missing required fields
+              
+              Please fix these issues to ensure content accuracy.`,
+              labels: ['bug', 'content', 'automated']
+            })
+
+  cleanup:
+    name: Cleanup Old Artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          retain_days: 30
+          keep_minimum_runs: 10
+
+      - name: Delete old artifacts
+        uses: c-hive/gha-remove-artifacts@v1
+        with:
+          age: '30 days'
+          skip-recent: 5
+
+  security-scan:
+    name: Weekly Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up UV
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+          version: ${{ env.UV_VERSION }}
+
+      - name: Set up Python
+        run: |
+          uv python install ${{ env.PYTHON_VERSION }}
+          uv python pin ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+          uv pip install safety bandit[toml]
+
+      - name: Run safety check
+        continue-on-error: true
+        run: |
+          uv run safety check --json > safety-report.json || true
+
+      - name: Run bandit scan
+        continue-on-error: true
+        run: |
+          uv run bandit -r dashboard/ scripts/ -f json -o bandit-report.json || true
+
+      - name: Check for secrets
+        run: |
+          # Simple check for potential secrets in code
+          if grep -r -E "(api[_-]?key|secret|token|password|pwd|passwd)" \
+               --include="*.py" --include="*.js" --include="*.json" \
+               --exclude-dir=".git" --exclude-dir="docs" --exclude-dir="build" . | \
+               grep -v -E "(#|//|/\*|\"|').*\b(api[_-]?key|secret|token|password|pwd|passwd)\b"; then
+            echo "⚠️ Potential secrets found in code!"
+            exit 1
+          fi
+
+      - name: Upload security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports-${{ github.run_id }}
+          path: |
+            safety-report.json
+            bandit-report.json
+          retention-days: 30

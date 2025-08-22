@@ -1,0 +1,17 @@
+{
+  "from_markdown": "docs/reference/course-guides/stat253.md",
+  "description": "Intensive survey course with applications for the sciences. Topics include descriptive statistics, probability, random variables, binomial, Poisson and normal distributions, estimation and hypothesis testing of common parameters, analysis of variance for single factor and two factors, correlation, and simple linear regression. A major statistical software package will be utilized.",
+  "prerequisites": "MATH A121 with a minimum grade of C or MATH A151 with a minimum grade of C or MATH A155 with a minimum grade of C or MATH A211 with a minimum grade of C or MATH A212 with a minimum grade of C or MATH A221 with a minimum grade of C or MATH A251 with a minimum grade of C or MATH A251F with a minimum grade of C or MATH A252 with a minimum grade of C or MATH A252F with a minimum grade of C or MATH A253 with a minimum grade of C or ALEKS Overall Test 1 with a score of 065 or ALEKS Overall Test 2 with a score of 065 or ALEKS Overall Test 3 with a score of 065 or ALEKS Overall Test 4 with a score of 065 or ALEKS Overall Test 5 with a score of 065\n\n**Note:** If prerequisite is not satisfied, an approved UAA placement test is required.",
+  "goals": [
+    "Introduce descriptive statistics, probability and more widely used parametric statistical methods",
+    "Utilize real-world data sets from the sciences and introduce one major statistical package to aid statistical analyses",
+    "Guide with writing reports effectively communicating the statistical results"
+  ],
+  "outcomes": [
+    "Develop their algebraic, analytic and numeric skills; use them to solve applied problems; and correctly explain their mathematical reasoning.",
+    "Solve thought-provoking problems and critically evaluate statistical information from real-life scenarios",
+    "Collect data either by running an appropriate randomized experiment or from a reliable source",
+    "Use a major statistical software package to conduct analysis of data, being sure to validate all assumptions relevant to the selected statistical method",
+    "Draw conclusions and write a report effectively communicating the results"
+  ]
+}

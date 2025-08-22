@@ -1,0 +1,54 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "description": "GitHub integration for repository management and issue tracking"
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "--allowed-directories", "/home/verlyn13/Projects/jjohnson-47/semester-2025-fall"],
+      "description": "Enhanced filesystem operations with safety constraints"
+    },
+    "memory-bank": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "env": {
+        "MEMORY_BANK_PATH": "/home/verlyn13/Projects/jjohnson-47/semester-2025-fall/.claude/memory-bank"
+      },
+      "description": "Persistent memory storage for cross-session context"
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "description": "Structured problem-solving and planning capabilities"
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "${BRAVE_SEARCH_API_KEY}"
+      },
+      "description": "Web search for documentation and academic resources"
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"],
+      "description": "Fetch and process web content for research"
+    }
+  },
+  "globalShortcuts": {
+    "gh": "github",
+    "fs": "filesystem",
+    "mem": "memory-bank",
+    "think": "sequential-thinking",
+    "search": "brave-search",
+    "web": "fetch"
+  },
+  "autoStart": ["filesystem", "memory-bank"],
+  "projectSpecific": true,
+  "version": "1.0.0"
+}
