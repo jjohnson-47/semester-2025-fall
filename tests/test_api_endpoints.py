@@ -7,7 +7,6 @@ Exercises blueprint routes to increase coverage.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
 
@@ -172,7 +171,7 @@ def test_export_endpoints(app, client):
     assert "BEGIN:VEVENT" in text
 
 
-def test_courses_endpoints(app, client):
+def test_courses_endpoints(app, client):  # noqa: ARG001
     # List
     resp = client.get("/api/courses")
     assert resp.status_code == 200

@@ -15,7 +15,7 @@ try:
 
     # Load base config
     load_dotenv()
-    
+
     # Load secrets if available
     secrets_file = Path('.env.secrets')
     if secrets_file.exists():
@@ -30,8 +30,8 @@ class Config:
     # Basic Flask config
     # Support both SECRET_KEY and FLASK_SECRET_KEY for flexibility
     SECRET_KEY = (
-        os.environ.get("FLASK_SECRET_KEY") 
-        or os.environ.get("SECRET_KEY") 
+        os.environ.get("FLASK_SECRET_KEY")
+        or os.environ.get("SECRET_KEY")
         or "dev-key-change-in-production"
     )
 

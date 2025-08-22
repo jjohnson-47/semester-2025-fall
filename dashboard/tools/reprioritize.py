@@ -18,7 +18,7 @@ import json
 import logging
 import sys
 from collections import defaultdict, deque
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -88,7 +88,7 @@ class TaskGraph:
         return anchors
 
     def compute_chain_weight(
-        self, task_id: str, anchors: set[str], method: str = "sum", distance_decay: float = 0.95
+        self, task_id: str, anchors: set[str], distance_decay: float = 0.95
     ) -> tuple[float, int, str | None]:
         """Compute critical chain weight from task to nearest anchor.
 
@@ -252,7 +252,7 @@ class SmartPrioritizer:
         """Check if task is pinned."""
         if not self.pins:
             return False
-            
+
         # Check exact ID pins
         by_id = self.pins.get("by_id", [])
         if by_id and task_id in by_id:
@@ -409,7 +409,7 @@ class SmartPrioritizer:
         current_phase = self.get_current_phase()
         if current_phase:
             logger.info(f"Current phase: {current_phase.get('name', 'Unknown')}")
-            
+
         # Score all tasks
         for task in self.tasks:
             if task.get("status") != "done":

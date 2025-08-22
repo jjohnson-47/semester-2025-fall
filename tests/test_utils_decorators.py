@@ -11,7 +11,7 @@ import pytest
 from flask import jsonify
 
 from dashboard import create_app
-from dashboard.utils.decorators import paginate, validate_json, require_api_key
+from dashboard.utils.decorators import paginate, require_api_key, validate_json
 
 
 @pytest.fixture

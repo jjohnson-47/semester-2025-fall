@@ -13,14 +13,15 @@ pipeline. The helpers are intentionally lightweight and JSON-focused for tests.
 """
 
 import argparse
-import os
 import json
 import logging
+import os
 import re
 import sys
+from collections.abc import Iterable
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import yaml
 
@@ -76,11 +77,11 @@ class TaskGenerator:
         # Load YAML, handling multiple documents separated by ---
         with open(template_file) as f:
             yaml_docs = list(yaml.safe_load_all(f))
-        
+
         for template in yaml_docs:
             if not template:  # Skip empty documents
                 continue
-                
+
             # Get applicable courses
             applies_to = template.get("applies_to", [])
             if "ALL" in applies_to:
@@ -320,7 +321,7 @@ def main() -> int:
     if not Path(args.templates).exists():
         print(f"Error: Templates directory not found: {args.templates}")
         return 1
-    
+
     # Load inputs (JSON path for this CLI)
     courses_data = json.loads(Path(args.courses).read_text())
     all_templates: list[dict[str, Any]] = []

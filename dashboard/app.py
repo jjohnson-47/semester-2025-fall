@@ -250,7 +250,7 @@ def index():
     """Main dashboard view."""
     data = TaskManager.load_tasks()
     courses = TaskManager.load_courses()
-    
+
     # Load Now Queue if it exists
     now_queue = []
     now_queue_file = STATE_DIR / "now_queue.json"
@@ -266,7 +266,7 @@ def index():
             task["priority"] = calculate_priority(task)
         else:
             task["priority"] = task["smart_score"]
-            
+
         task["status_color"] = get_status_color(task.get("status", "todo"))
         task["due_color"] = get_due_color(task)
 

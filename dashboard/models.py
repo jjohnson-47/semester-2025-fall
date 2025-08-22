@@ -294,7 +294,7 @@ class TaskGraph:
         from collections import deque
 
         # Build in-degree map: number of dependencies for each task
-        in_degree = {task_id: 0 for task_id in self.tasks.keys()}
+        in_degree = dict.fromkeys(self.tasks.keys(), 0)
         for task in self.tasks.values():
             for _dep_id in task.depends_on:
                 # Edge is dep -> task, so increment task's in-degree

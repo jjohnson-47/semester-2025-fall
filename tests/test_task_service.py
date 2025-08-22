@@ -5,8 +5,6 @@ Unit tests for TaskService to exercise file I/O, filtering, and bulk ops.
 
 from __future__ import annotations
 
-from datetime import datetime
-
 import pytest
 
 from dashboard import create_app
