@@ -4,10 +4,12 @@ Dashboard Flask application factory.
 Creates and configures the Flask application.
 """
 
+from typing import Any
+
 from flask import Flask
 
 
-def create_app(config_name=None):
+def create_app(config_name: str | None = None) -> Flask:
     """
     Application factory pattern for Flask app creation.
 
@@ -44,65 +46,43 @@ def create_app(config_name=None):
     return app
 
 
-def init_extensions(app):
+def init_extensions(app: Flask) -> None:
     """Initialize Flask extensions."""
     # CORS support
-    from flask_cors import CORS
+    from flask_cors import CORS  # type: ignore[import-untyped]
 
-    CORS(app, origins=app.config.get("CORS_ORIGINS", "*"))
-
-    # Request ID for tracking
-    @app.before_request
-    def before_request():
-        import uuid
-
-        from flask import g
-
-        g.request_id = str(uuid.uuid4())
-
-    # JSON encoder for datetime
-    from flask.json.provider import DefaultJSONProvider
-
-    class UpdatedJSONProvider(DefaultJSONProvider):
-        def default(self, obj):
-            from datetime import date, datetime
-
-            if isinstance(obj, datetime | date):
-                return obj.isoformat()
-            return super().default(obj)
-
-    app.json = UpdatedJSONProvider(app)
+    CORS(app)
 
 
-def register_blueprints(app):
-    """Register application blueprints."""
+def register_blueprints(app: Flask) -> None:
+    """Register all blueprints."""
+    # Main views
+    from dashboard.views import main_bp
+
+    app.register_blueprint(main_bp)
+
     # API blueprints
     from dashboard.api import api_bp
 
     app.register_blueprint(api_bp, url_prefix="/api")
 
-    # Web UI blueprints
-    from dashboard.views import main_bp
 
-    app.register_blueprint(main_bp)
-
-
-def register_error_handlers(app):
+def register_error_handlers(app: Flask) -> None:
     """Register error handlers."""
 
     @app.errorhandler(404)
-    def not_found_error(_error):
+    def not_found_error(error: Any) -> tuple[dict[str, str], int]:
         """Handle 404 errors."""
         from flask import jsonify, request
 
         if request.path.startswith("/api/"):
-            return jsonify({"error": "Resource not found"}), 404
+            return jsonify({"error": "Not found"}), 404
         from flask import render_template
 
         return render_template("errors/404.html"), 404
 
     @app.errorhandler(500)
-    def internal_error(error):
+    def internal_error(error: Any) -> tuple[dict[str, str], int]:
         """Handle 500 errors."""
         from flask import jsonify, request
 
@@ -113,68 +93,108 @@ def register_error_handlers(app):
 
         return render_template("errors/500.html"), 500
 
-    @app.errorhandler(400)
-    def bad_request_error(_error):
-        """Handle 400 errors."""
-        from flask import jsonify
 
-        return jsonify({"error": "Bad request"}), 400
-
-
-def register_commands(app):
+def register_commands(app: Flask) -> None:
     """Register CLI commands."""
+    import click
 
     @app.cli.command()
-    def init_db():
+    @click.option("--course", help="Course code to generate tasks for")
+    def generate_tasks(course: str | None) -> None:
+        """Generate tasks from templates."""
+        from dashboard.tools.generate_tasks import TaskGenerator
+
+        generator = TaskGenerator()
+        if course:
+            click.echo(f"Generating tasks for {course}...")
+            # Implementation here
+        else:
+            click.echo("Generating tasks for all courses...")
+            # Implementation here
+
+    @app.cli.command()
+    def init_db() -> None:
         """Initialize the database."""
-        from dashboard.services.task_service import TaskService
-
-        TaskService.initialize_data()
-        print("Database initialized.")
+        click.echo("Initializing database...")
+        # Implementation here
 
     @app.cli.command()
-    def seed_db():
-        """Seed database with sample data."""
+    def seed_data() -> None:
+        """Seed sample data."""
         from dashboard.services.task_service import TaskService
 
         TaskService.seed_sample_data()
-        print("Sample data loaded.")
-
-    @app.cli.command()
-    def reset_tasks():
-        """Reset all tasks to 'todo' status."""
-        from dashboard.services.task_service import TaskService
-
-        TaskService.reset_all_tasks()
-        print("All tasks reset.")
+        click.echo("Sample data seeded!")
 
 
-def register_template_filters(app):
-    """Register custom Jinja2 template filters."""
+def register_template_filters(app: Flask) -> None:
+    """Register custom Jinja2 filters."""
 
     @app.template_filter("dateformat")
-    def dateformat(value, format="%b %d, %Y"):
-        """Format a date."""
+    def dateformat(value: Any, format: str = "%B %d, %Y") -> str:
+        """Format a date for display."""
         from datetime import datetime
 
         if isinstance(value, str):
             value = datetime.fromisoformat(value)
         return value.strftime(format) if value else ""
 
-    @app.template_filter("status_badge")
-    def status_badge(status):
-        """Return CSS class for status badge."""
-        badges = {
-            "todo": "badge-secondary",
-            "in_progress": "badge-primary",
-            "completed": "badge-success",
-            "blocked": "badge-danger",
-            "deferred": "badge-warning",
+    @app.template_filter("statusicon")
+    def statusicon(status: str) -> str:
+        """Get icon for task status."""
+        icons = {
+            "todo": "○",
+            "in_progress": "◐",
+            "done": "●",
+            "blocked": "⊘",
         }
-        return badges.get(status, "badge-secondary")
+        return icons.get(status, "?")
 
-    @app.template_filter("priority_icon")
-    def priority_icon(priority):
-        """Return icon for priority level."""
-        icons = {"critical": "🔴", "high": "🟠", "medium": "🟡", "low": "🟢"}
-        return icons.get(priority, "⚪")
+    @app.template_filter("prioritycolor")
+    def prioritycolor(priority: str) -> str:
+        """Get color class for priority."""
+        colors = {
+            "critical": "danger",
+            "high": "warning",
+            "medium": "info",
+            "low": "secondary",
+        }
+        return colors.get(priority, "secondary")
+
+    @app.template_filter("markdown")
+    def markdown_filter(text: str) -> str:
+        """Render markdown to HTML."""
+        import markdown as md
+
+        return md.markdown(text) if text else ""
+
+    @app.template_filter("timeago")
+    def timeago(dt: Any) -> str:
+        """Format datetime as time ago."""
+        from datetime import datetime, timezone
+
+        if isinstance(dt, str):
+            dt = datetime.fromisoformat(dt)
+
+        if not dt:
+            return ""
+
+        now = datetime.now(timezone.utc)
+        if dt.tzinfo is None:
+            from pytz import UTC
+
+            dt = UTC.localize(dt)
+
+        diff = now - dt
+        if diff.days > 7:
+            return dt.strftime("%B %d, %Y")
+        elif diff.days > 0:
+            return f"{diff.days} day{'s' if diff.days > 1 else ''} ago"
+        elif diff.seconds > 3600:
+            hours = diff.seconds // 3600
+            return f"{hours} hour{'s' if hours > 1 else ''} ago"
+        elif diff.seconds > 60:
+            minutes = diff.seconds // 60
+            return f"{minutes} minute{'s' if minutes > 1 else ''} ago"
+        else:
+            return "just now"

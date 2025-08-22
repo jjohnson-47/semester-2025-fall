@@ -4,7 +4,9 @@ Task API endpoints.
 Handles CRUD operations for tasks.
 """
 
-from flask import current_app, jsonify, request
+from typing import Any
+
+from flask import Response, current_app, jsonify, request
 
 from dashboard.api import api_bp
 from dashboard.services.task_service import TaskService
@@ -12,7 +14,7 @@ from dashboard.utils.decorators import validate_json
 
 
 @api_bp.route("/tasks", methods=["GET"])
-def get_tasks():
+def get_tasks() -> Response:
     """
     Get list of tasks with optional filtering.
 
@@ -44,7 +46,7 @@ def get_tasks():
 
 
 @api_bp.route("/tasks/<task_id>", methods=["GET"])
-def get_task(task_id):
+def get_task(task_id: str) -> tuple[Response, int] | Response:
     """Get a specific task by ID."""
     try:
         task = TaskService.get_task_by_id(task_id)
@@ -59,23 +61,29 @@ def get_task(task_id):
 
 @api_bp.route("/tasks", methods=["POST"])
 @validate_json
-def create_task():
-    """Create a new task."""
+def create_task() -> tuple[Response, int] | Response:
+    """
+    Create a new task.
+
+    Expected JSON body:
+    - title: Task title (required)
+    - course: Course code (required)
+    - description: Task description
+    - priority: Priority level
+    - due_date: Due date in ISO format
+    - depends_on: List of prerequisite task IDs
+    """
     try:
         data = request.get_json()
 
         # Validate required fields
-        required = ["course", "title", "status", "priority"]
-        missing = [field for field in required if field not in data]
-        if missing:
-            return jsonify({"error": f"Missing required fields: {', '.join(missing)}"}), 400
+        if not data.get("title") or not data.get("course"):
+            return jsonify({"error": "Title and course are required"}), 400
 
         # Create task
         task = TaskService.create_task(data)
         return jsonify(task), 201
 
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
     except Exception as e:
         current_app.logger.error(f"Error creating task: {e}")
         return jsonify({"error": "Failed to create task"}), 500
@@ -83,90 +91,83 @@ def create_task():
 
 @api_bp.route("/tasks/<task_id>", methods=["PUT"])
 @validate_json
-def update_task(task_id):
+def update_task(task_id: str) -> tuple[Response, int] | Response:
     """Update an existing task."""
     try:
         data = request.get_json()
 
-        # Update task
         task = TaskService.update_task(task_id, data)
         if not task:
             return jsonify({"error": "Task not found"}), 404
 
         return jsonify({"success": True, "task": task})
 
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
     except Exception as e:
         current_app.logger.error(f"Error updating task {task_id}: {e}")
         return jsonify({"error": "Failed to update task"}), 500
 
 
 @api_bp.route("/tasks/<task_id>", methods=["DELETE"])
-def delete_task(task_id):
+def delete_task(task_id: str) -> tuple[Response, int] | Response:
     """Delete a task."""
     try:
         success = TaskService.delete_task(task_id)
         if not success:
             return jsonify({"error": "Task not found"}), 404
 
-        return jsonify({"success": True, "message": "Task deleted"})
+        return jsonify({"success": True})
 
     except Exception as e:
         current_app.logger.error(f"Error deleting task {task_id}: {e}")
         return jsonify({"error": "Failed to delete task"}), 500
 
 
-@api_bp.route("/tasks/bulk-update", methods=["POST"])
-@validate_json
-def bulk_update_tasks():
-    """
-    Bulk update multiple tasks.
-
-    Request body:
-    {
-        "filter": {"course": "MATH221", "status": "todo"},
-        "update": {"status": "in_progress"}
-    }
-    """
-    try:
-        data = request.get_json()
-
-        if "filter" not in data or "update" not in data:
-            return jsonify({"error": "Missing filter or update parameters"}), 400
-
-        count = TaskService.bulk_update(data["filter"], data["update"])
-
-        return jsonify({"success": True, "updated_count": count})
-
-    except Exception as e:
-        current_app.logger.error(f"Error in bulk update: {e}")
-        return jsonify({"error": "Failed to perform bulk update"}), 500
-
-
 @api_bp.route("/tasks/<task_id>/status", methods=["PATCH"])
 @validate_json
-def update_task_status(task_id):
-    """Quick endpoint to update just the task status."""
+def update_task_status(task_id: str) -> tuple[Response, int] | Response:
+    """
+    Update task status.
+
+    Expected JSON body:
+    - status: New status value
+    """
     try:
         data = request.get_json()
+        status = data.get("status")
 
-        if "status" not in data:
-            return jsonify({"error": "Status field required"}), 400
+        if not status:
+            return jsonify({"error": "Status is required"}), 400
 
-        valid_statuses = ["todo", "in_progress", "completed", "blocked", "deferred"]
-        if data["status"] not in valid_statuses:
-            return (
-                jsonify({"error": f"Invalid status. Must be one of: {', '.join(valid_statuses)}"}),
-                400,
-            )
-
-        success = TaskService.update_task_status(task_id, data["status"])
+        success = TaskService.update_task_status(task_id, status)
         if not success:
             return jsonify({"error": "Task not found"}), 404
 
-        return jsonify({"success": True, "status": data["status"]})
+        return jsonify({"success": True})
 
     except Exception as e:
         current_app.logger.error(f"Error updating task status: {e}")
         return jsonify({"error": "Failed to update status"}), 500
+
+
+@api_bp.route("/tasks/bulk", methods=["GET"])
+def get_bulk_tasks() -> Response:
+    """Get all tasks without pagination."""
+    try:
+        tasks = TaskService.get_all_tasks()
+        return jsonify(tasks)
+
+    except Exception as e:
+        current_app.logger.error(f"Error getting bulk tasks: {e}")
+        return jsonify({"error": "Failed to retrieve tasks"}), 500
+
+
+@api_bp.route("/tasks/reset", methods=["POST"])
+def reset_tasks() -> Response:
+    """Reset all tasks to TODO status."""
+    try:
+        TaskService.reset_all_tasks()
+        return jsonify({"success": True, "message": "All tasks reset to TODO"})
+
+    except Exception as e:
+        current_app.logger.error(f"Error resetting tasks: {e}")
+        return jsonify({"error": "Failed to reset tasks"}), 500

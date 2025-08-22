@@ -10,19 +10,19 @@ from dashboard.views import main_bp
 
 
 @main_bp.route("/")
-def index():
+def index() -> str:
     """Main dashboard page."""
     return render_template("dashboard.html")
 
 
 @main_bp.route("/tasks")
-def tasks_view():
+def tasks_view() -> str:
     """Tasks list view."""
     tasks = TaskService.get_tasks()
     return render_template("tasks.html", tasks=tasks)
 
 
 @main_bp.route("/courses")
-def courses_view():
+def courses_view() -> str:
     """Courses overview."""
     return render_template("courses.html")

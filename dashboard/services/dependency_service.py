@@ -40,14 +40,15 @@ class DependencyService:
             tasks = [t for t in tasks if t.course == course]
 
         # Build hierarchy
-        hierarchy = {"root_tasks": [], "task_map": {}, "children_map": {}}
+        hierarchy: dict[str, Any] = {"root_tasks": [], "task_map": {}, "children_map": {}}
 
         for task in tasks:
             task_dict = task.to_dict()
             task_dict["children"] = []
             task_dict["is_blocked"] = task.is_blocked()
             task_dict["blocker_titles"] = [
-                graph.get_task(dep_id).title for dep_id in task.depends_on if graph.get_task(dep_id)
+                blocker.title for dep_id in task.depends_on 
+                if (blocker := graph.get_task(dep_id)) is not None
             ]
 
             hierarchy["task_map"][task.id] = task_dict
@@ -111,7 +112,10 @@ class DependencyService:
         if task.is_blocked() and new_status in ["in_progress", "done"]:
             return {
                 "error": "Cannot start blocked task",
-                "blockers": [graph.get_task(dep_id).title for dep_id in task.depends_on],
+                "blockers": [
+                    blocker.title for dep_id in task.depends_on 
+                    if (blocker := graph.get_task(dep_id)) is not None
+                ],
             }
 
         old_status = task.status
