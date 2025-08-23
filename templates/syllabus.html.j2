@@ -354,6 +354,14 @@
         <hr>
         <p><em>This syllabus is subject to change. Any changes will be announced in Blackboard.</em></p>
         <p><strong>Last Updated:</strong> {{ now().strftime('%B %d, %Y') }}</p>
+
+        {% if attach_schedule and schedule_markdown %}
+        <hr>
+        <h2>Appendix: Course Calendar</h2>
+        <div>
+            {{ schedule_markdown | markdown | safe }}
+        </div>
+        {% endif %}
     </div>
 </body>
 </html>

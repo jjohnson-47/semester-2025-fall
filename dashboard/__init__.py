@@ -4,7 +4,8 @@ Dashboard Flask application factory.
 Creates and configures the Flask application.
 """
 
-from typing import Any
+from datetime import UTC
+from typing import Any, cast
 
 from flask import Flask
 
@@ -49,7 +50,7 @@ def create_app(config_name: str | None = None) -> Flask:
 def init_extensions(app: Flask) -> None:
     """Initialize Flask extensions."""
     # CORS support
-    from flask_cors import CORS  # type: ignore[import-untyped]
+    from flask_cors import CORS
 
     CORS(app)
 
@@ -71,7 +72,7 @@ def register_error_handlers(app: Flask) -> None:
     """Register error handlers."""
 
     @app.errorhandler(404)
-    def not_found_error(error: Any) -> tuple[dict[str, str], int]:
+    def not_found_error(error: Any) -> tuple[dict[str, str], int]:  # noqa: ARG001
         """Handle 404 errors."""
         from flask import jsonify, request
 
@@ -102,15 +103,14 @@ def register_commands(app: Flask) -> None:
     @click.option("--course", help="Course code to generate tasks for")
     def generate_tasks(course: str | None) -> None:
         """Generate tasks from templates."""
-        from dashboard.tools.generate_tasks import TaskGenerator
-
-        generator = TaskGenerator()
+        # TODO: Add proper paths for courses and templates
+        # For now, just show a placeholder message
         if course:
             click.echo(f"Generating tasks for {course}...")
-            # Implementation here
+            click.echo("Task generation not yet implemented in this context")
         else:
             click.echo("Generating tasks for all courses...")
-            # Implementation here
+            click.echo("Task generation not yet implemented in this context")
 
     @app.cli.command()
     def init_db() -> None:
@@ -164,14 +164,14 @@ def register_template_filters(app: Flask) -> None:
     @app.template_filter("markdown")
     def markdown_filter(text: str) -> str:
         """Render markdown to HTML."""
-        import markdown as md
+        import markdown as md  # type: ignore[import-untyped]
 
         return md.markdown(text) if text else ""
 
     @app.template_filter("timeago")
     def timeago(dt: Any) -> str:
         """Format datetime as time ago."""
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         if isinstance(dt, str):
             dt = datetime.fromisoformat(dt)
@@ -179,15 +179,17 @@ def register_template_filters(app: Flask) -> None:
         if not dt:
             return ""
 
-        now = datetime.now(timezone.utc)
+        from datetime import UTC
+        
+        now = datetime.now(UTC)
         if dt.tzinfo is None:
-            from pytz import UTC
+            from pytz import UTC as pytz_UTC  # type: ignore[import-untyped]
 
-            dt = UTC.localize(dt)
+            dt = pytz_UTC.localize(dt)
 
         diff = now - dt
         if diff.days > 7:
-            return dt.strftime("%B %d, %Y")
+            return cast(str, dt.strftime("%B %d, %Y"))
         elif diff.days > 0:
             return f"{diff.days} day{'s' if diff.days > 1 else ''} ago"
         elif diff.seconds > 3600:

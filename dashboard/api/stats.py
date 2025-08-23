@@ -4,22 +4,23 @@ Statistics API endpoints.
 """
 
 from flask import jsonify
+from flask.typing import ResponseReturnValue
 
 from dashboard.api import api_bp
 from dashboard.services.task_service import TaskService
 
 
 @api_bp.route("/stats", methods=["GET"])
-def get_stats():
+def get_stats() -> ResponseReturnValue:
     """Get dashboard statistics."""
     data = TaskService._load_tasks_data()
     tasks = data.get("tasks", [])
 
     # Calculate statistics
     total = len(tasks)
-    by_status = {}
-    by_priority = {}
-    by_course = {}
+    by_status: dict[str, int] = {}
+    by_priority: dict[str, int] = {}
+    by_course: dict[str, int] = {}
 
     for task in tasks:
         # Count by status
@@ -53,7 +54,7 @@ def get_stats():
 
 
 @api_bp.route("/stats/courses/<course_code>", methods=["GET"])
-def get_course_stats(course_code):
+def get_course_stats(course_code: str) -> ResponseReturnValue:
     """Get statistics for a specific course."""
     data = TaskService._load_tasks_data()
     tasks = [t for t in data.get("tasks", []) if t.get("course") == course_code.upper()]
@@ -63,9 +64,9 @@ def get_course_stats(course_code):
 
     # Calculate course-specific stats
     total = len(tasks)
-    by_status = {}
-    by_priority = {}
-    by_category = {}
+    by_status: dict[str, int] = {}
+    by_priority: dict[str, int] = {}
+    by_category: dict[str, int] = {}
 
     for task in tasks:
         status = task.get("status", "unknown")

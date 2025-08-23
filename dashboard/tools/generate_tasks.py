@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -208,9 +208,9 @@ class TaskGenerator:
         if not text:
             return text
 
-        def replacer(match):
+        def replacer(match: re.Match[str]) -> str:
             path = match.group(1).split(".")
-            value = context
+            value: Any = context
             for key in path:
                 if isinstance(value, dict):
                     value = value.get(key, match.group(0))
@@ -360,8 +360,8 @@ def main() -> int:
     output_path = Path(args.out)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(output_path, "w") as f:
-        json.dump(result, f, indent=2)
+    with open(output_path, "w") as file_handle:
+        json.dump(result, file_handle, indent=2)
 
     print(f"\n✓ Generated {len(result['tasks'])} tasks")
     print(f"✓ Written to {args.out}")

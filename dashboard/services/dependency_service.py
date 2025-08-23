@@ -47,7 +47,8 @@ class DependencyService:
             task_dict["children"] = []
             task_dict["is_blocked"] = task.is_blocked()
             task_dict["blocker_titles"] = [
-                blocker.title for dep_id in task.depends_on 
+                blocker.title
+                for dep_id in task.depends_on
                 if (blocker := graph.get_task(dep_id)) is not None
             ]
 
@@ -113,7 +114,8 @@ class DependencyService:
             return {
                 "error": "Cannot start blocked task",
                 "blockers": [
-                    blocker.title for dep_id in task.depends_on 
+                    blocker.title
+                    for dep_id in task.depends_on
                     if (blocker := graph.get_task(dep_id)) is not None
                 ],
             }

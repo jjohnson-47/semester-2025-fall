@@ -3,13 +3,13 @@
 Custom decorators for Flask routes.
 """
 
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable, TypeVar, cast
+from typing import Any, TypeVar, cast
 
 from flask import current_app, jsonify, request
-from flask.wrappers import Response
 
-F = TypeVar('F', bound=Callable[..., Any])
+F = TypeVar("F", bound=Callable[..., Any])
 
 
 def validate_json(f: F) -> F:

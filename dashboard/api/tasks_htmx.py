@@ -4,6 +4,8 @@ HTMX-specific task endpoints with out-of-band swap support.
 Implements dependency-aware updates following HTMX 2.x patterns.
 """
 
+from typing import cast
+
 from flask import render_template, request
 
 from dashboard.api import api_bp
@@ -12,7 +14,7 @@ from dashboard.services.task_service import TaskService
 
 
 @api_bp.route("/tasks/<task_id>/status", methods=["POST"])
-def update_task_status_htmx(task_id):
+def update_task_status_htmx(task_id: str) -> str | tuple[str, int]:
     """
     Update task status with HTMX out-of-band swaps for unblocked tasks.
     Returns the updated task row plus any affected task rows.
@@ -48,11 +50,11 @@ def update_task_status_htmx(task_id):
             oob=True,
         )
 
-    return primary_html + oob_html
+    return cast(str, primary_html + oob_html)
 
 
 @api_bp.route("/tasks/<task_id>/complete", methods=["POST"])
-def quick_complete_task(task_id):
+def quick_complete_task(task_id: str) -> str | tuple[str, int]:
     """
     Quick complete a task with dependency resolution.
     Returns updated rows for all affected tasks.
@@ -79,11 +81,11 @@ def quick_complete_task(task_id):
             oob=True,
         )
 
-    return completed_html + oob_html
+    return cast(str, completed_html + oob_html)
 
 
 @api_bp.route("/tasks/<task_id>/children", methods=["GET"])
-def get_task_children(task_id):
+def get_task_children(task_id: str) -> str:
     """
     Get children tasks for hierarchical display.
     Used for lazy-loading child tasks when expanding a parent.
@@ -98,11 +100,13 @@ def get_task_children(task_id):
         if child_id in hierarchy["task_map"]
     ]
 
-    return render_template("_task_children.html", parent_id=task_id, tasks=children_tasks)
+    return cast(
+        str, render_template("_task_children.html", parent_id=task_id, tasks=children_tasks)
+    )
 
 
 @api_bp.route("/tasks/list", methods=["GET"])
-def get_tasks_list_view():
+def get_tasks_list_view() -> str:
     """Get tasks in list view format."""
     course = request.args.get("course")
     status = request.args.get("status")
@@ -121,11 +125,11 @@ def get_tasks_list_view():
     if assignee:
         tasks = [t for t in tasks if t.get("assignee") == assignee]
 
-    return render_template("_task_list.html", tasks=tasks)
+    return cast(str, render_template("_task_list.html", tasks=tasks))
 
 
 @api_bp.route("/tasks/kanban", methods=["GET"])
-def get_tasks_kanban_view():
+def get_tasks_kanban_view() -> str:
     """Get tasks in Kanban board view format."""
     course = request.args.get("course")
 
@@ -133,18 +137,18 @@ def get_tasks_kanban_view():
     all_tasks = list(hierarchy["task_map"].values())
 
     # Organize by status columns
-    kanban = {"blocked": [], "todo": [], "in_progress": [], "done": []}
+    kanban: dict[str, list] = {"blocked": [], "todo": [], "in_progress": [], "done": []}
 
     for task in all_tasks:
         status = task["status"]
         if status in kanban:
             kanban[status].append(task)
 
-    return render_template("_kanban_board.html", kanban=kanban)
+    return cast(str, render_template("_kanban_board.html", kanban=kanban))
 
 
 @api_bp.route("/tasks/<task_id>/dependencies", methods=["GET"])
-def get_task_dependencies(task_id):
+def get_task_dependencies(task_id: str) -> str | tuple[str, int]:
     """
     Get dependency visualization for a task.
     Shows what blocks this task and what this task blocks.
@@ -153,28 +157,31 @@ def get_task_dependencies(task_id):
     task = graph.get_task(task_id)
 
     if not task:
-        return render_template("_error.html", message="Task not found"), 404
+        return cast(str, render_template("_error.html", message="Task not found")), 404
 
     blockers = graph.get_blockers(task_id)
     blocked_by_this = graph.get_blocked_by(task_id)
 
-    return render_template(
-        "_dependency_modal.html",
-        task=task.to_dict(),
-        blockers=[b.to_dict() for b in blockers],
-        blocks=[b.to_dict() for b in blocked_by_this],
+    return cast(
+        str,
+        render_template(
+            "_dependency_modal.html",
+            task=task.to_dict(),
+            blockers=[b.to_dict() for b in blockers],
+            blocks=[b.to_dict() for b in blocked_by_this],
+        ),
     )
 
 
 @api_bp.route("/tasks/quick-add", methods=["POST"])
-def quick_add_task():
+def quick_add_task() -> str | tuple[str, int]:
     """
     Quick add a task from the command palette.
     Returns the updated task list.
     """
     title = request.form.get("title", "").strip()
     if not title:
-        return render_template("_error.html", message="Title required"), 400
+        return cast(str, render_template("_error.html", message="Title required")), 400
 
     # Parse title for course code
     course = "MATH221"  # Default
@@ -197,11 +204,11 @@ def quick_add_task():
 
     # Return updated task list
     hierarchy = DependencyService.get_task_hierarchy()
-    return render_template("_task_list.html", tasks=hierarchy["root_tasks"])
+    return cast(str, render_template("_task_list.html", tasks=hierarchy["root_tasks"]))
 
 
 @api_bp.route("/tasks/filtered", methods=["GET"])
-def get_filtered_tasks():
+def get_filtered_tasks() -> str:
     """
     Get filtered tasks based on multiple criteria.
     Used by the filter bar with live updates.
@@ -247,10 +254,10 @@ def get_filtered_tasks():
     view = request.args.get("view", "list")
     if view == "kanban":
         # Organize by status for Kanban
-        kanban = {"blocked": [], "todo": [], "in_progress": [], "done": []}
+        kanban: dict[str, list] = {"blocked": [], "todo": [], "in_progress": [], "done": []}
         for task in all_tasks:
             if task["status"] in kanban:
                 kanban[task["status"]].append(task)
-        return render_template("_kanban_board.html", kanban=kanban)
+        return cast(str, render_template("_kanban_board.html", kanban=kanban))
     else:
-        return render_template("_task_list.html", tasks=root_tasks)
+        return cast(str, render_template("_task_list.html", tasks=root_tasks))

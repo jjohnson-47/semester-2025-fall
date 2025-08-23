@@ -4,9 +4,8 @@ Task API endpoints.
 Handles CRUD operations for tasks.
 """
 
-from typing import Any
-
-from flask import Response, current_app, jsonify, request
+from flask import current_app, jsonify, request
+from flask.typing import ResponseReturnValue
 
 from dashboard.api import api_bp
 from dashboard.services.task_service import TaskService
@@ -14,7 +13,7 @@ from dashboard.utils.decorators import validate_json
 
 
 @api_bp.route("/tasks", methods=["GET"])
-def get_tasks() -> Response:
+def get_tasks() -> ResponseReturnValue:
     """
     Get list of tasks with optional filtering.
 
@@ -46,7 +45,7 @@ def get_tasks() -> Response:
 
 
 @api_bp.route("/tasks/<task_id>", methods=["GET"])
-def get_task(task_id: str) -> tuple[Response, int] | Response:
+def get_task(task_id: str) -> ResponseReturnValue:
     """Get a specific task by ID."""
     try:
         task = TaskService.get_task_by_id(task_id)
@@ -61,7 +60,7 @@ def get_task(task_id: str) -> tuple[Response, int] | Response:
 
 @api_bp.route("/tasks", methods=["POST"])
 @validate_json
-def create_task() -> tuple[Response, int] | Response:
+def create_task() -> ResponseReturnValue:
     """
     Create a new task.
 
@@ -91,7 +90,7 @@ def create_task() -> tuple[Response, int] | Response:
 
 @api_bp.route("/tasks/<task_id>", methods=["PUT"])
 @validate_json
-def update_task(task_id: str) -> tuple[Response, int] | Response:
+def update_task(task_id: str) -> ResponseReturnValue:
     """Update an existing task."""
     try:
         data = request.get_json()
@@ -108,7 +107,7 @@ def update_task(task_id: str) -> tuple[Response, int] | Response:
 
 
 @api_bp.route("/tasks/<task_id>", methods=["DELETE"])
-def delete_task(task_id: str) -> tuple[Response, int] | Response:
+def delete_task(task_id: str) -> ResponseReturnValue:
     """Delete a task."""
     try:
         success = TaskService.delete_task(task_id)
@@ -124,7 +123,7 @@ def delete_task(task_id: str) -> tuple[Response, int] | Response:
 
 @api_bp.route("/tasks/<task_id>/status", methods=["PATCH"])
 @validate_json
-def update_task_status(task_id: str) -> tuple[Response, int] | Response:
+def update_task_status(task_id: str) -> ResponseReturnValue:
     """
     Update task status.
 
@@ -138,6 +137,14 @@ def update_task_status(task_id: str) -> tuple[Response, int] | Response:
         if not status:
             return jsonify({"error": "Status is required"}), 400
 
+        # Validate status value
+        valid_statuses = ["blocked", "todo", "in_progress", "done", "completed"]
+        if status not in valid_statuses:
+            return (
+                jsonify({"error": f"Invalid status. Must be one of: {', '.join(valid_statuses)}"}),
+                400,
+            )
+
         success = TaskService.update_task_status(task_id, status)
         if not success:
             return jsonify({"error": "Task not found"}), 404
@@ -150,11 +157,13 @@ def update_task_status(task_id: str) -> tuple[Response, int] | Response:
 
 
 @api_bp.route("/tasks/bulk", methods=["GET"])
-def get_bulk_tasks() -> Response:
+def get_bulk_tasks() -> ResponseReturnValue:
     """Get all tasks without pagination."""
     try:
-        tasks = TaskService.get_all_tasks()
-        return jsonify(tasks)
+        # Get all tasks without filters or pagination
+        data = TaskService._load_tasks_data()
+        tasks = data.get("tasks", [])
+        return jsonify({"tasks": tasks, "total": len(tasks)})
 
     except Exception as e:
         current_app.logger.error(f"Error getting bulk tasks: {e}")
@@ -162,7 +171,7 @@ def get_bulk_tasks() -> Response:
 
 
 @api_bp.route("/tasks/reset", methods=["POST"])
-def reset_tasks() -> Response:
+def reset_tasks() -> ResponseReturnValue:
     """Reset all tasks to TODO status."""
     try:
         TaskService.reset_all_tasks()

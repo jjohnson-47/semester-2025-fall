@@ -4,12 +4,13 @@ Course API endpoints.
 """
 
 from flask import jsonify
+from flask.typing import ResponseReturnValue
 
 from dashboard.api import api_bp
 
 
 @api_bp.route("/courses", methods=["GET"])
-def get_courses():
+def get_courses() -> ResponseReturnValue:
     """Get list of all courses."""
     # For now, return static course list
     courses = [
@@ -40,7 +41,7 @@ def get_courses():
 
 
 @api_bp.route("/courses/<course_code>", methods=["GET"])
-def get_course(course_code):
+def get_course(course_code: str) -> ResponseReturnValue:
     """Get details for a specific course."""
     courses = {
         "MATH221": {

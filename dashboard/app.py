@@ -43,10 +43,11 @@ import json
 import logging
 import os
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, cast
 
 import pytz  # type: ignore[import-untyped]
 from flask import Flask, Response, jsonify, render_template, request
+from flask.typing import ResponseReturnValue
 
 from dashboard.config import Config
 
@@ -178,7 +179,7 @@ def get_upcoming_deadlines(tasks: list[dict[str, Any]], days: int = 7) -> list[d
 
 def calculate_priority(task: dict[str, Any]) -> int:
     """Calculate task priority based on due date and weight."""
-    priority = task.get("weight", 1)
+    priority: int = int(task.get("weight", 1))
 
     if "due" in task:
         try:
@@ -243,7 +244,7 @@ def validate_task_data(task: dict[str, Any]) -> bool:
 
 
 @app.route("/")
-def index():
+def index() -> str:
     """Main dashboard view."""
     data = TaskManager.load_tasks()
     courses = TaskManager.load_courses()
@@ -289,7 +290,7 @@ def index():
     data["tasks"].sort(key=lambda t: t.get("smart_score", t.get("priority", 0)), reverse=True)
 
     # Group by course
-    by_course = {}
+    by_course: dict[str, list] = {}
     for task in data["tasks"]:
         course = task.get("course", "General")
         if course not in by_course:
@@ -307,20 +308,23 @@ def index():
         "overdue": sum(1 for t in data["tasks"] if t.get("due_color") == "danger"),
     }
 
-    return render_template(
-        "dashboard.html",
-        tasks=data["tasks"],
-        by_course=by_course,
-        courses=courses.get("courses", []),
-        stats=stats,
-        updated=data["metadata"].get("updated"),
-        now_queue=now_queue,
+    return cast(
+        str,
+        render_template(
+            "dashboard.html",
+            tasks=data["tasks"],
+            by_course=by_course,
+            courses=courses.get("courses", []),
+            stats=stats,
+            updated=data["metadata"].get("updated"),
+            now_queue=now_queue,
+        ),
     )
 
 
 # --- Lightweight JSON API (TaskManager-backed) ---
 @app.route("/api/tasks", methods=["GET"])
-def api_get_tasks():
+def api_get_tasks() -> ResponseReturnValue:
     """Return tasks with optional filtering by course and status."""
     data = TaskManager.load_tasks()
     tasks = data.get("tasks", [])
@@ -337,7 +341,7 @@ def api_get_tasks():
 
 
 @app.route("/api/tasks", methods=["POST"])
-def api_create_task():
+def api_create_task() -> ResponseReturnValue:
     """Create a new task and persist it to state."""
     payload = request.get_json(silent=True) or {}
     required = ["course", "title", "status", "priority"]
@@ -369,7 +373,7 @@ def api_create_task():
 
 
 @app.route("/api/tasks/<task_id>", methods=["PUT"])
-def api_update_task(task_id: str):
+def api_update_task(task_id: str) -> ResponseReturnValue:
     """Update a task's status. Expects JSON: {"status": "..."}."""
     body = request.get_json(silent=True) or {}
     new_status = body.get("status")
@@ -387,7 +391,7 @@ def api_update_task(task_id: str):
 
 
 @app.route("/api/stats", methods=["GET"])
-def api_stats():
+def api_stats() -> ResponseReturnValue:
     """Return basic task statistics for dashboard tests."""
     data = TaskManager.load_tasks()
     tasks = data.get("tasks", [])
@@ -403,7 +407,7 @@ def api_stats():
 
 
 @app.route("/api/tasks/bulk-update", methods=["POST"])
-def api_bulk_update() -> Response:
+def api_bulk_update() -> ResponseReturnValue:
     """Bulk update tasks matching simple filter criteria.
 
     Expected body: {"filter": {...}, "update": {...}}
@@ -433,7 +437,7 @@ def api_bulk_update() -> Response:
 
 
 @app.route("/api/export", methods=["GET"])
-def api_export() -> Response:
+def api_export() -> ResponseReturnValue:
     """Export tasks in CSV, JSON, or ICS format.
 
     Query params: format=csv|json|ics, optional course, status filters.
@@ -550,7 +554,7 @@ def api_export() -> Response:
 
 
 @app.route("/api/task/<task_id>", methods=["GET", "POST"])
-def api_task(task_id):
+def api_task(task_id: str) -> ResponseReturnValue:
     """API endpoint for task operations."""
     data = TaskManager.load_tasks()
 
@@ -599,7 +603,7 @@ def api_task(task_id):
 
 
 @app.route("/api/tasks/bulk", methods=["POST"])
-def api_bulk_update_tasks_list():
+def api_bulk_update_tasks_list() -> ResponseReturnValue:
     """Bulk update tasks."""
     data = TaskManager.load_tasks()
     updates = request.json
@@ -620,7 +624,7 @@ def api_bulk_update_tasks_list():
 
 
 @app.route("/view/<view_name>")
-def filtered_view(view_name):
+def filtered_view(view_name: str) -> str:
     """Filtered views (today, week, overdue, etc.)."""
     data = TaskManager.load_tasks()
 
@@ -684,11 +688,14 @@ def filtered_view(view_name):
 
     filtered_tasks.sort(key=lambda t: t["priority"], reverse=True)
 
-    return render_template(
-        "filtered.html",
-        tasks=filtered_tasks,
-        view_name=view_name.title(),
-        count=len(filtered_tasks),
+    return cast(
+        str,
+        render_template(
+            "filtered.html",
+            tasks=filtered_tasks,
+            view_name=view_name.title(),
+            count=len(filtered_tasks),
+        ),
     )
 
 
@@ -718,7 +725,7 @@ def get_relative_time(dt: datetime) -> str:
 
 
 @app.route("/syllabi/<course_code>")
-def view_syllabus(course_code: str):
+def view_syllabus(course_code: str) -> ResponseReturnValue:
     """Serve generated syllabus for a course."""
     from flask import abort, send_from_directory
 
@@ -726,8 +733,10 @@ def view_syllabus(course_code: str):
     syllabi_dir = Config.SYLLABI_DIR
 
     # Try HTML first, then Markdown
-    html_path = syllabi_dir / f"{course_code}.html"
-    md_path = syllabi_dir / f"{course_code}.md"
+    variant = (request.args.get("variant") or "").strip().lower()
+    base_name = f"{course_code}_with_calendar" if variant == "with_calendar" else course_code
+    html_path = syllabi_dir / f"{base_name}.html"
+    md_path = syllabi_dir / f"{base_name}.md"
 
     if html_path.exists():
         return send_from_directory(str(syllabi_dir), f"{course_code}.html")
@@ -760,7 +769,7 @@ def view_syllabus(course_code: str):
         """
         return html_content
     else:
-        abort(404, f"Syllabus not found for {course_code}")
+        abort(404, f"Syllabus not found for {course_code}{' (with calendar)' if variant=='with_calendar' else ''}")
 
 
 @app.template_filter("status_icon")

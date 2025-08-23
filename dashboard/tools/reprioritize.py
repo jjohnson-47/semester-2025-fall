@@ -22,7 +22,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 # Configure logging
 logging.basicConfig(
@@ -132,8 +132,8 @@ class TaskGraph:
 
         return (
             float(best_weight),
-            best_distance if best_distance != float("inf") else 999,
-            best_anchor
+            int(best_distance) if best_distance != float("inf") else 999,
+            best_anchor,
         )
 
     def is_chain_head(self, task_id: str) -> bool:
@@ -508,9 +508,9 @@ def main() -> None:
             print("=" * 60)
             for i, task in enumerate(now_queue[:10], 1):
                 status_icon = "➜" if task.get("is_chain_head") else "○"
-                title = task.get('title', '')[:50] if task.get('title') else 'No title'
-                due_date = task.get('due_date', 'N/A')
-                due_date_str = due_date[:10] if due_date != 'N/A' else 'N/A'
+                title = task.get("title", "")[:50] if task.get("title") else "No title"
+                due_date = task.get("due_date", "N/A")
+                due_date_str = due_date[:10] if due_date != "N/A" else "N/A"
                 print(
                     f"{i:2}. {status_icon} [{task.get('course')}] {title}"
                     f"\n     Score: {task.get('smart_score', 0):.1f} | "

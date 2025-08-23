@@ -1,20 +1,20 @@
 {
   "weeks": [
-    {"week": 1, "topic": "Functions, Operations on Functions, Linear Functions", "readings": ["1.1", "1.2", "1.3"], "assignments": ["MyOpenMath: Sections 1.1-1.3"], "assessments": [], "notes": ""},
-    {"week": 2, "topic": "Exponents, Quadratics, Polynomials & Rational Functions", "readings": ["1.4", "1.5", "1.6"], "assignments": ["MyOpenMath: Sections 1.4-1.6"], "assessments": [], "notes": ""},
-    {"week": 3, "topic": "Exponential & Logarithmic Functions, Rate of Change", "readings": ["1.7", "1.8", "2.1"], "assignments": ["MyOpenMath: Sections 1.7-2.1"], "assessments": [], "notes": ""},
-    {"week": 4, "topic": "Limits, Continuity, The Derivative", "readings": ["2.2", "2.3", "2.4"], "assignments": ["MyOpenMath: Sections 2.2-2.4"], "assessments": [], "notes": ""},
-    {"week": 5, "topic": "Derivative Formulas and Rules", "readings": ["2.5"], "assignments": ["MyOpenMath: Section 2.5"], "assessments": [], "notes": ""},
-    {"week": 6, "topic": "Second Derivative & Concavity", "readings": ["2.6"], "assignments": ["MyOpenMath: Section 2.6"], "assessments": ["Exam 1"], "notes": ""},
-    {"week": 7, "topic": "Optimization and Curve Sketching", "readings": ["2.7", "2.8", "2.9"], "assignments": ["MyOpenMath: Sections 2.7-2.9"], "assessments": [], "notes": ""},
-    {"week": 8, "topic": "Implicit Differentiation & Related Rates", "readings": ["2.10", "2.11"], "assignments": ["MyOpenMath: Sections 2.10-2.11"], "assessments": [], "notes": ""},
-    {"week": 9, "topic": "Definite Integral & Fundamental Theorem", "readings": ["3.1", "3.2", "3.3"], "assignments": ["MyOpenMath: Sections 3.1-3.3"], "assessments": ["Exam 2"], "notes": ""},
-    {"week": 10, "topic": "Integration Techniques", "readings": ["3.4", "3.5"], "assignments": ["MyOpenMath: Sections 3.4-3.5"], "assessments": [], "notes": ""},
-    {"week": 11, "topic": "Applications of Integration", "readings": ["3.6", "3.7"], "assignments": ["MyOpenMath: Sections 3.6-3.7"], "assessments": [], "notes": ""},
-    {"week": 12, "topic": "Differential Equations", "readings": ["3.8"], "assignments": ["MyOpenMath: Section 3.8"], "assessments": [], "notes": ""},
-    {"week": 13, "topic": "Functions of Two Variables", "readings": ["4.1"], "assignments": ["MyOpenMath: Section 4.1"], "assessments": ["Exam 3"], "notes": ""},
-    {"week": 14, "topic": "Partial Derivatives and Optimization", "readings": ["4.2", "4.3"], "assignments": ["MyOpenMath: Sections 4.2-4.3"], "assessments": [], "notes": ""},
-    {"week": 15, "topic": "Review and Final Preparation", "readings": [], "assignments": [], "assessments": [], "notes": ""}
+    {"week": 1, "topic": "Functions, Operations on Functions, Linear Functions", "readings": ["1.1", "1.2", "1.3"], "assignments": ["MyOpenMath: Sections 1.1-1.3", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
+    {"week": 2, "topic": "Exponents, Quadratics, Polynomials & Rational Functions", "readings": ["1.4", "1.5", "1.6"], "assignments": ["MyOpenMath: Sections 1.4-1.6", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
+    {"week": 3, "topic": "Exponential & Logarithmic Functions, Rate of Change", "readings": ["1.7", "1.8", "2.1"], "assignments": ["MyOpenMath: Sections 1.7-2.1", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
+    {"week": 4, "topic": "Limits, Continuity, The Derivative", "readings": ["2.2", "2.3", "2.4"], "assignments": ["MyOpenMath: Sections 2.2-2.4", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
+    {"week": 5, "topic": "Derivative Formulas and Rules", "readings": ["2.5"], "assignments": ["MyOpenMath: Section 2.5", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
+    {"week": 6, "topic": "Second Derivative & Concavity", "readings": ["2.6"], "assignments": ["MyOpenMath: Section 2.6", "MyOpenMath Class Activity"], "assessments": ["Exam 1"], "notes": ""},
+    {"week": 7, "topic": "Optimization and Curve Sketching", "readings": ["2.7", "2.8", "2.9"], "assignments": ["MyOpenMath: Sections 2.7-2.9", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
+    {"week": 8, "topic": "Implicit Differentiation & Related Rates", "readings": ["2.10", "2.11"], "assignments": ["MyOpenMath: Sections 2.10-2.11", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
+    {"week": 9, "topic": "Definite Integral & Fundamental Theorem", "readings": ["3.1", "3.2", "3.3"], "assignments": ["MyOpenMath: Sections 3.1-3.3", "MyOpenMath Class Activity"], "assessments": ["Exam 2"], "notes": ""},
+    {"week": 10, "topic": "Integration Techniques", "readings": ["3.4", "3.5"], "assignments": ["MyOpenMath: Sections 3.4-3.5", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
+    {"week": 11, "topic": "Applications of Integration", "readings": ["3.6", "3.7"], "assignments": ["MyOpenMath: Sections 3.6-3.7", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
+    {"week": 12, "topic": "Differential Equations", "readings": ["3.8"], "assignments": ["MyOpenMath: Section 3.8", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
+    {"week": 13, "topic": "Functions of Two Variables", "readings": ["4.1"], "assignments": ["MyOpenMath: Section 4.1", "MyOpenMath Class Activity"], "assessments": ["Exam 3"], "notes": ""},
+    {"week": 14, "topic": "Partial Derivatives and Optimization", "readings": ["4.2", "4.3"], "assignments": ["MyOpenMath: Sections 4.2-4.3", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
+    {"week": 15, "topic": "Review and Final Preparation", "readings": [], "assignments": ["MyOpenMath Class Activity"], "assessments": [], "notes": ""}
   ],
   "finals": {"topic": "Final Exam", "assessments": ["Final Exam"], "notes": "Comprehensive"}
 }

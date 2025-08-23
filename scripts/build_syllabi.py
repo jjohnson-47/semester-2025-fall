@@ -15,6 +15,7 @@ from typing import Any
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
+from scripts.build_schedules import ScheduleBuilder
 from scripts.utils.jinja_env import create_jinja_env
 from scripts.utils.semester_calendar import SemesterCalendar
 
@@ -146,17 +147,43 @@ class SyllabusBuilder:
         # Load data
         data = self.load_course_data(course_code)
 
-        # Generate HTML
+        # Ensure schedule is generated as a separate document
+        schedule_builder = ScheduleBuilder(output_dir="build/schedules")
+        schedule_path = Path(schedule_builder.build_schedule(course_code))
+        schedule_md_full = (
+            schedule_path.read_text(encoding="utf-8") if schedule_path.exists() else ""
+        )
+        # Strip top-level heading from schedule when embedding as appendix
+        schedule_lines = schedule_md_full.splitlines()
+        if schedule_lines and schedule_lines[0].startswith("# "):
+            schedule_md_body = "\n".join(schedule_lines[1:]).lstrip()
+        else:
+            schedule_md_body = schedule_md_full
+
+        # Generate HTML (no calendar attached)
         html_template = self.env.get_template("syllabus.html.j2")
         html_output = html_template.render(**data)
         html_path = self.output_dir / f"{course_code}.html"
         html_path.write_text(html_output, encoding="utf-8")
 
-        # Generate Markdown
+        # Generate Markdown (no calendar attached)
         md_template = self.env.get_template("syllabus.md.j2")
         md_output = md_template.render(**data)
         md_path = self.output_dir / f"{course_code}.md"
         md_path.write_text(md_output, encoding="utf-8")
+
+        # Generate variants with calendar attached as appendix
+        html_with_cal_output = html_template.render(
+            **data, attach_schedule=True, schedule_markdown=schedule_md_body
+        )
+        html_with_cal_path = self.output_dir / f"{course_code}_with_calendar.html"
+        html_with_cal_path.write_text(html_with_cal_output, encoding="utf-8")
+
+        md_with_cal_output = md_template.render(
+            **data, attach_schedule=True, schedule_markdown=schedule_md_body
+        )
+        md_with_cal_path = self.output_dir / f"{course_code}_with_calendar.md"
+        md_with_cal_path.write_text(md_with_cal_output, encoding="utf-8")
 
         # Generate PDF if enabled
         pdf_path = None
@@ -167,6 +194,9 @@ class SyllabusBuilder:
             "html": str(html_path),
             "markdown": str(md_path),
             "pdf": str(pdf_path) if pdf_path else "",
+            "html_with_calendar": str(html_with_cal_path),
+            "markdown_with_calendar": str(md_with_cal_path),
+            "schedule_markdown": str(schedule_path),
         }
 
     def _generate_pdf(self, html_path: Path, course_code: str) -> Path | None:

@@ -9,13 +9,14 @@ from datetime import datetime
 from io import StringIO
 
 from flask import Response, request
+from flask.typing import ResponseReturnValue
 
 from dashboard.api import api_bp
 from dashboard.services.task_service import TaskService
 
 
 @api_bp.route("/export/csv", methods=["GET"])
-def export_csv():
+def export_csv() -> ResponseReturnValue:
     """Export tasks as CSV."""
     # Get filter parameters
     course = request.args.get("course")
@@ -66,7 +67,7 @@ def export_csv():
 
 
 @api_bp.route("/export/json", methods=["GET"])
-def export_json():
+def export_json() -> ResponseReturnValue:
     """Export tasks as JSON."""
     # Get filter parameters
     course = request.args.get("course")
@@ -82,16 +83,12 @@ def export_json():
     if status:
         tasks = [t for t in tasks if t.get("status") == status]
 
-    # Create JSON response
-    export_data = {
-        "exported_at": datetime.now().isoformat(),
-        "filters": {"course": course, "status": status},
-        "count": len(tasks),
-        "tasks": tasks,
-    }
-
+    # Create response
     response = Response(
-        json.dumps(export_data, indent=2),
+        json.dumps(
+            {"tasks": tasks, "count": len(tasks), "exported_at": datetime.now().isoformat()},
+            indent=2,
+        ),
         mimetype="application/json",
         headers={
             "Content-Disposition": f"attachment; filename=tasks_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
@@ -102,12 +99,12 @@ def export_json():
 
 
 @api_bp.route("/export/ics", methods=["GET"])
-def export_ics():
-    """Export tasks as ICS calendar file."""
+def export_ics() -> ResponseReturnValue:
+    """Export tasks as iCalendar."""
     # Get filter parameters
     course = request.args.get("course")
 
-    # Get tasks with due dates
+    # Get tasks
     data = TaskService._load_tasks_data()
     tasks = data.get("tasks", [])
 
@@ -117,58 +114,56 @@ def export_ics():
     else:
         tasks = [t for t in tasks if t.get("due_date")]
 
-    # Create ICS content
-    ics_lines = [
+    # Create iCalendar content
+    lines = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
-        "PRODID:-//Fall 2025 Dashboard//Task Calendar//EN",
+        "PRODID:-//Dashboard//Task Export//EN",
         "CALSCALE:GREGORIAN",
-        "METHOD:PUBLISH",
     ]
 
     for task in tasks:
-        due_date = task.get("due_date", "").replace("-", "")
-        if len(due_date) == 8:  # YYYYMMDD format
-            ics_lines.extend(
+        uid = task.get("id", "")
+        summary = f"[{task.get('course', '')}] {task.get('title', '')}"
+        description = task.get("description", "")
+        due_date = task.get("due_date", "")
+        status_map = {"todo": "NEEDS-ACTION", "in_progress": "IN-PROCESS", "done": "COMPLETED"}
+        status = status_map.get(task.get("status", ""), "NEEDS-ACTION")
+        priority_map = {"critical": "1", "high": "3", "medium": "5", "low": "7"}
+        priority = priority_map.get(task.get("priority", ""), "5")
+
+        # Format date for iCal
+        if due_date:
+            try:
+                dt = datetime.fromisoformat(due_date)
+                due_date_ics = dt.strftime("%Y%m%dT%H%M%S")
+            except (ValueError, TypeError):
+                continue
+
+            lines.extend(
                 [
                     "BEGIN:VEVENT",
-                    f"UID:{task.get('id')}@dashboard.local",
-                    f"DTSTART;VALUE=DATE:{due_date}",
-                    f"DTEND;VALUE=DATE:{due_date}",
-                    f"SUMMARY:[{task.get('course')}] {task.get('title')}",
-                    f"DESCRIPTION:{task.get('description', '')}",
-                    f"PRIORITY:{_priority_to_ics(task.get('priority', 'medium'))}",
-                    f"STATUS:{_status_to_ics(task.get('status', 'todo'))}",
+                    f"UID:{uid}@dashboard",
+                    f"SUMMARY:{summary}",
+                    f"DESCRIPTION:{description}",
+                    f"DTSTART:{due_date_ics}",
+                    f"DTEND:{due_date_ics}",
+                    f"STATUS:{status}",
+                    f"PRIORITY:{priority}",
                     "END:VEVENT",
                 ]
             )
 
-    ics_lines.append("END:VCALENDAR")
+    lines.append("END:VCALENDAR")
+    ical_content = "\r\n".join(lines)
 
+    # Create response
     response = Response(
-        "\r\n".join(ics_lines),
+        ical_content,
         mimetype="text/calendar",
         headers={
-            "Content-Disposition": f"attachment; filename=tasks_{datetime.now().strftime('%Y%m%d')}.ics"
+            "Content-Disposition": f"attachment; filename=tasks_{datetime.now().strftime('%Y%m%d_%H%M%S')}.ics"
         },
     )
 
     return response
-
-
-def _priority_to_ics(priority: str) -> int:
-    """Convert priority to ICS priority value (1-9, 1 is highest)."""
-    mapping = {"critical": 1, "high": 3, "medium": 5, "low": 7}
-    return mapping.get(priority, 5)
-
-
-def _status_to_ics(status: str) -> str:
-    """Convert status to ICS status value."""
-    mapping = {
-        "todo": "NEEDS-ACTION",
-        "in_progress": "IN-PROCESS",
-        "completed": "COMPLETED",
-        "blocked": "CANCELLED",
-        "deferred": "TENTATIVE",
-    }
-    return mapping.get(status, "NEEDS-ACTION")

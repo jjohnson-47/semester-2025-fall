@@ -212,3 +212,11 @@ The University of Alaska is committed to providing an environment free from disc
 *This syllabus is subject to change. Any changes will be announced in Blackboard.*
 
 **Last Updated:** {{ now().strftime('%B %d, %Y') }}
+
+{% if attach_schedule and schedule_markdown %}
+---
+
+## Appendix: Course Calendar
+
+{{ schedule_markdown }}
+{% endif %}
