@@ -1,0 +1,15 @@
+# Cloudflare Project Context for cf-go
+# This file helps cf-go commands resolve project-specific settings
+
+PROJECT_NAME=semester-2025-fall
+PAGES_PROJECT=jeffsthings-courses
+ZONE=jeffsthings.com
+PRODUCTION_BRANCH=main
+
+# Token paths in gopass
+TOKEN_PATH=cloudflare/tokens/projects/semester-2025-fall/pages
+ACCOUNT_PATH=cloudflare/account/id
+
+# Pages configuration
+PAGES_SUBDOMAIN=courses
+PAGES_CUSTOM_DOMAIN=courses.jeffsthings.com

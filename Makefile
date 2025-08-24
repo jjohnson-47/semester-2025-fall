@@ -130,7 +130,7 @@ clean: ## Remove all generated files
 
 dev-server: ## Start development server for preview
 	@echo "$(BLUE)Starting preview server...$(NC)"
-	@cd $(BUILD_DIR) && uv run python -m http.server 8000
+	@cd $(BUILD_DIR) && $(PYTHON) -m http.server 8000
 
 lint: ## Run code linting with Ruff
 	@echo "$(BLUE)Running linters...$(NC)"
@@ -290,3 +290,175 @@ dev-setup: init pre-commit-install ## Complete development environment setup
 	@echo "$(BLUE)Setting up development environment...$(NC)"
 	@bash scripts/setup-dev.sh
 	@echo "$(GREEN)✓ Development environment ready$(NC)"
+
+# ---------------------------------------------
+# Cloudflare Pages (public site) targets
+# ---------------------------------------------
+
+.PHONY: build-site serve-site compare-site pages-list pages-project pages-deployments pages-deploy
+
+ENV ?= preview
+ACADEMIC_TERM ?= fall-2025
+SITE_DIR := site
+
+build-site: validate ## Build public site into site/
+	@echo "$(BLUE)Building public site (ENV=$(ENV), ACADEMIC_TERM=$(ACADEMIC_TERM))...$(NC)"
+	@$(PYTHON) scripts/site_build.py --out $(SITE_DIR) --env $(ENV) --term $(ACADEMIC_TERM)
+	@test -f $(SITE_DIR)/manifest.json || (echo "$(RED)❌ Manifest missing$(NC)" && exit 1)
+	@test -f $(SITE_DIR)/_headers || (echo "$(RED)❌ Headers missing$(NC)" && exit 1)
+	@echo "$(GREEN)✓ Site built at $(SITE_DIR)/$(NC)"
+
+serve-site: ## Serve site/ locally on port 8000
+	@echo "$(BLUE)Serving site/ on http://127.0.0.1:8000 ...$(NC)"
+	@$(PYTHON) -m http.server -d $(SITE_DIR) 8000
+
+compare-site: ## Compare legacy build/ with site/
+	@echo "$(BLUE)Comparing build/ and site/ (expect differences)...$(NC)"
+	@diff -qr build $(SITE_DIR) || true
+
+# Cloudflare Pages management via cf-go (see docs/cloudflare-pages-cf-go.md)
+pages-list: ## List Cloudflare Pages projects
+	@test -n "$(CLOUDFLARE_ACCOUNT_ID)" || (echo "CLOUDFLARE_ACCOUNT_ID required" && exit 1)
+	@test -n "$(CLOUDFLARE_API_TOKEN)" || (echo "CLOUDFLARE_API_TOKEN required" && exit 1)
+	@cf-go api GET accounts/$(CLOUDFLARE_ACCOUNT_ID)/pages/projects
+
+pages-project: ## Show one Pages project (use PROJECT=<name>)
+	@test -n "$(CLOUDFLARE_ACCOUNT_ID)" || (echo "CLOUDFLARE_ACCOUNT_ID required" && exit 1)
+	@test -n "$(CLOUDFLARE_API_TOKEN)" || (echo "CLOUDFLARE_API_TOKEN required" && exit 1)
+	@test -n "$(PROJECT)" || (echo "PROJECT required" && exit 1)
+	@cf-go api GET accounts/$(CLOUDFLARE_ACCOUNT_ID)/pages/projects/$(PROJECT)
+
+pages-verify-token: ## Verify Cloudflare API token has Pages access
+	@echo "$(BLUE)Verifying Cloudflare Pages token...$(NC)"
+	@test -n "$(CLOUDFLARE_ACCOUNT_ID)" || (echo "CLOUDFLARE_ACCOUNT_ID required" && exit 1)
+	@test -n "$(CLOUDFLARE_API_TOKEN)" || (echo "CLOUDFLARE_API_TOKEN required" && exit 1)
+	@cf-go api GET accounts/$(CLOUDFLARE_ACCOUNT_ID)/pages/projects > /dev/null && \
+		echo "$(GREEN)✓ Token verified - Pages access confirmed$(NC)" || \
+		(echo "$(RED)✗ Token verification failed$(NC)" && exit 1)
+
+pages-deployments: ## List deployments for a project (use PROJECT=<name>)
+	@test -n "$(CLOUDFLARE_ACCOUNT_ID)" || (echo "CLOUDFLARE_ACCOUNT_ID required" && exit 1)
+	@test -n "$(PROJECT)" || (echo "PROJECT required" && exit 1)
+	@cf-go api GET accounts/$(CLOUDFLARE_ACCOUNT_ID)/pages/projects/$(PROJECT)/deployments
+
+pages-deploy: ## Trigger deployment from BRANCH (use PROJECT=<name> BRANCH=main)
+	@test -n "$(CLOUDFLARE_ACCOUNT_ID)" || (echo "CLOUDFLARE_ACCOUNT_ID required" && exit 1)
+	@test -n "$(CLOUDFLARE_API_TOKEN)" || (echo "CLOUDFLARE_API_TOKEN required" && exit 1)
+	@test -n "$(PROJECT)" || (echo "PROJECT required" && exit 1)
+	@test -n "$(BRANCH)" || (echo "BRANCH required" && exit 1)
+	@cf-go api POST accounts/$(CLOUDFLARE_ACCOUNT_ID)/pages/projects/$(PROJECT)/deployments \
+	  --data '{"deployment_trigger":{"metadata":{"branch":"'"$(BRANCH)"'"}},"env_vars":{}}'
+
+# Enhanced cf-go Pages operations
+.PHONY: pages-create pages-attach-domain pages-status pages-env pages-load-context
+
+pages-load-context: ## Load project context from .cloudflare and gopass
+	@echo "$(BLUE)Loading Cloudflare context...$(NC)"
+	@test -f .cloudflare || (echo "$(RED).cloudflare file missing$(NC)" && exit 1)
+	@export CLOUDFLARE_API_TOKEN=$$(gopass show -o cloudflare/tokens/projects/semester-2025-fall/pages 2>/dev/null) && \
+	 export CLOUDFLARE_ACCOUNT_ID=$$(gopass show -o cloudflare/account/id 2>/dev/null) && \
+	 echo "$(GREEN)✓ Context loaded$(NC)" || (echo "$(RED)Failed to load credentials from gopass$(NC)" && exit 1)
+
+pages-create: pages-load-context ## Create Pages project (reads from .cloudflare)
+	@echo "$(BLUE)Creating Pages project...$(NC)"
+	@source .cloudflare && \
+	 export CLOUDFLARE_API_TOKEN=$$(gopass show -o $$TOKEN_PATH) && \
+	 export CLOUDFLARE_ACCOUNT_ID=$$(gopass show -o $$ACCOUNT_PATH) && \
+	 cf-go api POST accounts/$$CLOUDFLARE_ACCOUNT_ID/pages/projects \
+	   --data '{"name":"'$$PAGES_PROJECT'","production_branch":"'$$PRODUCTION_BRANCH'"}' && \
+	 echo "$(GREEN)✓ Pages project '$$PAGES_PROJECT' created$(NC)" || \
+	 echo "$(YELLOW)Project may already exist or creation failed$(NC)"
+
+pages-attach-domain: pages-load-context ## Attach custom domain to Pages project
+	@echo "$(BLUE)Attaching custom domain...$(NC)"
+	@source .cloudflare && \
+	 export CLOUDFLARE_API_TOKEN=$$(gopass show -o $$TOKEN_PATH) && \
+	 export CLOUDFLARE_ACCOUNT_ID=$$(gopass show -o $$ACCOUNT_PATH) && \
+	 cf-go api POST accounts/$$CLOUDFLARE_ACCOUNT_ID/pages/projects/$$PAGES_PROJECT/domains \
+	   --data '{"name":"'$$PAGES_CUSTOM_DOMAIN'"}' && \
+	 echo "$(GREEN)✓ Domain '$$PAGES_CUSTOM_DOMAIN' attached$(NC)" || \
+	 echo "$(YELLOW)Domain attachment failed or already attached$(NC)"
+
+pages-status: pages-load-context ## Show Pages project status and domains
+	@echo "$(BLUE)Pages Project Status$(NC)"
+	@source .cloudflare && \
+	 export CLOUDFLARE_API_TOKEN=$$(gopass show -o $$TOKEN_PATH) && \
+	 export CLOUDFLARE_ACCOUNT_ID=$$(gopass show -o $$ACCOUNT_PATH) && \
+	 echo "Project: $$PAGES_PROJECT" && \
+	 cf-go api GET accounts/$$CLOUDFLARE_ACCOUNT_ID/pages/projects/$$PAGES_PROJECT | \
+	 jq -r '.result | {name, subdomain, production_branch, created_on, domains: .domains}'
+
+pages-env: ## Show current Cloudflare environment variables
+	@echo "$(BLUE)Cloudflare Environment$(NC)"
+	@source .cloudflare 2>/dev/null && \
+	 echo "PROJECT_NAME: $$PROJECT_NAME" && \
+	 echo "PAGES_PROJECT: $$PAGES_PROJECT" && \
+	 echo "ZONE: $$ZONE" && \
+	 echo "PRODUCTION_BRANCH: $$PRODUCTION_BRANCH" && \
+	 echo "PAGES_CUSTOM_DOMAIN: $$PAGES_CUSTOM_DOMAIN" && \
+	 echo "" && \
+	 echo "Credentials:" && \
+	 (gopass ls cloudflare/tokens/projects/semester-2025-fall 2>/dev/null && \
+	  echo "$(GREEN)✓ Token stored in gopass$(NC)" || \
+	  echo "$(YELLOW)⚠ Token not found in gopass$(NC)")
+
+# DNS management via cf-go
+.PHONY: dns-list dns-add-cname dns-verify
+
+dns-list: pages-load-context ## List DNS records for the zone
+	@echo "$(BLUE)DNS Records for zone$(NC)"
+	@source .cloudflare && \
+	 export CLOUDFLARE_API_TOKEN=$$(gopass show -o $$TOKEN_PATH) && \
+	 export CLOUDFLARE_ACCOUNT_ID=$$(gopass show -o $$ACCOUNT_PATH) && \
+	 cf-go dns list $$ZONE
+
+dns-add-cname: pages-load-context ## Add CNAME for Pages subdomain
+	@echo "$(BLUE)Adding CNAME record...$(NC)"
+	@source .cloudflare && \
+	 export CLOUDFLARE_API_TOKEN=$$(gopass show -o $$TOKEN_PATH) && \
+	 export CLOUDFLARE_ACCOUNT_ID=$$(gopass show -o $$ACCOUNT_PATH) && \
+	 cf-go dns add CNAME $$PAGES_SUBDOMAIN $$PAGES_PROJECT.pages.dev --zone $$ZONE && \
+	 echo "$(GREEN)✓ CNAME record added$(NC)"
+
+dns-verify: pages-load-context ## Verify DNS and nameservers
+	@echo "$(BLUE)DNS Verification$(NC)"
+	@source .cloudflare && \
+	 export CLOUDFLARE_API_TOKEN=$$(gopass show -o $$TOKEN_PATH) && \
+	 export CLOUDFLARE_ACCOUNT_ID=$$(gopass show -o $$ACCOUNT_PATH) && \
+	 echo "Nameservers for $$ZONE:" && \
+	 cf-go ns $$ZONE && \
+	 echo "" && \
+	 echo "Pages-related DNS records:" && \
+	 cf-go dns list $$ZONE | grep -E "($$PAGES_SUBDOMAIN|pages\.dev)" || \
+	 echo "No Pages-related records found"
+
+# Complete Pages setup workflow
+.PHONY: pages-setup
+
+pages-setup: ## Complete Pages setup (create project, attach domain, configure DNS)
+	@echo "$(BLUE)════════════════════════════════════$(NC)"
+	@echo "$(BLUE)   Cloudflare Pages Setup Wizard    $(NC)"
+	@echo "$(BLUE)════════════════════════════════════$(NC)"
+	@$(MAKE) pages-env --no-print-directory
+	@echo ""
+	@echo "$(YELLOW)Step 1: Create Pages project$(NC)"
+	@$(MAKE) pages-create --no-print-directory || true
+	@echo ""
+	@echo "$(YELLOW)Step 2: Build and deploy site$(NC)"
+	@$(MAKE) build-site ENV=preview --no-print-directory
+	@echo "Now trigger deployment via GitHub Actions or wrangler"
+	@echo ""
+	@echo "$(YELLOW)Step 3: Attach custom domain$(NC)"
+	@$(MAKE) pages-attach-domain --no-print-directory || true
+	@echo ""
+	@echo "$(YELLOW)Step 4: Configure DNS$(NC)"
+	@$(MAKE) dns-add-cname --no-print-directory || true
+	@echo ""
+	@echo "$(YELLOW)Step 5: Verify setup$(NC)"
+	@$(MAKE) pages-status --no-print-directory
+	@echo ""
+	@$(MAKE) dns-verify --no-print-directory
+	@echo ""
+	@echo "$(GREEN)════════════════════════════════════$(NC)"
+	@echo "$(GREEN)      Setup Complete!               $(NC)"
+	@echo "$(GREEN)════════════════════════════════════$(NC)"

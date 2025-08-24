@@ -1,0 +1,4 @@
+# Course latest shortcuts → current term
+/courses/MATH221/latest/*  /courses/MATH221/fall-2025/:splat  301
+/courses/MATH251/latest/*  /courses/MATH251/fall-2025/:splat  301
+/courses/STAT253/latest/*  /courses/STAT253/fall-2025/:splat  301
