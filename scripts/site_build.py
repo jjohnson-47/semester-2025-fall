@@ -59,6 +59,17 @@ def copy_if_exists(src: Path, dst: Path) -> None:
         shutil.copy2(src, dst)
 
 
+def copy_js_assets(out_assets: Path) -> None:
+    """Copy JavaScript assets to the site assets directory."""
+    src_js_dir = PROJECT_ROOT / "assets" / "js"
+    dst_js_dir = out_assets / "js"
+    
+    if src_js_dir.exists():
+        ensure_dir(dst_js_dir)
+        for js_file in src_js_dir.glob("*.js"):
+            copy_if_exists(js_file, dst_js_dir / js_file.name)
+
+
 def copy_course_assets(course_code: str, out_assets: Path) -> None:
     """Copy only the CSS files needed for this course.
 
@@ -348,6 +359,8 @@ def build_site(cfg: SiteConfig, include_docs: list[str], exclude_docs: list[str]
     # Assets root for site
     out_assets = cfg.out_dir / "assets"
     ensure_dir(out_assets)
+    # Copy JavaScript assets (needed for iframe generator)
+    copy_js_assets(out_assets)
 
     # Determine doc filters
     allowlist = {d.strip().lower() for d in include_docs if d}
