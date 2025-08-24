@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Materials - Fall 2025</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #333;
+        }
+        h1 {
+            color: #0051c3;
+            font-size: 2.5em;
+            margin-bottom: 0.5em;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 2em;
+        }
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .course-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .course-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        .course-header {
+            border-bottom: 2px solid #0051c3;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        .course-code {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #0051c3;
+        }
+        .course-title {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        .course-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .course-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #333;
+            transition: background 0.2s;
+        }
+        .course-link:hover {
+            background: #e9ecef;
+        }
+        .link-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 1rem;
+            fill: #0051c3;
+        }
+        .link-label {
+            flex: 1;
+            font-weight: 500;
+        }
+        .link-arrow {
+            color: #0051c3;
+        }
+        .tools-section {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .tools-header {
+            font-size: 1.5em;
+            color: #0051c3;
+            margin-bottom: 1rem;
+        }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .tool-link {
+            display: inline-block;
+            padding: 1rem;
+            background: #0051c3;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            text-align: center;
+            transition: background 0.2s;
+        }
+        .tool-link:hover {
+            background: #003d94;
+        }
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            color: #666;
+        }
+        @media (max-width: 768px) {
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Course Materials</h1>
+    <p class="subtitle">Fall 2025 Semester - Jeffrey Johnson</p>
+    
+    <div class="courses-grid">
+        {% for course in courses %}
+        <div class="course-card">
+            <div class="course-header">
+                <div class="course-code">{{ course }}</div>
+                <div class="course-title">
+                    {% if course == "MATH221" %}Applied Calculus for Managerial and Social Sciences
+                    {% elif course == "MATH251" %}Calculus I
+                    {% elif course == "STAT253" %}Applied Statistics for the Sciences
+                    {% endif %}
+                </div>
+            </div>
+            <div class="course-links">
+                <a href="/courses/{{ course }}/{{ term }}/syllabus/" class="course-link">
+                    <svg class="link-icon" viewBox="0 0 24 24">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    </svg>
+                    <span class="link-label">Course Syllabus</span>
+                    <span class="link-arrow">→</span>
+                </a>
+                <a href="/courses/{{ course }}/{{ term }}/schedule/" class="course-link">
+                    <svg class="link-icon" viewBox="0 0 24 24">
+                        <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z"/>
+                    </svg>
+                    <span class="link-label">Course Schedule</span>
+                    <span class="link-arrow">→</span>
+                </a>
+                <a href="/courses/{{ course }}/{{ term }}/syllabus/embed/" class="course-link">
+                    <svg class="link-icon" viewBox="0 0 24 24">
+                        <path d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z"/>
+                    </svg>
+                    <span class="link-label">Embed Version (Syllabus)</span>
+                    <span class="link-arrow">→</span>
+                </a>
+                <a href="/courses/{{ course }}/{{ term }}/schedule/embed/" class="course-link">
+                    <svg class="link-icon" viewBox="0 0 24 24">
+                        <path d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z"/>
+                    </svg>
+                    <span class="link-label">Embed Version (Schedule)</span>
+                    <span class="link-arrow">→</span>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="tools-section">
+        <h2 class="tools-header">Instructor Tools</h2>
+        <div class="tools-grid">
+            <a href="/embed/generator/" class="tool-link">
+                📝 iframe Code Generator
+            </a>
+            <a href="/manifest.json" class="tool-link">
+                📊 API Manifest
+            </a>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>© 2025 Jeffrey Johnson | University of Alaska Anchorage</p>
+        <p style="font-size: 0.9em;">
+            <a href="mailto:jjohnson47@alaska.edu">jjohnson47@alaska.edu</a>
+        </p>
+    </div>
+</body>
+</html>

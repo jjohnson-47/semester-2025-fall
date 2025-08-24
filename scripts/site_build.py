@@ -336,23 +336,28 @@ def copy_cf_headers_redirects(out_dir: Path, env: str) -> None:
 def build_site(cfg: SiteConfig, include_docs: list[str], exclude_docs: list[str]) -> None:
     ensure_dir(cfg.out_dir)
 
-    # Create or preserve index.html
+    # Site templates root
+    site_templates = PROJECT_ROOT / "templates" / "site"
+    
+    # Create index.html from template
     index_path = cfg.out_dir / "index.html"
-    if not index_path.exists():
-        # Create default index.html
-        index_content = create_default_index(cfg.courses, cfg.term)
-        index_path.write_text(index_content)
-        preserve_index = False
+    
+    # Check if index template exists
+    index_template_path = site_templates / "index.html.j2"
+    if index_template_path.exists():
+        # Use template for index page
+        env_site = create_jinja_env(str(site_templates))
+        index_template = env_site.get_template("index.html.j2")
+        index_content = index_template.render(courses=cfg.courses, term=cfg.term)
     else:
-        # Preserve existing index.html
-        index_content = index_path.read_text()
-        preserve_index = True
+        # Fall back to construction page if no template
+        index_content = create_default_index(cfg.courses, cfg.term)
+    
+    index_path.write_text(index_content)
+    
     # Prepare shared builders
     sb = SyllabusBuilder(template_dir="templates", output_dir="build/syllabi")
     schedule_builder = ScheduleBuilder(output_dir="build/schedules")
-
-    # Site templates root
-    site_templates = PROJECT_ROOT / "templates" / "site"
 
     results: dict[str, dict[str, dict[str, str]]] = {}
 
@@ -418,10 +423,6 @@ def build_site(cfg: SiteConfig, include_docs: list[str], exclude_docs: list[str]
     # Write manifest and copy CF config
     write_manifest(cfg.out_dir, cfg.term, cfg.courses, results)
     copy_cf_headers_redirects(cfg.out_dir, cfg.env)
-
-    # Restore index.html if it was preserved
-    if preserve_index and index_content:
-        index_path.write_text(index_content)
 
 
 def parse_args() -> argparse.Namespace:
