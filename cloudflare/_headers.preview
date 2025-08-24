@@ -1,7 +1,9 @@
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; frame-src 'self'; frame-ancestors 'self' *.blackboard.com *.ultra.blackboard.com https://blackboard.alaska.edu;
+  Content-Security-Policy: default-src 'self' https://*.jeffsthings.com https://*.pages.dev; script-src 'self' https://*.jeffsthings.com https://*.pages.dev; style-src 'self' 'unsafe-inline' https://*.jeffsthings.com https://*.pages.dev; img-src 'self' data: https://*.jeffsthings.com https://*.pages.dev; font-src 'self' data: https://*.jeffsthings.com https://*.pages.dev; connect-src 'self' https://*.jeffsthings.com https://*.pages.dev; frame-src 'self' https://*.jeffsthings.com https://*.pages.dev; frame-ancestors 'self' https://*.jeffsthings.com https://*.pages.dev *.blackboard.com *.ultra.blackboard.com https://blackboard.alaska.edu http://localhost:* http://127.0.0.1:*;
   Referrer-Policy: no-referrer
   X-Content-Type-Options: nosniff
+  X-Frame-Options: ALLOWALL
+  X-Robots-Tag: noindex, nofollow
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 
 /assets/*
