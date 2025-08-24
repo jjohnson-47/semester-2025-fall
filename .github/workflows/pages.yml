@@ -23,7 +23,6 @@ jobs:
   build-and-deploy:
     name: Build and Deploy (Pages)
     runs-on: ubuntu-latest
-    if: ${{ secrets.CF_PROJECT != '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
