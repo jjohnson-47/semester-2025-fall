@@ -303,7 +303,7 @@ SITE_DIR := site
 
 build-site: validate ## Build public site into site/
 	@echo "$(BLUE)Building public site (ENV=$(ENV), ACADEMIC_TERM=$(ACADEMIC_TERM))...$(NC)"
-	@$(PYTHON) scripts/site_build.py --out $(SITE_DIR) --env $(ENV) --term $(ACADEMIC_TERM)
+	@$(PYTHON) scripts/site_build.py --out $(SITE_DIR) --env $(ENV) --term $(ACADEMIC_TERM) --include-docs syllabus schedule
 	@test -f $(SITE_DIR)/manifest.json || (echo "$(RED)❌ Manifest missing$(NC)" && exit 1)
 	@test -f $(SITE_DIR)/_headers || (echo "$(RED)❌ Headers missing$(NC)" && exit 1)
 	@echo "$(GREEN)✓ Site built at $(SITE_DIR)/$(NC)"
