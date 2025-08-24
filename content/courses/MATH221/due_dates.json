@@ -1,0 +1,56 @@
+{
+  "description": "Custom due dates for MATH221 MyOpenMath assignments and exams",
+  "source": "MyOpenMath - Applied Calculus Course",
+  "last_updated": "2025-08-23",
+  "dates": {
+    "MyOpenMath: Sections 1.1, 1.2, 1.3": "2025-08-29",
+    "Blackboard Discussion: Getting Registered & Introductions": "2025-08-29",
+
+    "MyOpenMath: Sections 1.4, 1.5, 1.6": "2025-09-05",
+    "Blackboard Discussion: Week 2 Check-In": "2025-09-05",
+
+    "MyOpenMath: Sections 1.7, 1.8, 2.1": "2025-09-12",
+    "Blackboard Discussion: Week 3 Check-In": "2025-09-12",
+
+    "MyOpenMath: Sections 2.2, 2.3, 2.4": "2025-09-19",
+    "Blackboard Discussion: Week 4 Check-In": "2025-09-19",
+
+    "MyOpenMath: Section 2.5": "2025-09-26",
+    "Blackboard Discussion: Week 5 Discussion": "2025-09-26",
+
+    "Exam #1 (Sections 1.1-2.4)": "2025-10-01",
+    "MyOpenMath: Section 2.6": "2025-10-03",
+    "Blackboard Discussion: Week 6 Discussion": "2025-10-03",
+
+    "MyOpenMath: Sections 2.7, 2.8": "2025-10-10",
+    "Blackboard Discussion: Week 7 Discussion": "2025-10-10",
+
+    "MyOpenMath: Sections 2.9, 2.10": "2025-10-17",
+    "Blackboard Discussion: Week 8 Discussion": "2025-10-17",
+
+    "MyOpenMath: Section 2.11": "2025-10-24",
+    "Blackboard Discussion: Week 9 Discussion": "2025-10-24",
+
+    "Exam #2 (Sections 2.5-2.11)": "2025-10-29",
+    "MyOpenMath: Sections 3.1, 3.2": "2025-10-31",
+    "Blackboard Discussion: Week 10 Discussion": "2025-10-31",
+
+    "MyOpenMath: Sections 3.3, 3.4": "2025-11-07",
+    "Blackboard Discussion: Week 11 Discussion": "2025-11-07",
+
+    "MyOpenMath: Sections 3.5, 3.6": "2025-11-14",
+    "Blackboard Discussion: Week 12 Discussion": "2025-11-14",
+
+    "MyOpenMath: Sections 3.7, 3.8": "2025-11-21",
+    "Blackboard Discussion: Week 13 Discussion": "2025-11-21",
+
+    "Exam #3 (Sections 3.1-3.8)": "2025-11-25",
+    "MyOpenMath: Chapter 3 Review": "2025-12-01",
+    "Blackboard Discussion: Week 14 Discussion": "2025-12-01",
+
+    "MyOpenMath: Sections 4.1, 4.2, 4.3": "2025-12-05",
+    "Blackboard Discussion: Week 15 Discussion & Final Review": "2025-12-05",
+
+    "Final Exam (Sections 2.5-4.3)": "2025-12-10"
+  }
+}

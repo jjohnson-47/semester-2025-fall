@@ -11,12 +11,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+from scripts.utils.jinja_env import create_jinja_env
 from scripts.utils.semester_calendar import SemesterCalendar
 
 
@@ -127,6 +129,39 @@ class ScheduleBuilder:
         day_label = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][weekday]
         return f"(due {day_label} {due_dt.strftime('%m/%d')})"
 
+    def _load_custom_due_dates(self, course_code: str) -> dict[str, str]:
+        """Load custom due dates if available for a course.
+
+        This allows courses to override the automatic date calculation
+        with specific dates from external systems (e.g., MyLab, WebAssign).
+
+        Returns:
+            Dictionary mapping assignment/assessment names to ISO date strings.
+        """
+        due_dates_file = self.content_root / "content" / "courses" / course_code / "due_dates.json"
+        if due_dates_file.exists():
+            with open(due_dates_file) as f:
+                data = json.load(f)
+                # Log the source for transparency
+                if "source" in data:
+                    print(f"  Using custom due dates from: {data['source']}")
+                return data.get("dates", {})
+        return {}
+
+    def _format_custom_due_date(self, date_str: str) -> str:
+        """Format a custom due date string.
+
+        Args:
+            date_str: ISO format date (YYYY-MM-DD)
+
+        Returns:
+            Formatted string like '(due Mon 09/02)'
+        """
+        due_date = datetime.strptime(date_str, "%Y-%m-%d")
+        day_names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        day_label = day_names[due_date.weekday()]
+        return f"(due {day_label} {due_date.strftime('%m/%d')})"
+
     def build_schedule(self, course_code: str, default_due_day: str = "Sun") -> str:
         """Build schedule for a single course by aligning to calendar weeks.
 
@@ -142,6 +177,7 @@ class ScheduleBuilder:
 
         weeks = self.calendar.get_weeks()
         course_schedule = self._load_course_schedule(course_code)
+        custom_due_dates = self._load_custom_due_dates(course_code)
 
         # Build static header using calendar
         dates = self.calendar.get_semester_dates()
@@ -162,6 +198,7 @@ class ScheduleBuilder:
         ]
 
         rows: list[str] = []
+        html_weeks: list[dict[str, Any]] = []
         instruction_weeks = [w for w in weeks if not w.get("is_finals")]
 
         if course_schedule and "weeks" in course_schedule:
@@ -175,18 +212,51 @@ class ScheduleBuilder:
                 topic = pw.get("topic", f"Week {idx + 1} Content")
                 # Assignments with due dates
                 assignments: list[str] = []
+                html_assignments: list[str] = []
                 for item in pw.get("assignments", []):
-                    wd = self._choose_due_weekday(item, is_assessment=False)
-                    wd, add = self._apply_holiday_shift(wd, cw.get("holidays", []), item, False)
-                    assignments.append(f"{item} {self._format_due(cw['start'], wd, add)}")
+                    # Check for custom override date first
+                    if item in custom_due_dates:
+                        due = self._format_custom_due_date(custom_due_dates[item])
+                    else:
+                        # Use automatic date calculation
+                        wd = self._choose_due_weekday(item, is_assessment=False)
+                        wd, add = self._apply_holiday_shift(wd, cw.get("holidays", []), item, False)
+                        due = self._format_due(cw["start"], wd, add)
+                    assignments.append(f"{item} {due}")
+                    html_assignments.append(f"{item} {due}")
                 # Assessments with due dates where applicable
                 assessments: list[str] = []
+                html_assessments: list[str] = []
                 for a in pw.get("assessments", []):
-                    wd = self._choose_due_weekday(a, is_assessment=True)
-                    wd, add = self._apply_holiday_shift(wd, cw.get("holidays", []), a, True)
-                    assessments.append(f"{a} {self._format_due(cw['start'], wd, add)}")
+                    # Check for custom override date first
+                    if a in custom_due_dates:
+                        due = self._format_custom_due_date(custom_due_dates[a])
+                    else:
+                        # Use automatic date calculation
+                        wd = self._choose_due_weekday(a, is_assessment=True)
+                        wd, add = self._apply_holiday_shift(wd, cw.get("holidays", []), a, True)
+                        due = self._format_due(cw["start"], wd, add)
+                    assessments.append(f"{a} {due}")
+                    html_assessments.append(f"{a} {due}")
                 rows.append(
                     f"| {idx + 1} | {date_range}{holidays} | {topic} | {', '.join(assignments)} | {', '.join(assessments)} |"
+                )
+                html_weeks.append(
+                    {
+                        "label": idx + 1,
+                        "date_range": date_range,
+                        "holidays": cw.get("holidays", []),
+                        "topic": topic,
+                        "subtopics": [],
+                        "readings": pw.get("readings", []),
+                        "assignments": html_assignments,
+                        "assessments": html_assessments,
+                        "has_exam": any(
+                            "exam" in a.lower() or "midterm" in a.lower()
+                            for a in pw.get("assessments", [])
+                        ),
+                        "is_finals": False,
+                    }
                 )
         else:
             # Fallback generic schedule if no course schedule available
@@ -195,6 +265,20 @@ class ScheduleBuilder:
                 holidays = f" ({', '.join(cw['holidays'])})" if cw.get("holidays") else ""
                 rows.append(
                     f"| {i} | {date_range}{holidays} | Week {i} Content | HW {i} (due {default_due_day}) | |"
+                )
+                html_weeks.append(
+                    {
+                        "label": i,
+                        "date_range": date_range,
+                        "holidays": cw.get("holidays", []),
+                        "topic": f"Week {i} Content",
+                        "subtopics": [],
+                        "readings": [],
+                        "assignments": [f"HW {i} (due {default_due_day})"],
+                        "assessments": [],
+                        "has_exam": False,
+                        "is_finals": False,
+                    }
                 )
 
         # Finals row(s)
@@ -206,15 +290,78 @@ class ScheduleBuilder:
             finals_assessments = []
             if course_schedule and course_schedule.get("finals"):
                 finals_topic = course_schedule["finals"].get("topic", finals_topic)
-                finals_assessments = course_schedule["finals"].get("assessments", [])
+                finals_assessments_raw = course_schedule["finals"].get("assessments", [])
+                # Apply custom due dates to finals assessments if available
+                finals_assessments = []
+                for assessment in finals_assessments_raw:
+                    if assessment in custom_due_dates:
+                        due = self._format_custom_due_date(custom_due_dates[assessment])
+                        finals_assessments.append(f"{assessment} {due}")
+                    else:
+                        finals_assessments.append(assessment)
+            else:
+                finals_assessments = []
             rows.append(
                 f"| Finals | {date_range} | {finals_topic} |  | {', '.join(finals_assessments)} |"
+            )
+            html_weeks.append(
+                {
+                    "label": "Finals",
+                    "date_range": date_range,
+                    "holidays": [],
+                    "topic": finals_topic,
+                    "subtopics": [],
+                    "readings": [],
+                    "assignments": [],
+                    "assessments": finals_assessments,
+                    "has_exam": True,
+                    "is_finals": True,
+                }
             )
 
         # Write file
         schedule_text = "\n".join(header + rows)
         output_file = self.output_dir / f"{course_code}_schedule.md"
         output_file.write_text(schedule_text, encoding="utf-8")
+        # Also render HTML schedule via Jinja
+        try:
+            env = create_jinja_env("templates")
+            tpl = env.get_template("course_schedule.html.j2")
+            # Load auxiliary info (best-effort)
+            course_meta: dict[str, Any] = {}
+            meta_path = self.content_root / f"content/courses/{course_code}/course_meta.json"
+            if meta_path.exists():
+                try:
+                    course_meta = json.loads(meta_path.read_text(encoding="utf-8"))
+                except Exception:
+                    course_meta = {}
+            try:
+                instructor = json.loads(
+                    Path("profiles/instructor.json").read_text(encoding="utf-8")
+                )
+            except Exception:
+                instructor = {"name": "Instructor", "office_hours": "By appointment"}
+
+            html_context = {
+                "course": {
+                    "code": course_code,
+                    "title": os.getenv(f"{course_code}_FULL", ""),
+                    "format": course_meta.get("format", "Online Asynchronous"),
+                    "meeting_times": os.getenv(f"{course_code}_MEET", ""),
+                    "location": os.getenv(f"{course_code}_LOCATION", "Online"),
+                },
+                "semester": {"name": "Fall", "year": 2025},
+                "dates": dates,
+                "weeks": html_weeks,
+                "instructor": instructor,
+            }
+            html_out = tpl.render(**html_context)
+            html_file = self.output_dir / f"{course_code}_schedule.html"
+            html_file.write_text(html_out, encoding="utf-8")
+        except Exception:
+            # Non-fatal if HTML template missing or render fails
+            pass
+
         return str(output_file)
 
     def build_all(self, courses: list[str] | None = None) -> None:

@@ -1,0 +1,32 @@
+{
+  "course": "STAT A253 Applied Statistics",
+  "textbook": "McClave: Statistics, 13e MyLab Revision with Technology Updates",
+  "assignments": [
+    { "assignment": "Homework #1 - Chapter 1", "due_date": "08/29/25" },
+    { "assignment": "Chapter 1 Test", "due_date": "09/02/25" },
+    { "assignment": "Homework #2 - Sections 2.1-2.7", "due_date": "09/05/25" },
+    { "assignment": "Chapter 2 Test", "due_date": "09/08/25" },
+    { "assignment": "Homework #3 - Sections 3.1, 3.4, 3.6-3.8", "due_date": "09/12/25" },
+    { "assignment": "Chapter 3 Test", "due_date": "09/15/25" },
+    { "assignment": "Homework #4 - Sections 4.1-4.2", "due_date": "09/20/25" },
+    { "assignment": "Homework #5 - Sections 4.3-4.5", "due_date": "09/26/25" },
+    { "assignment": "Chapter 4 Test", "due_date": "09/29/25" },
+    { "assignment": "Homework #6 - Sections 5.2-5.5", "due_date": "10/03/25" },
+    { "assignment": "Chapter 5 Test", "due_date": "10/06/25" },
+    { "assignment": "Homework #7 - Sections 6.1-6.2", "due_date": "10/10/25" },
+    { "assignment": "Homework #8 - Sections 6.3-6.4", "due_date": "10/17/25" },
+    { "assignment": "Chapter 6 Test", "due_date": "10/20/25" },
+    { "assignment": "Homework #9 - Sections 7.2-7.5", "due_date": "10/31/25" },
+    { "assignment": "Chapter 7 Test", "due_date": "11/03/25" },
+    { "assignment": "Homework #10 - Sections 8.2-8.6", "due_date": "11/07/25" },
+    { "assignment": "Chapter 8 Test", "due_date": "11/10/25" },
+    { "assignment": "Homework #11 - Sections 9.2-9.6", "due_date": "11/14/25" },
+    { "assignment": "Chapter 9 Test", "due_date": "11/17/25" },
+    { "assignment": "Homework #12 - Sections 10.1-10.2", "due_date": "11/21/25" },
+    { "assignment": "Homework #13 - Sections 10.3-10.5", "due_date": "12/01/25" },
+    { "assignment": "Chapter 10 Test", "due_date": "12/01/25" },
+    { "assignment": "Homework #14 - Sections 11.1-11.3", "due_date": "12/05/25" },
+    { "assignment": "Homework #15 - Sections 11.4-11.6", "due_date": "12/12/25" },
+    { "assignment": "Final Test", "due_date": "12/12/25" }
+  ]
+}

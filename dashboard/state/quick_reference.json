@@ -1,0 +1,35 @@
+{
+  "generated": "2025-08-24T10:44:05.085654",
+  "semester": "Fall 2025",
+  "courses": [
+    "MATH221",
+    "MATH251",
+    "STAT253"
+  ],
+  "critical_dates": {
+    "classes_begin": "2025-08-25",
+    "labor_day": "2025-09-01",
+    "fall_break": "2025-11-27",
+    "last_day": "2025-12-13",
+    "finals": "2025-12-16 to 2025-12-20"
+  },
+  "orchestration_status": {
+    "master_agent": "active",
+    "advanced_orchestrator": "active",
+    "registered_agents": 5,
+    "critical_issues": 1,
+    "pending_tasks": 157
+  },
+  "quick_commands": {
+    "validate": "make validate",
+    "build_all": "make all",
+    "dashboard": "make dash",
+    "deploy": "@orchestrate deploy",
+    "status": "@orchestrate status"
+  },
+  "iframe_endpoints": {
+    "generator": "http://127.0.0.1:5055/embed/generator",
+    "syllabus": "http://127.0.0.1:5055/embed/syllabus/{course}",
+    "schedule": "http://127.0.0.1:5055/embed/schedule/{course}"
+  }
+}

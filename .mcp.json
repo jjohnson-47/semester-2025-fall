@@ -1,0 +1,77 @@
+{
+  "mcpServers": {
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "env": {
+        "MEMORY_NAMESPACE": "kpc-fall-2025-semester"
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}",
+        "GITHUB_REPOSITORY": "jjohnson-47/semester-2025-fall"
+      }
+    },
+    "filesystem-extended": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+      "env": {
+        "ALLOWED_DIRECTORIES": "/home/verlyn13/Projects/jjohnson-47/semester-2025-fall:/home/verlyn13/Projects/shared-libs"
+      }
+    },
+    "academic-calendar": {
+      "command": "python",
+      "args": ["-m", "scripts.mcp_calendar_server"],
+      "cwd": "/home/verlyn13/Projects/jjohnson-47/semester-2025-fall",
+      "env": {
+        "SEMESTER_DATA": "/home/verlyn13/Projects/jjohnson-47/semester-2025-fall/variables/semester.json",
+        "COURSES": "MATH221,MATH251,STAT253"
+      }
+    },
+    "course-validator": {
+      "command": "python",
+      "args": ["-m", "scripts.mcp_validator_server"],
+      "cwd": "/home/verlyn13/Projects/jjohnson-47/semester-2025-fall",
+      "env": {
+        "VALIDATION_SCHEMA_DIR": "/home/verlyn13/Projects/jjohnson-47/semester-2025-fall/schemas",
+        "COURSES_DIR": "/home/verlyn13/Projects/jjohnson-47/semester-2025-fall/content/courses"
+      }
+    },
+    "task-orchestrator": {
+      "command": "python",
+      "args": ["-m", "dashboard.mcp_orchestrator_server"],
+      "cwd": "/home/verlyn13/Projects/jjohnson-47/semester-2025-fall",
+      "env": {
+        "DASHBOARD_STATE": "/home/verlyn13/Projects/jjohnson-47/semester-2025-fall/dashboard/state",
+        "ORCHESTRATION_LOG": "/home/verlyn13/Projects/jjohnson-47/semester-2025-fall/.claude/orchestration.log"
+      }
+    },
+    "content-builder": {
+      "command": "python",
+      "args": ["-m", "scripts.mcp_builder_server"],
+      "cwd": "/home/verlyn13/Projects/jjohnson-47/semester-2025-fall",
+      "env": {
+        "TEMPLATES_DIR": "/home/verlyn13/Projects/jjohnson-47/semester-2025-fall/templates",
+        "BUILD_DIR": "/home/verlyn13/Projects/jjohnson-47/semester-2025-fall/build",
+        "UV_PYTHON": "1"
+      }
+    }
+  },
+  "logging": {
+    "level": "info",
+    "file": ".claude/mcp-activity.log"
+  },
+  "permissions": {
+    "allowNetworkAccess": false,
+    "allowFileSystemWrite": true,
+    "allowFileSystemRead": true,
+    "allowProcessExecution": true
+  },
+  "timeout": {
+    "connection": 30000,
+    "request": 60000
+  }
+}

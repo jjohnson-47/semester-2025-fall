@@ -1,21 +1,20 @@
 {
   "weeks": [
-    {"week": 1, "topic": "Statistics, Data, and Statistical Thinking", "readings": ["Chapter 1"], "assignments": ["Install R/RStudio", "Homework 1"], "assessments": [], "notes": ""},
-    {"week": 2, "topic": "Methods for Describing Sets of Data", "readings": ["Chapter 2"], "assignments": ["Homework 2", "R Assignment 1"], "assessments": ["Chapter 1 Test", "Chapter 2 Test"], "notes": ""},
-    {"week": 3, "topic": "Probability", "readings": ["Chapter 3"], "assignments": ["Homework 3"], "assessments": ["Chapter 3 Test"], "notes": ""},
-    {"week": 4, "topic": "Discrete Random Variables", "readings": ["Chapter 4"], "assignments": ["Homework 4"], "assessments": [], "notes": ""},
-    {"week": 5, "topic": "Discrete Random Variables (continued)", "readings": ["Chapter 4"], "assignments": ["Homework 5", "Final Report Draft 1"], "assessments": ["Chapter 4 Test"], "notes": ""},
-    {"week": 6, "topic": "Continuous Random Variables", "readings": ["Chapter 5"], "assignments": ["Homework 6"], "assessments": ["Chapter 5 Test"], "notes": ""},
-    {"week": 7, "topic": "Sampling Distributions", "readings": ["Chapter 6"], "assignments": ["Homework 7", "R Assignment 2"], "assessments": [], "notes": ""},
-    {"week": 8, "topic": "Sampling Distributions (continued)", "readings": ["Chapter 6"], "assignments": ["Homework 8"], "assessments": ["Chapter 6 Test"], "notes": ""},
+    {"week": 1, "topic": "Statistics, Data, and Statistical Thinking", "readings": ["Chapter 1"], "assignments": ["Install R/RStudio", "Homework #1 - Chapter 1"], "assessments": ["Chapter 1 Test"], "notes": "HW due 8/29, Test due 9/2"},
+    {"week": 2, "topic": "Methods for Describing Sets of Data", "readings": ["Chapter 2"], "assignments": ["Homework #2 - Sections 2.1-2.7", "R Assignment 1"], "assessments": ["Chapter 2 Test"], "notes": "HW due 9/5, Test due 9/8"},
+    {"week": 3, "topic": "Probability", "readings": ["Chapter 3"], "assignments": ["Homework #3 - Sections 3.1, 3.4, 3.6-3.8"], "assessments": ["Chapter 3 Test"], "notes": "HW due 9/12, Test due 9/15"},
+    {"week": 4, "topic": "Discrete Random Variables", "readings": ["Chapter 4"], "assignments": ["Homework #4 - Sections 4.1-4.2"], "assessments": [], "notes": "HW due 9/20"},
+    {"week": 5, "topic": "Discrete Random Variables (continued)", "readings": ["Chapter 4"], "assignments": ["Homework #5 - Sections 4.3-4.5", "Final Report Draft 1 (Brainstorming)"], "assessments": ["Chapter 4 Test"], "notes": "HW due 9/26, Test due 9/29"},
+    {"week": 6, "topic": "Continuous Random Variables", "readings": ["Chapter 5"], "assignments": ["Homework #6 - Sections 5.2-5.5"], "assessments": ["Chapter 5 Test"], "notes": "HW due 10/3, Test due 10/6"},
+    {"week": 7, "topic": "Sampling Distributions", "readings": ["Chapter 6"], "assignments": ["Homework #7 - Sections 6.1-6.2", "R Assignment 2"], "assessments": [], "notes": "HW due 10/10"},
+    {"week": 8, "topic": "Sampling Distributions (continued)", "readings": ["Chapter 6"], "assignments": ["Homework #8 - Sections 6.3-6.4"], "assessments": ["Chapter 6 Test"], "notes": "HW due 10/17, Test due 10/20"},
     {"week": 9, "topic": "Project Work and Review", "readings": [], "assignments": ["Project Work"], "assessments": [], "notes": "No new content"},
-    {"week": 10, "topic": "Inferences Based on a Single Sample (CI)", "readings": ["Chapter 7"], "assignments": ["Homework 9", "R Assignment 3"], "assessments": ["Chapter 7 Test"], "notes": ""},
-    {"week": 11, "topic": "Inferences Based on a Single Sample (HT)", "readings": ["Chapter 8"], "assignments": ["Homework 10", "Final Report Draft 2"], "assessments": ["Chapter 8 Test"], "notes": ""},
-    {"week": 12, "topic": "Inferences Based on Two Samples", "readings": ["Chapter 9"], "assignments": ["Homework 11", "R Assignment 4"], "assessments": ["Chapter 9 Test"], "notes": ""},
-    {"week": 13, "topic": "Analysis of Variance (ANOVA)", "readings": ["Chapter 10"], "assignments": ["Homework 12"], "assessments": [], "notes": ""},
-    {"week": 14, "topic": "ANOVA (continued)", "readings": ["Chapter 10"], "assignments": ["Homework 13", "R Assignment 5"], "assessments": ["Chapter 10 Test"], "notes": ""},
-    {"week": 15, "topic": "Linear Regression", "readings": ["Chapter 11"], "assignments": ["Homework 14"], "assessments": [], "notes": ""},
-    {"week": 16, "topic": "Linear Regression and Review", "readings": ["Chapter 11"], "assignments": ["Homework 15", "Final Report"], "assessments": [], "notes": "Finals Week"}
+    {"week": 10, "topic": "Inferences Based on a Single Sample (CI)", "readings": ["Chapter 7"], "assignments": ["Homework #9 - Sections 7.2-7.5", "R Assignment 3"], "assessments": ["Chapter 7 Test"], "notes": "HW due 10/31, Test due 11/3"},
+    {"week": 11, "topic": "Inferences Based on a Single Sample (HT)", "readings": ["Chapter 8"], "assignments": ["Homework #10 - Sections 8.2-8.6", "Final Report Draft 2 (Outline)"], "assessments": ["Chapter 8 Test"], "notes": "HW due 11/7, Test due 11/10"},
+    {"week": 12, "topic": "Inferences Based on Two Samples", "readings": ["Chapter 9"], "assignments": ["Homework #11 - Sections 9.2-9.6", "R Assignment 4"], "assessments": ["Chapter 9 Test"], "notes": "HW due 11/14, Test due 11/17"},
+    {"week": 13, "topic": "Analysis of Variance (ANOVA)", "readings": ["Chapter 10"], "assignments": ["Homework #12 - Sections 10.1-10.2"], "assessments": [], "notes": "HW due 11/21"},
+    {"week": 14, "topic": "ANOVA (continued)", "readings": ["Chapter 10"], "assignments": ["Homework #13 - Sections 10.3-10.5", "R Assignment 5"], "assessments": ["Chapter 10 Test"], "notes": "HW due 12/1, Test due 12/1"},
+    {"week": 15, "topic": "Linear Regression and Review", "readings": ["Chapter 11"], "assignments": ["Homework #14 - Sections 11.1-11.3", "Homework #15 - Sections 11.4-11.6", "Final Report (Final Draft)"], "assessments": [], "notes": "HW14 due 12/5, HW15 due 12/12"}
   ],
-  "finals": {"topic": "Final Test", "assessments": ["Final Test (Comprehensive)"], "notes": "All assignments must be submitted"}
+  "finals": {"topic": "Final Test", "assessments": ["Final Test (Comprehensive)"], "notes": "Final Test due 12/12"}
 }

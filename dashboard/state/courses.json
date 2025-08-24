@@ -1,39 +1,151 @@
 {
   "semester": "2025-fall",
-  "courses": [
-    {
-      "code": "MATH221",
-      "name": "Applied Calculus for Business and Economics",
-      "section": "F01",
-      "credits": 3,
-      "format": "online",
-      "instructor": "Jeffrey Johnson"
-    },
-    {
-      "code": "MATH251",
-      "name": "Calculus I",
-      "section": "F01",
-      "credits": 4,
-      "format": "online",
-      "instructor": "Jeffrey Johnson"
-    },
-    {
-      "code": "STAT253",
-      "name": "Introduction to Statistics",
-      "section": "F01",
-      "credits": 3,
-      "format": "online",
-      "instructor": "Jeffrey Johnson"
-    }
-  ],
+  "timezone": "America/Anchorage",
   "important_dates": {
     "first_day": "2025-08-25",
     "last_day": "2025-12-13",
-    "add_drop_deadline": "2025-09-03",
-    "withdrawal_deadline": "2025-10-31",
-    "thanksgiving_break_start": "2025-11-26",
-    "thanksgiving_break_end": "2025-11-30",
-    "finals_start": "2025-12-09",
-    "finals_end": "2025-12-13"
-  }
+    "finals_window": "2025-12-08..2025-12-13",
+    "drop_deadline": "2025-09-05",
+    "withdrawal_deadline": "2025-10-31"
+  },
+  "courses": [
+    {
+      "code": "MATH221",
+      "title": "Applied Calculus for Managerial and Social Sciences",
+      "crn": "74645",
+      "credits": 3,
+      "modality": "online",
+      "section": "901",
+      "weeks": 16,
+      "blackboard": {
+        "course_id": "2025-FALL-MATH221-901",
+        "copy_from_id": "2024-FALL-MATH221-901",
+        "links": {
+          "shell": "https://blackboard.alaska.edu/ultra/courses/_123456_MATH221_1",
+          "grade_center": "https://blackboard.alaska.edu/webapps/gradebook2/controller"
+        }
+      },
+      "evaluation": {
+        "categories": [
+          {
+            "name": "Blackboard Discussion Participation",
+            "weight": 4
+          },
+          {
+            "name": "MyOpenMath Homework",
+            "weight": 24
+          },
+          {
+            "name": "MyOpenMath Class Activities",
+            "weight": 12
+          },
+          {
+            "name": "Exams (3 Midterms @ 15% each)",
+            "weight": 45
+          },
+          {
+            "name": "Final Exam",
+            "weight": 15
+          }
+        ]
+      },
+      "description": "Covers functions and graphs, differentiation, exponential and logarithmic functions, antidifferentiation and integration, and functions of several variables. Applies these mathematical concepts."
+    },
+    {
+      "code": "MATH251",
+      "title": "Calculus I",
+      "crn": "74647",
+      "credits": 4,
+      "modality": "online",
+      "section": "901",
+      "weeks": 16,
+      "blackboard": {
+        "course_id": "2025-FALL-MATH251-901",
+        "copy_from_id": "2024-FALL-MATH251-901",
+        "links": {
+          "shell": "https://blackboard.alaska.edu/ultra/courses/_123456_MATH251_1",
+          "grade_center": "https://blackboard.alaska.edu/webapps/gradebook2/controller"
+        }
+      },
+      "evaluation": {
+        "categories": [
+          {
+            "name": "Discussion and Participation",
+            "weight": 5
+          },
+          {
+            "name": "Weekly Quizzes",
+            "weight": 10
+          },
+          {
+            "name": "Edfinity Homework",
+            "weight": 20
+          },
+          {
+            "name": "Written Homework",
+            "weight": 15
+          },
+          {
+            "name": "Blackboard Assignments",
+            "weight": 10
+          },
+          {
+            "name": "Midterm Exam",
+            "weight": 15
+          },
+          {
+            "name": "Final Exam",
+            "weight": 25
+          }
+        ]
+      },
+      "description": "A first course in single-variable calculus. Topics include limits; continuity and differentiation of functions; applications of the derivative to graphing, optimization and rates of change; definite and indefinite integration; and the fundamental theorem of calculus."
+    },
+    {
+      "code": "STAT253",
+      "title": "Applied Statistics for the Sciences",
+      "crn": "74688",
+      "credits": 4,
+      "modality": "online",
+      "section": "901",
+      "weeks": 16,
+      "blackboard": {
+        "course_id": "2025-FALL-STAT253-901",
+        "copy_from_id": "2024-FALL-STAT253-901",
+        "links": {
+          "shell": "https://blackboard.alaska.edu/ultra/courses/_123456_STAT253_1",
+          "grade_center": "https://blackboard.alaska.edu/webapps/gradebook2/controller"
+        }
+      },
+      "evaluation": {
+        "categories": [
+          {
+            "name": "Participation",
+            "weight": 5
+          },
+          {
+            "name": "Homework",
+            "weight": 23
+          },
+          {
+            "name": "Chapter Tests",
+            "weight": 31
+          },
+          {
+            "name": "R Assignments",
+            "weight": 16
+          },
+          {
+            "name": "Final Report",
+            "weight": 12
+          },
+          {
+            "name": "Final Test",
+            "weight": 13
+          }
+        ]
+      },
+      "description": "Intensive survey course with applications for the sciences. Topics include descriptive statistics, probability, random variables, binomial, Poisson and normal distributions, estimation and hypothesis testing of common parameters, analysis of variance for single factor and two factors, correlation, and simple linear regression. A major statistical software package will be utilized."
+    }
+  ]
 }

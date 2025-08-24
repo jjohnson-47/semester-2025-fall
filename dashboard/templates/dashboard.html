@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Setup Dashboard - Fall 2025</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         .task-card {
             border-left: 4px solid;
@@ -61,7 +62,15 @@
     <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
             <span class="navbar-brand mb-0 h1">📚 Course Setup Dashboard</span>
-            <span class="navbar-text">Fall 2025 | Last updated: {{ updated }}</span>
+            <div class="d-flex align-items-center">
+                <a href="/embed/generator" class="btn btn-outline-light btn-sm me-3" title="Get iframe codes for Blackboard">
+                    <i class="bi bi-code-square"></i> Blackboard iFrames
+                </a>
+                <a href="/api/export/docx" class="btn btn-outline-light btn-sm me-3" title="Download all syllabi as DOCX">
+                    <i class="bi bi-file-earmark-word"></i> Export DOCX
+                </a>
+                <span class="navbar-text">Fall 2025 | Last updated: {{ updated }}</span>
+            </div>
         </div>
     </nav>
 
@@ -118,6 +127,51 @@
 
             <!-- Main content -->
             <div class="col-md-10">
+                <!-- Document Preview -->
+                <div class="card mb-3 mt-3">
+                    <div class="card-header d-flex align-items-center justify-content-between"
+                         style="cursor: pointer;" onclick="toggleDocumentPreview()">
+                        <div>
+                            <i class="bi bi-chevron-down" id="document-collapse-icon"></i>
+                            <strong>📄 Document Preview</strong>
+                            <small class="text-muted ms-2">Click to toggle</small>
+                        </div>
+                        <div onclick="event.stopPropagation();">
+                            <a href="/preview" class="btn btn-sm btn-primary" target="_blank">
+                                <i class="bi bi-arrows-fullscreen"></i> Enhanced Preview
+                            </a>
+                            <a href="/embed/generator" class="btn btn-sm btn-info ms-2" target="_blank" title="Get iframe codes for Blackboard">
+                                <i class="bi bi-code-square"></i> Blackboard iFrames
+                            </a>
+                            <a href="/api/export/docx" class="btn btn-sm btn-success ms-2" title="Download all materials as DOCX">
+                                <i class="bi bi-file-earmark-word"></i> Export DOCX
+                            </a>
+                        </div>
+                        <div class="d-flex align-items-center" onclick="event.stopPropagation();">
+                            <div class="btn-group btn-group-sm me-3" role="group">
+                                <input type="radio" class="btn-check" name="doc-type" id="doc-syllabus" value="syllabus" checked>
+                                <label class="btn btn-outline-primary" for="doc-syllabus">Syllabus</label>
+                                <input type="radio" class="btn-check" name="doc-type" id="doc-schedule" value="schedule">
+                                <label class="btn btn-outline-primary" for="doc-schedule">Schedule</label>
+                            </div>
+                            <label class="me-2 mb-0" for="preview-course">Course:</label>
+                            <select id="preview-course" class="form-select form-select-sm me-3" style="width: 180px;">
+                                {% set course_codes = courses | map(attribute='code') | list %}
+                                {% for c in courses %}
+                                <option value="{{ c.code }}">{{ c.code }} - {{ c.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-check form-switch" id="calendar-toggle" style="display: inline-block; min-width: 140px;">
+                                <input class="form-check-input" type="checkbox" id="with-calendar" checked>
+                                <label class="form-check-label" for="with-calendar">Include calendar</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0" id="document-preview-body">
+                        <iframe id="document-frame" src="/syllabi/{{ (courses[0].code if courses else 'MATH221') }}?variant=with_calendar" style="width: 100%; height: 720px; border: 0;">
+                        </iframe>
+                    </div>
+                </div>
                 <div id="search-box">
                     <input type="text" class="form-control" id="task-search"
                            placeholder="🔍 Search tasks... (/ to focus)">
@@ -132,9 +186,10 @@
                         <div class="col-md-12 mb-2">
                             <div class="card border-primary">
                                 <div class="card-body p-2">
-                                    <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex justify-content-between align-items-center" style="cursor: pointer;" onclick="toggleNowQueueDetails('{{ task.id }}')">
                                         <div>
                                             <strong>
+                                                <i class="bi bi-chevron-right task-expand-icon" id="now-expand-{{ task.id }}"></i>
                                                 {% if task.is_chain_head %}➜{% else %}○{% endif %}
                                                 [{{ task.course }}] {{ task.title }}
                                             </strong>
@@ -152,15 +207,44 @@
                                             {% if task.due_date %}
                                                 <span class="badge bg-secondary">Due: {{ task.due_date[:10] }}</span>
                                             {% endif %}
-                                            <button class="btn btn-sm btn-outline-primary ms-2"
-                                                    onclick="updateStatus('{{ task.id }}', 'doing')">
-                                                Start ⚡
+                                        </div>
+                                    </div>
+                                    <div id="now-details-{{ task.id }}" style="display: none;" class="mt-2">
+                                        {% if task.description %}
+                                        <p class="text-muted small mb-2">{{ task.description }}</p>
+                                        {% endif %}
+
+                                        {% if task.checklist %}
+                                        <div class="checklist mb-2">
+                                            <strong class="small">Checklist:</strong>
+                                            {% for item in task.checklist %}
+                                            <div class="checklist-item small">
+                                                <input type="checkbox"
+                                                       id="now-check-{{ task.id }}-{{ loop.index }}"
+                                                       {% if item.done %}checked{% endif %}>
+                                                <label for="now-check-{{ task.id }}-{{ loop.index }}">
+                                                    {{ item.text|default(item) }}
+                                                </label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+
+                                        <div class="mt-2">
+                                            <button class="btn btn-sm btn-primary"
+                                                    onclick="event.stopPropagation(); updateStatus('{{ task.id }}', 'doing')">
+                                                <i class="bi bi-play-fill"></i> Start Task
+                                            </button>
+                                            <button class="btn btn-sm btn-success"
+                                                    onclick="event.stopPropagation(); updateStatus('{{ task.id }}', 'done')">
+                                                <i class="bi bi-check-circle"></i> Mark Complete
+                                            </button>
+                                            <button class="btn btn-sm btn-warning"
+                                                    onclick="event.stopPropagation(); updateStatus('{{ task.id }}', 'blocked')">
+                                                <i class="bi bi-exclamation-triangle"></i> Mark Blocked
                                             </button>
                                         </div>
                                     </div>
-                                    {% if task.description %}
-                                    <small class="text-muted d-block mt-1">{{ task.description[:100] }}{% if task.description|length > 100 %}...{% endif %}</small>
-                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -185,17 +269,38 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-8">
-                                    <h6 class="card-title">
+                                    <h6 class="card-title task-header" style="cursor: pointer;" onclick="toggleTaskDetails('{{ task.id }}')">
                                         <span class="status-icon">{{ task.status|status_icon }}</span>
                                         {% if task.is_chain_head %}
                                             <span class="badge bg-warning" title="Chain Head - Ready to Start">➜</span>
                                         {% endif %}
+                                        <i class="bi bi-chevron-right task-expand-icon" id="expand-{{ task.id }}"></i>
                                         {{ task.title }}
                                         {% if task.smart_score %}
                                             <small class="text-muted">({{ "%.0f"|format(task.smart_score) }})</small>
                                         {% endif %}
                                     </h6>
-                                    <p class="card-text text-muted small">{{ task.description }}</p>
+                                    <div class="task-details" id="details-{{ task.id }}" style="display: none;">
+                                        <p class="card-text text-muted small mt-2">{{ task.description }}</p>
+
+                                        {% if task.notes %}
+                                        <div class="alert alert-light mt-2">
+                                            <small><strong>Notes:</strong> {{ task.notes }}</small>
+                                        </div>
+                                        {% endif %}
+
+                                        <div class="mt-2">
+                                            <button class="btn btn-sm btn-primary" onclick="updateStatus('{{ task.id }}', 'doing')">
+                                                <i class="bi bi-play-fill"></i> Start Task
+                                            </button>
+                                            <button class="btn btn-sm btn-success" onclick="updateStatus('{{ task.id }}', 'done')">
+                                                <i class="bi bi-check-circle"></i> Mark Complete
+                                            </button>
+                                            <button class="btn btn-sm btn-warning" onclick="updateStatus('{{ task.id }}', 'blocked')">
+                                                <i class="bi bi-exclamation-triangle"></i> Mark Blocked
+                                            </button>
+                                        </div>
+                                    </div>
 
                                     {% if task.checklist %}
                                     <div class="checklist">
@@ -275,19 +380,109 @@
     </div>
 
     <script>
+        // Document preview controls
+        (function() {
+            const courseSelect = document.getElementById('preview-course');
+            const withCalToggle = document.getElementById('with-calendar');
+            const calendarToggleDiv = document.getElementById('calendar-toggle');
+            const frame = document.getElementById('document-frame');
+            const syllabusRadio = document.getElementById('doc-syllabus');
+            const scheduleRadio = document.getElementById('doc-schedule');
+
+            function updatePreview() {
+                const course = courseSelect.value;
+                const docType = document.querySelector('input[name="doc-type"]:checked').value;
+
+                if (docType === 'syllabus') {
+                    const variant = withCalToggle.checked ? 'with_calendar' : '';
+                    const url = `/syllabi/${course}` + (variant ? `?variant=${variant}` : '');
+                    frame.src = url;
+                    calendarToggleDiv.style.visibility = 'visible';
+                } else {
+                    // Schedule doesn't have calendar variant
+                    const url = `/schedules/${course}`;
+                    frame.src = url;
+                    calendarToggleDiv.style.visibility = 'hidden';
+                }
+            }
+
+            if (courseSelect && withCalToggle && frame) {
+                courseSelect.addEventListener('change', updatePreview);
+                withCalToggle.addEventListener('change', updatePreview);
+                syllabusRadio.addEventListener('change', updatePreview);
+                scheduleRadio.addEventListener('change', updatePreview);
+            }
+        })();
+
         // Update task status
         function updateStatus(taskId, status) {
+            if (!taskId || taskId === 'None' || taskId === 'undefined') {
+                console.error('Invalid task ID:', taskId);
+                alert('Unable to update task - invalid task ID. Tasks may need to be regenerated.');
+                return;
+            }
+
+            console.log('Updating task', taskId, 'to status', status);
+
             fetch(`/api/task/${taskId}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({status: status})
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    // Update the UI without full page reload
+                    const taskCard = document.querySelector(`[data-task-id="${taskId}"]`);
+                    if (taskCard) {
+                        // Remove old status class
+                        taskCard.className = taskCard.className.replace(/status-\w+/, `status-${status}`);
+
+                        // Update status icon if present
+                        const statusIcon = taskCard.querySelector('.status-icon');
+                        if (statusIcon) {
+                            const icons = {
+                                'todo': '📋',
+                                'doing': '⚡',
+                                'done': '✅',
+                                'blocked': '🚫',
+                                'review': '👀'
+                            };
+                            statusIcon.textContent = icons[status] || '📋';
+                        }
+
+                        // Show feedback
+                        showNotification(`Task updated to ${status}`, 'success');
+                    }
+
+                    // Reload after a short delay to get updated data
+                    setTimeout(() => location.reload(), 500);
+                } else {
+                    alert('Failed to update task: ' + (data.error || 'Unknown error'));
                 }
+            })
+            .catch(error => {
+                console.error('Error updating task:', error);
+                alert('Error updating task: ' + error.message);
             });
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} position-fixed top-0 start-50 translate-middle-x mt-3`;
+            notification.style.zIndex = '9999';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 2000);
         }
 
         // Search functionality
@@ -299,11 +494,100 @@
             });
         });
 
+        // Toggle task details
+        function toggleTaskDetails(taskId) {
+            const details = document.getElementById(`details-${taskId}`);
+            const icon = document.getElementById(`expand-${taskId}`);
+
+            if (details) {
+                if (details.style.display === 'none') {
+                    details.style.display = 'block';
+                    if (icon) icon.className = 'bi bi-chevron-down task-expand-icon';
+                } else {
+                    details.style.display = 'none';
+                    if (icon) icon.className = 'bi bi-chevron-right task-expand-icon';
+                }
+            }
+        }
+
+        // Toggle Now Queue task details
+        function toggleNowQueueDetails(taskId) {
+            const details = document.getElementById(`now-details-${taskId}`);
+            const icon = document.getElementById(`now-expand-${taskId}`);
+
+            if (details) {
+                if (details.style.display === 'none') {
+                    details.style.display = 'block';
+                    if (icon) icon.className = 'bi bi-chevron-down task-expand-icon';
+                } else {
+                    details.style.display = 'none';
+                    if (icon) icon.className = 'bi bi-chevron-right task-expand-icon';
+                }
+            }
+        }
+
+        // Toggle Document Preview
+        function toggleDocumentPreview() {
+            const body = document.getElementById('document-preview-body');
+            const icon = document.getElementById('document-collapse-icon');
+
+            if (body) {
+                if (body.style.display === 'none') {
+                    body.style.display = 'block';
+                    if (icon) icon.className = 'bi bi-chevron-down';
+                    localStorage.setItem('documentPreviewCollapsed', 'false');
+                } else {
+                    body.style.display = 'none';
+                    if (icon) icon.className = 'bi bi-chevron-right';
+                    localStorage.setItem('documentPreviewCollapsed', 'true');
+                }
+            }
+        }
+
+        // For backward compatibility
+        function toggleSyllabusPreview() {
+            toggleDocumentPreview();
+        }
+
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            if (e.key === '/') {
+            if (e.key === '/' && e.target.tagName !== 'INPUT') {
                 e.preventDefault();
                 document.getElementById('task-search').focus();
+            }
+
+            // Press 'x' to expand/collapse all tasks
+            if (e.key === 'x' && e.target.tagName !== 'INPUT') {
+                e.preventDefault();
+                const allDetails = document.querySelectorAll('.task-details');
+                const anyOpen = Array.from(allDetails).some(d => d.style.display !== 'none');
+
+                allDetails.forEach(details => {
+                    const taskId = details.id.replace('details-', '');
+                    const icon = document.getElementById(`expand-${taskId}`);
+                    if (anyOpen) {
+                        details.style.display = 'none';
+                        if (icon) icon.className = 'bi bi-chevron-right task-expand-icon';
+                    } else {
+                        details.style.display = 'block';
+                        if (icon) icon.className = 'bi bi-chevron-down task-expand-icon';
+                    }
+                });
+            }
+        });
+
+        // Restore document preview state on load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check both old and new keys for backward compatibility
+            const isCollapsed = localStorage.getItem('documentPreviewCollapsed') === 'true' ||
+                               localStorage.getItem('syllabusPreviewCollapsed') === 'true';
+            if (isCollapsed) {
+                const body = document.getElementById('document-preview-body');
+                const icon = document.getElementById('document-collapse-icon');
+                if (body) {
+                    body.style.display = 'none';
+                    if (icon) icon.className = 'bi bi-chevron-right';
+                }
             }
         });
 
@@ -337,5 +621,53 @@
             });
         });
     </script>
+
+    <style>
+        .task-header:hover {
+            background-color: rgba(0, 123, 255, 0.05);
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin: -2px -4px;
+        }
+
+        .task-expand-icon {
+            font-size: 0.8em;
+            margin-right: 0.5em;
+            transition: transform 0.2s;
+        }
+
+        .task-details {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            margin-top: 10px;
+            animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-todo { border-left: 4px solid #6c757d; }
+        .status-doing { border-left: 4px solid #ffc107; background-color: #fff9e6; }
+        .status-done { border-left: 4px solid #28a745; opacity: 0.8; }
+        .status-blocked { border-left: 4px solid #dc3545; background-color: #fef2f2; }
+        .status-review { border-left: 4px solid #17a2b8; }
+
+        #document-preview-body {
+            transition: all 0.3s ease;
+        }
+
+        .btn-group .btn {
+            padding: 0.25rem 0.75rem;
+        }
+    </style>
 </body>
 </html>

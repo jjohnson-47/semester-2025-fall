@@ -11,6 +11,9 @@ Complete documentation for the Fall 2025 Semester Course Management System.
 - [Quick Start Guide](../README.md#-quick-start) - Get up and running quickly
 - [Installation Guide](../README.md#-development) - Detailed setup instructions
 - [Environment Configuration](setup/environment.md) - Setting up your development environment
+- [Claude Code Orchestration](../.claude-task-orchestration.md) - AI agent coordination system
+- [Task Templates](../.claude-task-templates.md) - Ready-to-use agent task patterns
+- [Orchestration Triggers](../.claude-orchestration-triggers.md) - Automatic agent coordination
 
 ### Reference Documentation
 
@@ -47,17 +50,21 @@ Complete documentation for the Fall 2025 Semester Course Management System.
 ### Key Commands
 
 ```bash
-# Build everything
-make all
+# Traditional build commands
+make all                    # Build everything
+make dash                   # Start dashboard
+make course COURSE=MATH221  # Build single course
+make validate              # Validate configuration
 
-# Start dashboard
-make dash
+# Claude Code Agent Commands (Task tool with subagent_type)
+Task("Full system validation", subagent_type="qa-validator")
+Task("Rebuild all course materials", subagent_type="course-content")
+Task("Deploy to preview", subagent_type="deploy-manager")
+Task("Update documentation", subagent_type="docs-keeper")
+Task("Sync all calendars", subagent_type="calendar-sync")
 
-# Build single course
-make course COURSE=MATH221
-
-# Validate configuration
-make validate
+# Multi-agent workflows with TodoWrite
+TodoWrite + Task("Complete semester prep", subagent_type="qa-validator")
 ```
 
 ### Configuration Files
@@ -69,6 +76,9 @@ make validate
 | `variables/semester.json` | Semester configuration |
 | `dashboard/state/courses.json` | Dashboard course configuration |
 | `dashboard/state/tasks.json` | Current task states |
+| `.claude-task-orchestration.md` | Claude Code agent coordination config |
+| `.claude-task-templates.md` | Task templates for all agent types |
+| `.claude-orchestration-triggers.md` | Automatic trigger patterns |
 
 ## 📝 Contributing to Documentation
 

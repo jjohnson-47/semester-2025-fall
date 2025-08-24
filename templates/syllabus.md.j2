@@ -8,7 +8,7 @@
 
 ---
 
-## Instructor Information
+## Instructor
 
 **Name:** {{ instructor.name }}
 **Title:** {{ instructor.title }}
@@ -24,17 +24,25 @@
 
 ---
 
-## Course Description
+## Course
+
+### Class Cancellation
+In the event of a class cancellation, I will notify students and Student Services. Notices will be posted in Blackboard and, for any on-campus meetings, on the classroom door.
+
+### Course Description
 
 {{ course_description.text | default('Course description to be provided.') }}
 
 {% if course_prerequisites -%}
-## Prerequisites
+### Course Prerequisites
 
 {{ course_prerequisites.text }}
 {% endif %}
 
-## Instructional Goals
+### Course Fees
+If any course fees apply, their purpose and details will be posted in Blackboard. See the KPC syllabus verbiage: https://docs.google.com/spreadsheets/d/1yz1Br90OigCacJI-tPZaj3cpxVlGUSNw2NnMDwiT3go/edit?usp=sharing
+
+### Instructional Goals
 
 {% if instructional_goals -%}
 {% for goal in instructional_goals.goals -%}
@@ -44,7 +52,7 @@
 Instructional goals will be provided in Blackboard.
 {% endif %}
 
-## Student Learning Outcomes
+### Student Outcomes
 
 Upon successful completion of this course, students will be able to:
 
@@ -58,9 +66,9 @@ Student learning outcomes will be provided in Blackboard.
 
 ---
 
-## Required Materials
+### Required Text(s) and Technology
 
-### Textbook
+#### Textbook
 
 {% if required_textbook -%}
 **Title:** {{ required_textbook.title }}
@@ -74,7 +82,7 @@ Student learning outcomes will be provided in Blackboard.
 Textbook information will be provided in Blackboard.
 {% endif %}
 
-### Technology Requirements
+#### Technology Requirements
 
 - Reliable internet connection
 - Computer capable of running modern web browsers
@@ -83,7 +91,7 @@ Textbook information will be provided in Blackboard.
 {{ calculators_and_technology.requirements | markdown }}
 {% endif %}
 
-### Platform Access
+#### Platform Access
 
 {% if platform_access -%}
 {{ platform_access.text | markdown }}
@@ -91,9 +99,15 @@ Textbook information will be provided in Blackboard.
 
 ---
 
+### Instructor Response Time
+- Email response: within 1 business day (Mon–Fri)
+- Assignment feedback: within 1 week; up to 2 weeks for major exams/projects
+
+---
+
 ## Grading
 
-### Grade Distribution
+### Evaluation Tools
 
 {% if evaluation_tools -%}
 {% set total_points = grading_policy.points_total | default(1000) %}
@@ -127,7 +141,19 @@ Grade distribution will be provided in Blackboard.
 
 ---
 
-## Course Schedule
+### Class Participation and Attendance
+Active participation is expected. In an online asynchronous course, regular engagement with weekly modules, discussions, and assignments constitutes attendance.
+
+### Class Atmosphere and Safety
+We foster a respectful, inclusive learning environment. Disruptive behavior is not permitted. {% if safety %}{{ safety.text }}{% endif %}
+
+### Audit Policy
+Students auditing the course should participate and complete assigned work as agreed with the instructor to receive an AU notation.
+
+### Required Written Work
+Major written work and projects are outlined in the course schedule and weekly modules in Blackboard.
+
+## Chronological/Topical Outline
 
 ### Important Dates
 
@@ -177,6 +203,9 @@ All work submitted must be your own. Plagiarism, cheating, or any form of academ
 
 ---
 
+## KPC Support & Policy Guide
+It is important to review the KPC Support & Policy Guide for Academic Services, Policies and Processes, and Campus Safety: https://drive.google.com/file/d/1lEn0osdkkN9BakEa8QjMpNd_o3RrQeww/view?usp=sharing
+
 ## University Policies
 
 ### Disability Services
@@ -203,7 +232,7 @@ The University of Alaska is committed to providing an environment free from disc
 {% endif %}
 
 {% if rsi -%}
-### Repetitive Strain Injury (RSI)
+### Regular and Substantive Interaction (RSI)
 {{ rsi.text }}
 {% endif %}
 

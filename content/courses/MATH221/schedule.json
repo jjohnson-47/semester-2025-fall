@@ -1,20 +1,174 @@
 {
   "weeks": [
-    {"week": 1, "topic": "Functions, Operations on Functions, Linear Functions", "readings": ["1.1", "1.2", "1.3"], "assignments": ["MyOpenMath: Sections 1.1-1.3", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
-    {"week": 2, "topic": "Exponents, Quadratics, Polynomials & Rational Functions", "readings": ["1.4", "1.5", "1.6"], "assignments": ["MyOpenMath: Sections 1.4-1.6", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
-    {"week": 3, "topic": "Exponential & Logarithmic Functions, Rate of Change", "readings": ["1.7", "1.8", "2.1"], "assignments": ["MyOpenMath: Sections 1.7-2.1", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
-    {"week": 4, "topic": "Limits, Continuity, The Derivative", "readings": ["2.2", "2.3", "2.4"], "assignments": ["MyOpenMath: Sections 2.2-2.4", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
-    {"week": 5, "topic": "Derivative Formulas and Rules", "readings": ["2.5"], "assignments": ["MyOpenMath: Section 2.5", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
-    {"week": 6, "topic": "Second Derivative & Concavity", "readings": ["2.6"], "assignments": ["MyOpenMath: Section 2.6", "MyOpenMath Class Activity"], "assessments": ["Exam 1"], "notes": ""},
-    {"week": 7, "topic": "Optimization and Curve Sketching", "readings": ["2.7", "2.8", "2.9"], "assignments": ["MyOpenMath: Sections 2.7-2.9", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
-    {"week": 8, "topic": "Implicit Differentiation & Related Rates", "readings": ["2.10", "2.11"], "assignments": ["MyOpenMath: Sections 2.10-2.11", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
-    {"week": 9, "topic": "Definite Integral & Fundamental Theorem", "readings": ["3.1", "3.2", "3.3"], "assignments": ["MyOpenMath: Sections 3.1-3.3", "MyOpenMath Class Activity"], "assessments": ["Exam 2"], "notes": ""},
-    {"week": 10, "topic": "Integration Techniques", "readings": ["3.4", "3.5"], "assignments": ["MyOpenMath: Sections 3.4-3.5", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
-    {"week": 11, "topic": "Applications of Integration", "readings": ["3.6", "3.7"], "assignments": ["MyOpenMath: Sections 3.6-3.7", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
-    {"week": 12, "topic": "Differential Equations", "readings": ["3.8"], "assignments": ["MyOpenMath: Section 3.8", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
-    {"week": 13, "topic": "Functions of Two Variables", "readings": ["4.1"], "assignments": ["MyOpenMath: Section 4.1", "MyOpenMath Class Activity"], "assessments": ["Exam 3"], "notes": ""},
-    {"week": 14, "topic": "Partial Derivatives and Optimization", "readings": ["4.2", "4.3"], "assignments": ["MyOpenMath: Sections 4.2-4.3", "MyOpenMath Class Activity"], "assessments": [], "notes": ""},
-    {"week": 15, "topic": "Review and Final Preparation", "readings": [], "assignments": ["MyOpenMath Class Activity"], "assessments": [], "notes": ""}
+    {
+      "week": 1,
+      "topic": "Functions, Operations on Functions, Linear Functions",
+      "readings": ["1.1", "1.2", "1.3"],
+      "assignments": [
+        "MyOpenMath: Sections 1.1, 1.2, 1.3",
+        "Blackboard Discussion: Getting Registered & Introductions"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 2,
+      "topic": "Exponents, Quadratics, Polynomials & Rational Functions",
+      "readings": ["1.4", "1.5", "1.6"],
+      "assignments": [
+        "MyOpenMath: Sections 1.4, 1.5, 1.6",
+        "Blackboard Discussion: Week 2 Check-In"
+      ],
+      "assessments": [],
+      "notes": "Labor Day - Monday, September 1"
+    },
+    {
+      "week": 3,
+      "topic": "Exponential & Logarithmic Functions, Instantaneous Rate of Change",
+      "readings": ["1.7", "1.8", "2.1"],
+      "assignments": [
+        "MyOpenMath: Sections 1.7, 1.8, 2.1",
+        "Blackboard Discussion: Week 3 Check-In"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 4,
+      "topic": "Limits & Continuity, The Derivative, Rates in Real Life",
+      "readings": ["2.2", "2.3", "2.4"],
+      "assignments": [
+        "MyOpenMath: Sections 2.2, 2.3, 2.4",
+        "Blackboard Discussion: Week 4 Check-In"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 5,
+      "topic": "Derivative Formulas (Power, Exponential, Logarithmic, Product & Quotient Rules)",
+      "readings": ["2.5"],
+      "assignments": [
+        "MyOpenMath: Section 2.5",
+        "Blackboard Discussion: Week 5 Discussion"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 6,
+      "topic": "The Second Derivative & Concavity",
+      "readings": ["2.6"],
+      "assignments": [
+        "MyOpenMath: Section 2.6",
+        "Blackboard Discussion: Week 6 Discussion"
+      ],
+      "assessments": ["Exam #1 (Sections 1.1-2.4)"],
+      "notes": "Exam opens Monday, closes Wednesday 11:59 PM"
+    },
+    {
+      "week": 7,
+      "topic": "Optimization and Curve Sketching",
+      "readings": ["2.7", "2.8"],
+      "assignments": [
+        "MyOpenMath: Sections 2.7, 2.8",
+        "Blackboard Discussion: Week 7 Discussion"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 8,
+      "topic": "Applied Optimization and Other Applications",
+      "readings": ["2.9", "2.10"],
+      "assignments": [
+        "MyOpenMath: Sections 2.9, 2.10",
+        "Blackboard Discussion: Week 8 Discussion"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 9,
+      "topic": "Implicit Differentiation & Related Rates",
+      "readings": ["2.11"],
+      "assignments": [
+        "MyOpenMath: Section 2.11",
+        "Blackboard Discussion: Week 9 Discussion"
+      ],
+      "assessments": [],
+      "notes": "Review for Exam #2"
+    },
+    {
+      "week": 10,
+      "topic": "The Definite Integral & Fundamental Theorem of Calculus",
+      "readings": ["3.1", "3.2"],
+      "assignments": [
+        "MyOpenMath: Sections 3.1, 3.2",
+        "Blackboard Discussion: Week 10 Discussion"
+      ],
+      "assessments": ["Exam #2 (Sections 2.5-2.11)"],
+      "notes": "Exam opens Monday, closes Wednesday 11:59 PM"
+    },
+    {
+      "week": 11,
+      "topic": "Antiderivative Formulas and Substitution",
+      "readings": ["3.3", "3.4"],
+      "assignments": [
+        "MyOpenMath: Sections 3.3, 3.4",
+        "Blackboard Discussion: Week 11 Discussion"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 12,
+      "topic": "Techniques of Integration, Area, Volume & Average Value",
+      "readings": ["3.5", "3.6"],
+      "assignments": [
+        "MyOpenMath: Sections 3.5, 3.6",
+        "Blackboard Discussion: Week 12 Discussion"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 13,
+      "topic": "Applications to Business and Differential Equations",
+      "readings": ["3.7", "3.8"],
+      "assignments": [
+        "MyOpenMath: Sections 3.7, 3.8",
+        "Blackboard Discussion: Week 13 Discussion"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 14,
+      "topic": "Review and Catch-up",
+      "readings": [],
+      "assignments": [
+        "MyOpenMath: Chapter 3 Review",
+        "Blackboard Discussion: Week 14 Discussion"
+      ],
+      "assessments": ["Exam #3 (Sections 3.1-3.8)"],
+      "notes": "Exam opens Monday, closes Wednesday 11:59 PM. Fall Break Thursday-Friday"
+    },
+    {
+      "week": 15,
+      "topic": "Functions of Two Variables, Partial Derivatives, Optimization",
+      "readings": ["4.1", "4.2", "4.3"],
+      "assignments": [
+        "MyOpenMath: Sections 4.1, 4.2, 4.3",
+        "Blackboard Discussion: Week 15 Discussion & Final Review"
+      ],
+      "assessments": [],
+      "notes": "Last day of classes December 5"
+    }
   ],
-  "finals": {"topic": "Final Exam", "assessments": ["Final Exam"], "notes": "Comprehensive"}
+  "finals": {
+    "topic": "Final Exam",
+    "assessments": ["Final Exam (Sections 2.5-4.3)"],
+    "notes": "Opens Monday Dec 8 at 6:00 AM, closes Wednesday Dec 10 at 11:59 PM"
+  }
 }

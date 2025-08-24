@@ -1,0 +1,45 @@
+{
+  "created": "2025-08-24T10:27:01.046755",
+  "base_url": "https://production.jeffsthings-courses.pages.dev",
+  "courses": {
+    "MATH221": {
+      "syllabus_iframe": "<iframe src=\"https://production.jeffsthings-courses.pages.dev/courses/MATH221/fall-2025/syllabus/embed/\" \nwidth=\"100%\" height=\"800\" frameborder=\"0\" \nstyle=\"border: 1px solid #ddd; border-radius: 4px;\"\ntitle=\"MATH221 Syllabus\"></iframe>",
+      "schedule_iframe": "<iframe src=\"https://production.jeffsthings-courses.pages.dev/courses/MATH221/fall-2025/schedule/embed/\" \nwidth=\"100%\" height=\"600\" frameborder=\"0\" \nstyle=\"border: 1px solid #ddd; border-radius: 4px;\"\ntitle=\"MATH221 Schedule\"></iframe>",
+      "instructions": [
+        "1. Log into Blackboard Ultra",
+        "2. Navigate to your MATH221 course",
+        "3. Create or edit a content area",
+        "4. Click the HTML editor button (</>)",
+        "5. Paste the iframe code",
+        "6. Save the content",
+        "7. The syllabus/schedule will appear embedded"
+      ]
+    },
+    "MATH251": {
+      "syllabus_iframe": "<iframe src=\"https://production.jeffsthings-courses.pages.dev/courses/MATH251/fall-2025/syllabus/embed/\" \nwidth=\"100%\" height=\"800\" frameborder=\"0\" \nstyle=\"border: 1px solid #ddd; border-radius: 4px;\"\ntitle=\"MATH251 Syllabus\"></iframe>",
+      "schedule_iframe": "<iframe src=\"https://production.jeffsthings-courses.pages.dev/courses/MATH251/fall-2025/schedule/embed/\" \nwidth=\"100%\" height=\"600\" frameborder=\"0\" \nstyle=\"border: 1px solid #ddd; border-radius: 4px;\"\ntitle=\"MATH251 Schedule\"></iframe>",
+      "instructions": [
+        "1. Log into Blackboard Ultra",
+        "2. Navigate to your MATH251 course",
+        "3. Create or edit a content area",
+        "4. Click the HTML editor button (</>)",
+        "5. Paste the iframe code",
+        "6. Save the content",
+        "7. The syllabus/schedule will appear embedded"
+      ]
+    },
+    "STAT253": {
+      "syllabus_iframe": "<iframe src=\"https://production.jeffsthings-courses.pages.dev/courses/STAT253/fall-2025/syllabus/embed/\" \nwidth=\"100%\" height=\"800\" frameborder=\"0\" \nstyle=\"border: 1px solid #ddd; border-radius: 4px;\"\ntitle=\"STAT253 Syllabus\"></iframe>",
+      "schedule_iframe": "<iframe src=\"https://production.jeffsthings-courses.pages.dev/courses/STAT253/fall-2025/schedule/embed/\" \nwidth=\"100%\" height=\"600\" frameborder=\"0\" \nstyle=\"border: 1px solid #ddd; border-radius: 4px;\"\ntitle=\"STAT253 Schedule\"></iframe>",
+      "instructions": [
+        "1. Log into Blackboard Ultra",
+        "2. Navigate to your STAT253 course",
+        "3. Create or edit a content area",
+        "4. Click the HTML editor button (</>)",
+        "5. Paste the iframe code",
+        "6. Save the content",
+        "7. The syllabus/schedule will appear embedded"
+      ]
+    }
+  }
+}

@@ -141,6 +141,68 @@ def build_syllabus_pages(
     return {"full": rel_full, "embed": rel_embed}
 
 
+def build_schedule_pages(
+    course_code: str,
+    sb: SyllabusBuilder,
+    schedule_builder: ScheduleBuilder,
+    env: str,  # noqa: ARG001
+    term: str,
+    out_dir: Path,
+    jinja_templates: Path,
+) -> dict[str, str]:
+    """Render full + embed schedule pages for a course.
+
+    Returns a mapping of doc -> variant URLs (relative paths for manifest).
+    """
+    # Load context using existing data pipeline
+    data = sb.load_course_data(course_code)
+
+    # Build schedule HTML content
+    schedule_path = Path(schedule_builder.build_schedule(course_code))
+    schedule_html_content = ""
+    if schedule_path.exists():
+        # Read the existing HTML file and extract the body content
+        schedule_html_full = schedule_path.read_text(encoding="utf-8")
+        # Extract the main content by finding the div with class container or body content
+        if '<div class="container">' in schedule_html_full:
+            start = schedule_html_full.find('<div class="container">')
+            end = schedule_html_full.rfind("</div>") + 6
+            schedule_html_content = schedule_html_full[start:end]
+        else:
+            # Fallback: use everything between body tags
+            if "<body>" in schedule_html_full and "</body>" in schedule_html_full:
+                start = schedule_html_full.find("<body>") + 6
+                end = schedule_html_full.find("</body>")
+                schedule_html_content = schedule_html_full[start:end]
+
+    # Prepare Jinja environment for site templates
+    env_site = create_jinja_env(str(jinja_templates))
+    template_full = env_site.get_template("schedule_full.html.j2")
+    template_embed = env_site.get_template("schedule_embed.html.j2")
+
+    # Output directories
+    base = out_dir / "courses" / course_code / term / "schedule"
+    base_embed = base / "embed"
+    ensure_dir(base)
+    ensure_dir(base_embed)
+
+    # Render pages
+    html_full = template_full.render(
+        **data, EMBED_MODE=False, schedule_content=schedule_html_content
+    )
+    html_embed = template_embed.render(
+        **data, EMBED_MODE=True, schedule_content=schedule_html_content
+    )
+
+    (base / "index.html").write_text(html_full, encoding="utf-8")
+    (base_embed / "index.html").write_text(html_embed, encoding="utf-8")
+
+    # Relative URLs for manifest
+    rel_full = f"/courses/{course_code}/{term}/schedule/"
+    rel_embed = f"/courses/{course_code}/{term}/schedule/embed/"
+    return {"full": rel_full, "embed": rel_embed}
+
+
 def write_manifest(
     out_dir: Path,
     term: str,
@@ -313,8 +375,32 @@ def build_site(cfg: SiteConfig, include_docs: list[str], exclude_docs: list[str]
             )
             course_docs["syllabus"] = syllabus_urls
 
+        # Render schedule pages if allowed
+        should_build_schedule = (allowlist and "schedule" in allowlist) or (
+            not allowlist and "schedule" not in denylist
+        )
+        if should_build_schedule:
+            schedule_urls = build_schedule_pages(
+                course,
+                sb,
+                schedule_builder,
+                cfg.env,
+                cfg.term,
+                cfg.out_dir,
+                site_templates,
+            )
+            course_docs["schedule"] = schedule_urls
+
         if course_docs:
             results[course] = course_docs
+
+    # Create iframe code generator if requested
+    generator_dir = cfg.out_dir / "embed" / "generator"
+    ensure_dir(generator_dir)
+    env_site = create_jinja_env(str(site_templates))
+    generator_template = env_site.get_template("generator.html.j2")
+    generator_html = generator_template.render(courses=cfg.courses, term=cfg.term)
+    (generator_dir / "index.html").write_text(generator_html, encoding="utf-8")
 
     # Write manifest and copy CF config
     write_manifest(cfg.out_dir, cfg.term, cfg.courses, results)

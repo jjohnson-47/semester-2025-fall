@@ -78,8 +78,14 @@ class Config:
     RATELIMIT_STORAGE_URL = "memory://"
     RATELIMIT_DEFAULT = "100/hour"
 
-    # CORS settings
-    CORS_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:5055"]
+    # CORS settings - allow iframe embedding from Blackboard and public sites
+    CORS_ORIGINS = [
+        "http://localhost:3000",
+        "http://127.0.0.1:5055",
+        "https://blackboard.alaska.edu",
+        "https://production.jeffsthings-courses.pages.dev",
+        "https://preview.jeffsthings-courses.pages.dev",
+    ]
 
     # Logging
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
@@ -87,6 +93,11 @@ class Config:
     # Features
     AUTO_SNAPSHOT = os.environ.get("DASH_AUTO_SNAPSHOT", "true").lower() == "true"
     ENABLE_PROFILING = False
+
+    # Public hosting URL for iframe generation (production deployment)
+    PUBLIC_BASE_URL = os.environ.get(
+        "PUBLIC_BASE_URL", "https://production.jeffsthings-courses.pages.dev"
+    )
 
     @staticmethod
     def init_app(app: Any) -> None:

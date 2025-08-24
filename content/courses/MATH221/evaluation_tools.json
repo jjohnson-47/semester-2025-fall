@@ -1,8 +1,9 @@
 {
   "categories": [
-    {"name": "Participation", "weight": 4},
+    {"name": "Blackboard Discussion Participation", "weight": 4},
     {"name": "MyOpenMath Homework", "weight": 24},
     {"name": "MyOpenMath Class Activities", "weight": 12},
-    {"name": "Exams", "weight": 60}
+    {"name": "Exams (3 Midterms @ 15% each)", "weight": 45},
+    {"name": "Final Exam", "weight": 15}
   ]
 }

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ course.code }} Schedule — {{ semester.name }} {{ semester.year }}</title>
+    <link rel="stylesheet" href="../css/course.css">
+    <link rel="stylesheet" href="../css/courses/{{ course.code }}.css">
+    <style>
+      /* Page-specific overrides for schedule layout */
+      .course-info, .important-dates {
+        background: var(--bg-secondary);
+        padding: var(--spacing-md);
+        border-radius: var(--border-radius);
+        margin: var(--spacing-md) 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Course Schedule</h1>
+
+      <div class="course-info">
+        <h2>Course Information</h2>
+        <p><strong>Course:</strong> {{ course.code }}{% if course.title %} — {{ course.title }}{% endif %}</p>
+        <p><strong>Semester:</strong> {{ semester.name }} {{ semester.year }}</p>
+        <p><strong>Meeting Times:</strong> {{ course.meeting_times or course.format or 'Online Asynchronous' }}</p>
+        <p><strong>Location:</strong> {{ course.location or 'Online' }}</p>
+        <p><strong>Instructor:</strong> {{ instructor.name }}</p>
+        <p><strong>Office Hours:</strong> {{ instructor.office_hours or 'By appointment' }}</p>
+      </div>
+
+      <div class="important-dates">
+        <h3>Important Dates</h3>
+        <ul>
+          <li><strong>First Day of Classes:</strong> {{ dates.start | date }}</li>
+          <li><strong>Add/Drop Deadline:</strong> {{ dates.add_drop | date }}</li>
+          <li><strong>Withdrawal Deadline:</strong> {{ dates.withdrawal | date }}</li>
+          <li><strong>Finals Week:</strong> {{ dates.finals_start | date }} – {{ dates.finals_end | date }}</li>
+          <li><strong>Last Day of Classes:</strong> {{ dates.end | date }}</li>
+        </ul>
+      </div>
+
+      <h2>Weekly Schedule</h2>
+      <p><em>This schedule is subject to change. Updates are posted in Blackboard.</em></p>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 8%;">Week</th>
+            <th style="width: 18%;">Date(s)</th>
+            <th style="width: 28%;">Topics</th>
+            <th style="width: 20%;">Readings</th>
+            <th style="width: 26%;">Assignments / Assessments</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for w in weeks %}
+          <tr class="{{ 'holiday-row' if w.holidays else '' }} {{ 'exam-row' if w.has_exam else '' }} {{ 'finals-row' if w.is_finals else '' }}">
+            <td class="week-header">{{ w.label }}</td>
+            <td>{{ w.date_range }}{% if w.holidays %}<br><em>{{ w.holidays | join(', ') }}</em>{% endif %}</td>
+            <td>
+              <strong>{{ w.topic }}</strong>
+              {% if w.subtopics %}
+              <ul>
+                {% for s in w.subtopics %}<li>{{ s }}</li>{% endfor %}
+              </ul>
+              {% endif %}
+            </td>
+            <td>
+              {% if w.readings and w.readings|length > 0 %}
+                {{ w.readings | join(', ') }}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td>
+              {% if (w.assignments and w.assignments|length) or (w.assessments and w.assessments|length) %}
+                {% for a in w.assignments %}{{ a }}<br>{% endfor %}
+                {% for e in w.assessments %}<strong>{{ e }}</strong><br>{% endfor %}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="legend">
+        <h3>Legend</h3>
+        <span class="legend-item holiday">Holiday / Break</span>
+        <span class="legend-item exam">Exam</span>
+        <span class="legend-item finals">Finals</span>
+      </div>
+
+      <hr>
+      <p><small><em>Last updated: {{ now().strftime('%B %d, %Y') }}</em></small></p>
+    </div>
+  </body>
+  </html>

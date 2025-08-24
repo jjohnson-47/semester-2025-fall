@@ -61,7 +61,7 @@ class SyllabusBuilder:
         data = {
             "course_code": course_code,
             "course_number": course_code,
-            "semester": os.getenv("SEMESTER_NAME", "Fall 2025"),
+            "semester": os.getenv("SEMESTER_NAME", "Fall"),
             "year": 2025,
         }
 
@@ -85,8 +85,21 @@ class SyllabusBuilder:
         data["course_section"] = meta.get("section", os.getenv(f"{course_code}_SECTION"))
         data["course_format"] = meta.get("format", os.getenv(f"{course_code}_FORMAT"))
 
-        # Add calendar data
-        data["calendar"] = self.calendar.get_course_calendar(course_code)
+        # Add calendar data with schedule integration
+        calendar_data = self.calendar.get_course_calendar(course_code)
+
+        # Enhance calendar weeks with schedule data if available
+        schedule_data = data.get("schedule", {})
+        if schedule_data and "weeks" in schedule_data:
+            for idx, week in enumerate(calendar_data["weeks"][: len(schedule_data["weeks"])]):
+                if idx < len(schedule_data["weeks"]):
+                    schedule_week = schedule_data["weeks"][idx]
+                    week["topic"] = schedule_week.get("topic", "")
+                    week["readings"] = schedule_week.get("readings", [])
+                    week["assignments"] = schedule_week.get("assignments", [])
+                    week["assessments"] = schedule_week.get("assessments", [])
+
+        data["calendar"] = calendar_data
 
         # Add course-specific names
         data["course_name_full"] = os.getenv(f"{course_code}_FULL", "")

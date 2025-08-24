@@ -1,0 +1,157 @@
+/* Print-friendly styles for syllabi and schedules */
+
+@media print {
+    /* Hide navigation and controls */
+    .navbar,
+    .control-panel,
+    .side-panel,
+    .preview-header,
+    .preview-tabs,
+    .btn,
+    .form-check,
+    .form-select,
+    .action-buttons {
+        display: none !important;
+    }
+
+    /* Remove shadows and borders */
+    .preview-container,
+    .card {
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+    }
+
+    /* Full width content */
+    .container,
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .col-lg-9,
+    .col-md-10 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+
+    /* Typography adjustments */
+    body {
+        font-size: 11pt;
+        line-height: 1.5;
+        color: #000;
+        background: white;
+    }
+
+    h1 { font-size: 18pt; }
+    h2 { font-size: 16pt; }
+    h3 { font-size: 14pt; }
+    h4 { font-size: 12pt; }
+
+    /* Table formatting */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 1em 0;
+    }
+
+    table, th, td {
+        border: 1px solid #000;
+    }
+
+    th, td {
+        padding: 0.5em;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f0f0f0 !important;
+        font-weight: bold;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Page breaks */
+    .page-break {
+        page-break-after: always;
+    }
+
+    h1, h2 {
+        page-break-after: avoid;
+    }
+
+    table, figure {
+        page-break-inside: avoid;
+    }
+
+    /* Links */
+    a {
+        color: #000;
+        text-decoration: underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+        font-size: 0.8em;
+    }
+
+    /* Hide link URLs for internal links */
+    a[href^="#"]:after,
+    a[href^="javascript:"]:after {
+        content: "";
+    }
+
+    /* Header and footer */
+    @page {
+        margin: 1in 0.75in;
+
+        @top-center {
+            content: "Fall 2025 Syllabus";
+            font-size: 10pt;
+        }
+
+        @bottom-center {
+            content: "Page " counter(page) " of " counter(pages);
+            font-size: 10pt;
+        }
+    }
+
+    /* Important dates highlighting */
+    .date-item {
+        border-left: 3px solid #000 !important;
+        padding-left: 0.5em;
+        margin: 0.5em 0;
+    }
+
+    /* Code blocks */
+    pre, code {
+        background-color: #f5f5f5 !important;
+        border: 1px solid #ddd;
+        padding: 0.25em;
+        font-family: "Courier New", monospace;
+        font-size: 9pt;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Lists */
+    ul, ol {
+        margin-left: 1.5em;
+        margin-bottom: 1em;
+    }
+
+    li {
+        margin-bottom: 0.25em;
+    }
+
+    /* Ensure iframe content is visible */
+    iframe {
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        border: none !important;
+    }
+}

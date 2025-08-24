@@ -1,3 +1,28 @@
 {
-  "text": "Regular and substantive interaction through: (1) Optional Monday and Wednesday Zoom study sessions (12-1 PM), (2) Personalized feedback on MyOpenMath assignments, (3) Weekly content-focused announcements and email responses within one business day, (4) Active participation in weekly Blackboard discussions."
+  "course_description": "Covers functions and graphs, differentiation, exponential and logarithmic functions, antidifferentiation and integration, and functions of several variables. Applies these mathematical concepts.",
+  "student_learning_outcomes": [
+    "Differentiate functions involving rational, exponential and logarithmic functions and combinations of these functions.",
+    "Integrate functions using the power rule (substitution method) and integration by parts techniques.",
+    "Use differentiation and integration techniques to solve applied problems."
+  ],
+  "required_materials": {
+    "textbook": "Applied Calculus",
+    "platform": "MyOpenMath",
+    "technology": "Graphing calculator or graphing software"
+  },
+  "evaluation_grading": {
+    "categories": [
+      {"name": "Blackboard Discussion Participation", "weight": 4},
+      {"name": "MyOpenMath Homework", "weight": 24},
+      {"name": "MyOpenMath Class Activities", "weight": 12},
+      {"name": "Exams (3 Midterms @ 15% each)", "weight": 45},
+      {"name": "Final Exam", "weight": 15}
+    ],
+    "grading_scale": "Standard 90-80-70-60 scale"
+  },
+  "course_policies": {
+    "interaction": "This fully online, asynchronous course includes weekly, instructor-initiated interaction through: (1) weekly content-focused announcements and guidance; (2) individualized, timely feedback on assignments and assessments; (3) scheduled Zoom office hours and optional study sessions; and (4) proactive check-ins via email/Blackboard. Instructor replies within one business day; feedback on assignments within one week (up to two weeks for major exams/projects).",
+    "attendance": "No physical attendance required - online course",
+    "late_policy": "Assignments accepted late with penalty as specified in course"
+  }
 }

@@ -1,3 +1,29 @@
 {
-  "text": "Regular and substantive interaction through: (1) Optional Monday and Wednesday Zoom study sessions (12-1 PM), (2) Personalized feedback on MyMathLab assignments, (3) Weekly content-focused announcements, (4) Active participation in Blackboard discussions. Interaction through at least two methods weekly."
+  "course_description": "Intensive survey course with applications for the sciences. Topics include descriptive statistics, probability, random variables, binomial, Poisson and normal distributions, estimation and hypothesis testing of common parameters, analysis of variance for single factor and two factors, correlation, and simple linear regression. A major statistical software package will be utilized.",
+  "student_learning_outcomes": [
+    "Develop their algebraic, analytic and numeric skills; use them to solve applied problems; and correctly explain their mathematical reasoning.",
+    "Solve thought-provoking problems and critically evaluate statistical information from real-life scenarios",
+    "Collect data either by running an appropriate randomized experiment or from a reliable source",
+    "Use a major statistical software package to conduct analysis of data, being sure to validate all assumptions relevant to the selected statistical method",
+    "Draw conclusions and write a report effectively communicating the results"
+  ],
+  "required_materials": {
+    "textbook": "Statistics for Business and Economics",
+    "platform": "MyLab Statistics",
+    "technology": "Statistical software package (R/SPSS/Excel)"
+  },
+  "evaluation_grading": {
+    "categories": [
+      {"name": "MyLab Statistics Assignments", "weight": 35},
+      {"name": "Discussion Posts", "weight": 15},
+      {"name": "Projects", "weight": 25},
+      {"name": "Exams", "weight": 25}
+    ],
+    "grading_scale": "Standard 90-80-70-60 scale"
+  },
+  "course_policies": {
+    "interaction": "This fully online, asynchronous course includes weekly, instructor-initiated interaction through: (1) weekly content-focused announcements and guidance; (2) individualized, timely feedback on assignments and assessments; (3) scheduled Zoom office hours and optional study sessions; and (4) proactive check-ins via email/Blackboard. Instructor replies within one business day; feedback on assignments within one week (up to two weeks for major exams/projects).",
+    "attendance": "No physical attendance required - online course",
+    "late_policy": "Assignments accepted late with penalty as specified in course"
+  }
 }

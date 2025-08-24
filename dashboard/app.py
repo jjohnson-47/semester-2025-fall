@@ -43,18 +43,24 @@ import json
 import logging
 import os
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any, cast
 
 import pytz  # type: ignore[import-untyped]
-from flask import Flask, Response, jsonify, render_template, request
+from flask import Flask, Response, jsonify, render_template, request, send_file, send_from_directory
 from flask.typing import ResponseReturnValue
 
 from dashboard.config import Config
+from dashboard.orchestrator import AgentCoordinator, TaskOrchestrator
 
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Initialize orchestrator
+orchestrator = TaskOrchestrator(state_dir=Config.STATE_DIR)
+agent_coordinator = AgentCoordinator(orchestrator)
 
 # Note: The more advanced API is exposed via the package factory in
 # dashboard/__init__.py. For this module-level app (used in simpler tests),
@@ -116,6 +122,15 @@ class TaskManager:
                 return True
 
         return False
+
+    @staticmethod
+    def load_courses() -> dict[str, Any]:
+        """Load courses configuration."""
+        if not COURSES_FILE.exists():
+            return {"courses": []}
+
+        with open(COURSES_FILE) as f:
+            return json.load(f)
 
     @staticmethod
     def validate_task_data(task: dict[str, Any]) -> bool:
@@ -724,6 +739,159 @@ def get_relative_time(dt: datetime) -> str:
         return f"Due in {days} days"
 
 
+@app.route("/preview")
+def syllabus_preview() -> str:
+    """Enhanced syllabus preview page."""
+    courses = TaskManager.load_courses().get("courses", [])
+    return render_template("syllabus_preview.html", courses=courses)  # type: ignore[no-any-return]
+
+
+@app.route("/api/schedule/<course_code>")
+def get_schedule_html(course_code: str) -> ResponseReturnValue:
+    """Get schedule as HTML for preview."""
+    import markdown as md  # type: ignore[import-untyped]
+
+    schedule_dir = Config.BUILD_DIR / "schedules"
+    schedule_path = schedule_dir / f"{course_code}_schedule.md"
+
+    if not schedule_path.exists():
+        return jsonify({"error": "Schedule not found"}), 404
+
+    # Read and convert markdown to HTML
+    with open(schedule_path) as f:
+        markdown_content = f.read()
+
+    # Convert to HTML with tables extension
+    html_content = md.markdown(markdown_content, extensions=["tables", "fenced_code", "nl2br"])
+
+    # Wrap in Bootstrap-styled container
+    styled_html = f"""
+    <div class="container-fluid p-4">
+        <style>
+            table {{
+                width: 100%;
+                margin: 1rem 0;
+            }}
+            table, th, td {{
+                border: 1px solid #dee2e6;
+                border-collapse: collapse;
+            }}
+            th, td {{
+                padding: 0.75rem;
+                text-align: left;
+            }}
+            th {{
+                background-color: #f8f9fa;
+                font-weight: 600;
+            }}
+            tr:hover {{
+                background-color: #f8f9fa;
+            }}
+            h1, h2, h3 {{
+                color: #495057;
+                margin-top: 1.5rem;
+                margin-bottom: 1rem;
+            }}
+            ul, ol {{
+                margin-left: 1.5rem;
+            }}
+            code {{
+                background: #f8f9fa;
+                padding: 0.2rem 0.4rem;
+                border-radius: 3px;
+            }}
+        </style>
+        {html_content}
+    </div>
+    """
+
+    return styled_html
+
+
+@app.route("/api/schedule/build/<course_code>", methods=["POST"])
+def build_schedule(course_code: str) -> ResponseReturnValue:
+    """Build schedule for a course."""
+    from scripts.build_schedules import ScheduleBuilder
+
+    try:
+        builder = ScheduleBuilder(output_dir="build/schedules")
+        schedule_path = builder.build_schedule(course_code)
+        return jsonify({"success": True, "path": str(schedule_path)})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/syllabus/pdf/<course_code>")
+@app.route("/api/syllabus/pdf/<course_code>_with_calendar")
+def download_syllabus_pdf(course_code: str) -> ResponseReturnValue:
+    """Download syllabus as PDF."""
+    from flask import abort, send_file
+
+    # Determine if with_calendar variant is requested
+    variant = "_with_calendar" if request.path.endswith("_with_calendar") else ""
+    course_code = course_code.replace("_with_calendar", "")
+
+    # Check if PDF exists
+    pdf_dir = Config.BUILD_DIR / "syllabi" / "pdf"
+    pdf_path = pdf_dir / f"{course_code}{variant}.pdf"
+
+    if not pdf_path.exists():
+        # Try to generate it
+        try:
+            from scripts.build_syllabi import SyllabusBuilder
+
+            builder = SyllabusBuilder()
+            builder.build_syllabus(course_code)
+        except Exception as e:
+            abort(404, f"PDF not available: {e}")
+
+    if pdf_path.exists():
+        return send_file(
+            pdf_path,
+            as_attachment=True,
+            download_name=f"{course_code}_syllabus{variant}.pdf",
+            mimetype="application/pdf",
+        )
+    else:
+        abort(404, "PDF not found")
+
+
+@app.route("/css/<path:filename>")
+def serve_css(filename: str) -> ResponseReturnValue:
+    """Serve CSS files from build/css directory using Flask's send_from_directory."""
+    css_directory = Config.BUILD_DIR / "css"
+    try:
+        return send_from_directory(css_directory, filename, mimetype="text/css")
+    except FileNotFoundError:
+        return "CSS file not found", 404
+
+
+@app.route("/schedules/<course_code>")
+def view_schedule(course_code: str) -> ResponseReturnValue:
+    """Serve HTML schedule for a course."""
+    schedule_file = Path(Config.BUILD_DIR) / "schedules" / f"{course_code}_schedule.html"
+
+    if not schedule_file.exists():
+        # Try to build it
+        result = subprocess.run(
+            [
+                "python",
+                "scripts/build_schedules.py",
+                "--course",
+                course_code,
+                "--output",
+                "build/schedules",
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        if not schedule_file.exists():
+            return f"Schedule not found for {course_code}", 404
+
+    return send_file(schedule_file)
+
+
 @app.route("/syllabi/<course_code>")
 def view_syllabus(course_code: str) -> ResponseReturnValue:
     """Serve generated syllabus for a course."""
@@ -769,7 +937,10 @@ def view_syllabus(course_code: str) -> ResponseReturnValue:
         """
         return html_content
     else:
-        abort(404, f"Syllabus not found for {course_code}{' (with calendar)' if variant=='with_calendar' else ''}")
+        abort(
+            404,
+            f"Syllabus not found for {course_code}{' (with calendar)' if variant=='with_calendar' else ''}",
+        )
 
 
 @app.template_filter("status_icon")
@@ -777,6 +948,396 @@ def status_icon(status: str) -> str:
     """Get icon for status."""
     icons = {"blocked": "🚫", "todo": "📋", "doing": "⚡", "review": "👀", "done": "✅"}
     return icons.get(status, "❓")
+
+
+# Iframe hosting routes for Blackboard Ultra integration
+@app.route("/embed/syllabus/<course_code>")
+def embed_syllabus(course_code: str) -> str:
+    """Serve syllabus optimized for iframe embedding with CORS headers."""
+    syllabus_path = Path(f"build/syllabi/{course_code}.html")
+
+    if syllabus_path.exists():
+        with open(syllabus_path, encoding="utf-8") as f:
+            content = f.read()
+
+        # Add iframe-optimized styling
+        iframe_style = """
+        <style>
+            body {
+                margin: 0;
+                padding: 15px;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                line-height: 1.6;
+            }
+            .container { max-width: 100%; }
+            @media print { body { padding: 0; } }
+        </style>
+        """
+
+        # Insert style before </head>
+        content = content.replace("</head>", f"{iframe_style}</head>")
+
+        response = Response(content, mimetype="text/html")
+        response.headers["X-Frame-Options"] = "ALLOWALL"
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Content-Security-Policy"] = "frame-ancestors *;"
+
+        return response
+
+    return "Syllabus not found", 404
+
+
+@app.route("/embed/schedule/<course_code>")
+def embed_schedule(course_code: str) -> str:
+    """Serve course schedule optimized for iframe embedding."""
+    schedule_path = Path(f"build/schedules/{course_code}.html")
+
+    if schedule_path.exists():
+        with open(schedule_path, encoding="utf-8") as f:
+            content = f.read()
+
+        # Add iframe-optimized styling
+        iframe_style = """
+        <style>
+            body {
+                margin: 0;
+                padding: 15px;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+            th, td {
+                padding: 8px;
+                border: 1px solid #ddd;
+                text-align: left;
+            }
+            th {
+                background-color: #f8f9fa;
+                font-weight: 600;
+            }
+            tr:hover { background-color: #f5f5f5; }
+            @media (max-width: 768px) {
+                body { padding: 10px; }
+                th, td { padding: 5px; font-size: 14px; }
+            }
+        </style>
+        """
+
+        content = content.replace("</head>", f"{iframe_style}</head>")
+
+        response = Response(content, mimetype="text/html")
+        response.headers["X-Frame-Options"] = "ALLOWALL"
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Content-Security-Policy"] = "frame-ancestors *;"
+
+        return response
+
+    return "Schedule not found", 404
+
+
+@app.route("/embed/generator")
+def embed_generator() -> str:
+    """Generate iframe embed codes for Blackboard Ultra."""
+    courses_data = TaskManager.load_courses()
+    courses = [c["code"] for c in courses_data.get("courses", [])]
+    if not courses:  # Fallback
+        courses = ["MATH221", "MATH251", "STAT253"]
+
+    # Use public URL for iframe generation instead of local dev server
+    base_url = Config.PUBLIC_BASE_URL
+
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Blackboard Ultra Embed Code Generator</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            .code-block {{
+                background: #f5f5f5;
+                padding: 15px;
+                border-radius: 5px;
+                font-family: 'Courier New', monospace;
+                font-size: 14px;
+                margin: 10px 0;
+                position: relative;
+            }}
+            .copy-btn {{
+                position: absolute;
+                top: 10px;
+                right: 10px;
+            }}
+            .copied {{
+                background-color: #28a745 !important;
+                border-color: #28a745 !important;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container mt-4">
+            <h1>Blackboard Ultra Embed Code Generator</h1>
+            <p class="lead">Copy and paste these iframe codes into Blackboard Ultra's HTML editor</p>
+
+            <div class="alert alert-info">
+                <h5><i class="bi bi-info-circle"></i> How to Use in Blackboard Ultra</h5>
+                <ol>
+                    <li>In Blackboard Ultra, create a new Content Item or edit existing</li>
+                    <li>Choose "Create" → "Document" or similar content type</li>
+                    <li>Click the HTML source button (&lt;/&gt;) in the editor toolbar</li>
+                    <li>Paste the iframe code below</li>
+                    <li>Click "Save" - content will appear with proper CORS headers</li>
+                    <li><strong>Note:</strong> iframes show live content from your server</li>
+                </ol>
+                <div class="mt-2">
+                    <strong>Public URL:</strong> <code>{base_url}</code><br>
+                    <small class="text-muted">iframes will load content from your production Cloudflare Pages deployment.</small>
+                    <br><small class="text-warning"><i class="bi bi-exclamation-triangle"></i> Ensure content is deployed to production before using these codes!</small>
+                </div>
+            </div>
+    """
+
+    for course in courses:
+        html += f"""
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>{course}</h3>
+                </div>
+                <div class="card-body">
+                    <h5>Syllabus Embed Code:</h5>
+                    <div class="code-block">
+                        <button class="btn btn-sm btn-primary copy-btn" onclick="copyCode(this, 'syllabus-{course}')">Copy</button>
+                        <code id="syllabus-{course}">&lt;iframe src="{base_url}/courses/{course}/fall-2025/syllabus/embed/"
+    width="100%"
+    height="800"
+    frameborder="0"
+    style="border: 1px solid #ddd; border-radius: 4px;"
+    title="{course} Syllabus"&gt;&lt;/iframe&gt;</code>
+                    </div>
+
+                    <h5>Schedule Embed Code:</h5>
+                    <div class="code-block">
+                        <button class="btn btn-sm btn-primary copy-btn" onclick="copyCode(this, 'schedule-{course}')">Copy</button>
+                        <code id="schedule-{course}">&lt;iframe src="{base_url}/courses/{course}/fall-2025/schedule/embed/"
+    width="100%"
+    height="600"
+    frameborder="0"
+    style="border: 1px solid #ddd; border-radius: 4px;"
+    title="{course} Schedule"&gt;&lt;/iframe&gt;</code>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col">
+                            <a href="{base_url}/courses/{course}/fall-2025/syllabus/embed/" target="_blank" class="btn btn-outline-primary">
+                                Preview Syllabus
+                            </a>
+                        </div>
+                        <div class="col">
+                            <a href="{base_url}/courses/{course}/fall-2025/schedule/embed/" target="_blank" class="btn btn-outline-primary">
+                                Preview Schedule
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        """
+
+    html += """
+        </div>
+        <script>
+            function copyCode(btn, codeId) {
+                const code = document.getElementById(codeId).textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    btn.textContent = 'Copied!';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.textContent = 'Copy';
+                        btn.classList.remove('copied');
+                    }, 2000);
+                });
+            }
+        </script>
+    </body>
+    </html>
+    """
+
+    return html
+
+
+@app.route("/api/export/docx")
+def export_docx() -> ResponseReturnValue:
+    """Export all syllabi and schedules as DOCX files using pandoc."""
+    import subprocess
+    import tempfile
+    import zipfile
+
+    try:
+        # Create temporary directory for DOCX files
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            zip_path = temp_path / "course_materials.zip"
+
+            # Get course codes
+            courses_data = TaskManager.load_courses()
+            course_codes = [c["code"] for c in courses_data.get("courses", [])]
+
+            # Create ZIP file with all DOCX exports
+            with zipfile.ZipFile(zip_path, "w") as zip_file:
+                for course_code in course_codes:
+                    # Convert syllabus to DOCX
+                    syllabus_html = Config.SYLLABI_DIR / f"{course_code}.html"
+                    if syllabus_html.exists():
+                        syllabus_docx = temp_path / f"{course_code}_syllabus.docx"
+                        subprocess.run(
+                            [
+                                "pandoc",
+                                str(syllabus_html),
+                                "-o",
+                                str(syllabus_docx),
+                                "--from=html",
+                                "--to=docx",
+                            ],
+                            check=True,
+                        )
+                        zip_file.write(syllabus_docx, f"{course_code}_syllabus.docx")
+
+                    # Convert schedule to DOCX if it exists
+                    schedule_html = Config.SCHEDULES_DIR / f"{course_code}.html"
+                    if schedule_html.exists():
+                        schedule_docx = temp_path / f"{course_code}_schedule.docx"
+                        subprocess.run(
+                            [
+                                "pandoc",
+                                str(schedule_html),
+                                "-o",
+                                str(schedule_docx),
+                                "--from=html",
+                                "--to=docx",
+                            ],
+                            check=True,
+                        )
+                        zip_file.write(schedule_docx, f"{course_code}_schedule.docx")
+
+                # Create combined document for admin
+                combined_html = temp_path / "combined.html"
+                with open(combined_html, "w") as f:
+                    f.write(
+                        "<html><head><title>All Course Materials - Fall 2025</title></head><body>"
+                    )
+                    f.write("<h1>Course Materials - Fall 2025</h1>")
+
+                    for course_code in course_codes:
+                        syllabus_html = Config.SYLLABI_DIR / f"{course_code}.html"
+                        schedule_html = Config.SCHEDULES_DIR / f"{course_code}.html"
+
+                        f.write(f"<h2>{course_code}</h2>")
+
+                        if syllabus_html.exists():
+                            f.write(f"<h3>{course_code} Syllabus</h3>")
+                            f.write(syllabus_html.read_text())
+                            f.write("<div style='page-break-after: always;'></div>")
+
+                        if schedule_html.exists():
+                            f.write(f"<h3>{course_code} Schedule</h3>")
+                            f.write(schedule_html.read_text())
+                            f.write("<div style='page-break-after: always;'></div>")
+
+                    f.write("</body></html>")
+
+                # Convert combined document to DOCX
+                combined_docx = temp_path / "combined_all_courses.docx"
+                subprocess.run(
+                    [
+                        "pandoc",
+                        str(combined_html),
+                        "-o",
+                        str(combined_docx),
+                        "--from=html",
+                        "--to=docx",
+                    ],
+                    check=True,
+                )
+                zip_file.write(combined_docx, "combined_all_courses.docx")
+
+            return send_file(
+                zip_path,
+                as_attachment=True,
+                download_name="course_materials_fall2025.zip",
+                mimetype="application/zip",
+            )
+
+    except subprocess.CalledProcessError as e:
+        return jsonify({"error": f"Pandoc conversion failed: {e}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"Export failed: {e}"}), 500
+
+
+@app.route("/api/orchestrate", methods=["POST"])
+def api_orchestrate() -> ResponseReturnValue:
+    """Analyze and orchestrate task execution."""
+    data = TaskManager.load_tasks()
+    tasks = data.get("tasks", [])
+
+    # Analyze task graph
+    analysis = orchestrator.analyze_task_graph(tasks)
+
+    # Get suggestions for next tasks
+    completed = [t["id"] for t in tasks if t.get("status") == "done"]
+    available = [t for t in tasks if t.get("status") in ["todo", "blocked"]]
+    suggestions = orchestrator.suggest_next_tasks(completed, available)
+
+    # Convert sets to lists for JSON serialization
+    if "parallel_groups" in analysis:
+        analysis["parallel_groups"] = [list(group) for group in analysis["parallel_groups"]]
+
+    return jsonify(
+        {
+            "analysis": analysis,
+            "suggestions": [{"task_id": tid, "confidence": score} for tid, score in suggestions],
+            "agent_status": agent_coordinator.get_agent_status(),
+        }
+    )
+
+
+@app.route("/api/agent/register", methods=["POST"])
+def api_register_agent() -> ResponseReturnValue:
+    """Register a new agent with capabilities."""
+    body = request.get_json(silent=True) or {}
+    agent_id = body.get("agent_id")
+    capabilities = body.get("capabilities", [])
+
+    if not agent_id:
+        return jsonify({"error": "Missing agent_id"}), 400
+
+    agent_coordinator.register_agent(agent_id, capabilities)
+
+    return jsonify({"success": True, "agent_id": agent_id})
+
+
+@app.route("/api/agent/assign", methods=["POST"])
+def api_assign_task() -> ResponseReturnValue:
+    """Assign a task to an available agent."""
+    body = request.get_json(silent=True) or {}
+    task_id = body.get("task_id")
+
+    if not task_id:
+        return jsonify({"error": "Missing task_id"}), 400
+
+    # Load task data
+    data = TaskManager.load_tasks()
+    task = next((t for t in data.get("tasks", []) if t["id"] == task_id), None)
+
+    if not task:
+        return jsonify({"error": "Task not found"}), 404
+
+    assigned_agent = agent_coordinator.assign_task(task)
+
+    if assigned_agent:
+        return jsonify({"success": True, "agent_id": assigned_agent})
+    else:
+        return jsonify({"error": "No available agent for task"}), 503
 
 
 if __name__ == "__main__":

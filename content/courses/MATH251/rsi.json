@@ -1,3 +1,28 @@
 {
-  "text": "Fully asynchronous course with regular and substantive interaction through: (1) Detailed, personalized feedback on assignments within two weeks, (2) Weekly announcements and Zoom office hours, (3) Active participation in weekly discussion board, (4) Personal check-ins throughout semester."
+  "course_description": "A first course in single-variable calculus. Topics include limits; continuity and differentiation of functions; applications of the derivative to graphing, optimization and rates of change; definite and indefinite integration; and the fundamental theorem of calculus.",
+  "student_learning_outcomes": [
+    "Understand and apply the concept of a limit",
+    "Understand and apply the concepts of differentiation and integration, and their relationship as expressed by the Fundamental Theorem of Calculus",
+    "Proficiently calculate derivatives, and definite and indefinite integrals by means of substitution",
+    "Apply the derivative in modeling settings, such as for graphing, optimization, and related rates problems"
+  ],
+  "required_materials": {
+    "textbook": "Calculus: Early Transcendentals",
+    "platform": "Edfinity",
+    "technology": "Graphing calculator or computer algebra system"
+  },
+  "evaluation_grading": {
+    "categories": [
+      {"name": "Edfinity Homework", "weight": 30},
+      {"name": "Weekly Quizzes", "weight": 20},
+      {"name": "Midterm Exams", "weight": 30},
+      {"name": "Final Exam", "weight": 20}
+    ],
+    "grading_scale": "Standard 90-80-70-60 scale"
+  },
+  "course_policies": {
+    "interaction": "This fully online, asynchronous course includes weekly, instructor-initiated interaction through: (1) weekly content-focused announcements and guidance; (2) individualized, timely feedback on assignments and assessments; (3) scheduled Zoom office hours and optional study sessions; and (4) proactive check-ins via email/Blackboard. Instructor replies within one business day; feedback on assignments within one week (up to two weeks for major exams/projects).",
+    "attendance": "No physical attendance required - online course",
+    "late_policy": "Assignments accepted late with penalty as specified in course"
+  }
 }

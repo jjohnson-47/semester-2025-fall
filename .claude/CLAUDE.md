@@ -216,6 +216,57 @@ semester-2025-fall/
 - Print-optimized stylesheets
 - Consistent navigation structure
 
+## Agentic Orchestration System (August 2025)
+
+### Available Orchestration Patterns
+
+#### Multi-Agent Workflows
+
+- Use **Task tool** for spawning specialized subagents
+- Prefix complex requests with **"think hard"** for deep analysis
+- Use **"/semester-prep"** for complete semester preparation
+- Use **"/agentic-debug"** for complex debugging workflows
+
+#### Specialized Subagents
+
+- **orchestrator**: Master coordinator (always start here for complex tasks)
+- **qa-validator**: JSON validation, RSI compliance, date consistency
+- **course-content**: Syllabus generation, schedule building, material creation
+- **calendar-sync**: Date propagation, deadline management, conflict resolution
+- **deploy-manager**: Site building, iframe setup, Cloudflare deployment
+- **docs-keeper**: Documentation updates, decision tracking
+
+#### Orchestration Commands
+
+```bash
+/semester-prep "Prepare Fall 2025 for launch"    # Complete preparation workflow
+/agentic-debug "Fix MATH221 validation errors"   # Multi-agent debugging
+/think hard about semester architecture          # Deep analysis with Opus
+```
+
+### Agent Coordination Patterns
+
+#### Sequential Pipeline
+
+User Request → qa-validator → course-content → calendar-sync → deploy-manager → docs-keeper
+
+#### Parallel Execution
+
+User Request → [MATH221 + MATH251 + STAT253] (simultaneously) → Merge Results
+
+#### Quality Gates
+
+Each phase includes validation checkpoints that must pass before proceeding to next phase
+
+### TodoWrite Integration
+
+The orchestrator automatically creates TodoWrite lists for complex workflows:
+
+1. Breaks multi-step operations into trackable tasks
+2. Assigns agents to specific tasks
+3. Tracks progress through completion
+4. Maintains context across agent handoffs
+
 ## Model-Specific Instructions
 
 ### For Quick Tasks (Haiku)
@@ -224,11 +275,11 @@ Focus on simple file edits, validation runs, and status checks
 
 ### For Standard Work (Sonnet)
 
-Handle syllabus generation, dashboard updates, and dependency management
+Handle syllabus generation, dashboard updates, dependency management, and agent coordination
 
-### For Architecture (Opus)
+### For Architecture & Orchestration (Opus)
 
-Design new features, refactor systems, solve complex integration issues
+Design new features, refactor systems, solve complex integration issues, and coordinate multi-agent workflows
 
 ## Remember
 

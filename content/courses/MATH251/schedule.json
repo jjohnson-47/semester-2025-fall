@@ -1,20 +1,193 @@
 {
   "weeks": [
-    {"week": 1, "topic": "Measuring velocity and the notion of a limit", "readings": ["1.1", "1.2"], "assignments": ["Prerequisites Review", "Edfinity 1.1-1.2"], "assessments": ["Week 1 Quiz"], "notes": ""},
-    {"week": 2, "topic": "Finding limits and continuity", "readings": ["1.7"], "assignments": ["BB1 Evaluating Limits", "Edfinity 1.7"], "assessments": ["Week 2 Quiz"], "notes": "Labor Day week"},
-    {"week": 3, "topic": "The derivative of a function", "readings": ["1.3", "1.4"], "assignments": ["BB2 Derivative function", "Edfinity 1.3-1.4"], "assessments": ["Week 3 Quiz"], "notes": ""},
-    {"week": 4, "topic": "Interpreting derivatives and second derivatives", "readings": ["1.5", "1.6"], "assignments": ["BB3 Second derivatives", "Written Problems 1"], "assessments": ["Week 4 Quiz"], "notes": ""},
-    {"week": 5, "topic": "Tangent lines and derivative rules", "readings": ["1.8", "2.1"], "assignments": ["BB4 Linear approximations", "Edfinity 1.8-2.1"], "assessments": ["Week 5 Quiz"], "notes": ""},
-    {"week": 6, "topic": "Trig derivatives, product and quotient rules", "readings": ["2.2", "2.3"], "assignments": ["BB5 Trig derivatives", "Edfinity 2.2-2.3"], "assessments": ["Week 6 Quiz"], "notes": ""},
-    {"week": 7, "topic": "Chain rule and advanced derivatives", "readings": ["2.4", "2.5"], "assignments": ["BB6 Chain rule", "Written Problems 2"], "assessments": ["Week 7 Quiz"], "notes": ""},
-    {"week": 8, "topic": "Inverse and implicit functions", "readings": ["2.6", "2.7"], "assignments": ["BB7 Inverse Functions", "Edfinity 2.6-2.7"], "assessments": ["Week 8 Quiz", "Midterm Exam"], "notes": ""},
-    {"week": 9, "topic": "L'Hopital's Rule and extreme values", "readings": ["2.8", "3.1"], "assignments": ["BB8 L'Hopital's Rule", "Written Problems 3"], "assessments": [], "notes": ""},
-    {"week": 10, "topic": "Global optimization", "readings": ["3.2", "3.3"], "assignments": ["BB9 Optimization", "Edfinity 3.2-3.3"], "assessments": ["Week 10 Quiz"], "notes": ""},
-    {"week": 11, "topic": "Applied optimization and related rates", "readings": ["3.4", "3.5", "4.1"], "assignments": ["BB10 Related Rates", "Written Problems 4"], "assessments": ["Week 11 Quiz"], "notes": ""},
-    {"week": 12, "topic": "Riemann sums and definite integral", "readings": ["4.2", "4.3"], "assignments": ["BB11 Summation Notation", "Edfinity 4.1-4.3"], "assessments": ["Week 12 Quiz"], "notes": ""},
-    {"week": 13, "topic": "Fundamental Theorem of Calculus", "readings": ["4.4", "5.1", "5.2"], "assignments": ["BB12 Antiderivatives", "Written Problems 5"], "assessments": ["Week 13 Quiz"], "notes": ""},
-    {"week": 14, "topic": "Integration techniques", "readings": ["5.3", "5.4"], "assignments": ["BB13 Integration", "Edfinity 5.3-5.4"], "assessments": ["Week 14 Quiz"], "notes": "Thanksgiving week"},
-    {"week": 15, "topic": "Review week", "readings": [], "assignments": ["BB14 Looking Ahead"], "assessments": [], "notes": ""}
+    {
+      "week": 1,
+      "topic": "Measuring Velocity and The Notion of a Limit",
+      "readings": ["1.1", "1.2"],
+      "assignments": [
+        "Week 1 Quiz",
+        "Prerequisites for Calculus 1",
+        "Edfinity Homework: Review of Prerequisites, Section 1.1 & 1.2"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 2,
+      "topic": "Finding Limits and Continuity",
+      "readings": ["1.7", "Finding Limits Supplement"],
+      "assignments": [
+        "Week 2 Quiz",
+        "Blackboard: BB1 Evaluating Limits",
+        "Edfinity: Section 1.7",
+        "Edfinity: Finding Limits"
+      ],
+      "assessments": [],
+      "notes": "Labor Day - Monday, September 1"
+    },
+    {
+      "week": 3,
+      "topic": "The Derivative at a Point and The Derivative Function",
+      "readings": ["1.3", "1.4"],
+      "assignments": [
+        "Week 3 Quiz",
+        "Blackboard: BB2 The derivative function",
+        "Edfinity Homework: Sections 1.3 & 1.4"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 4,
+      "topic": "Interpreting Derivatives and The Second Derivative",
+      "readings": ["1.5", "1.6"],
+      "assignments": [
+        "Week 4 Quiz",
+        "Blackboard: BB3 Second derivatives and interpretation",
+        "Edfinity Homework: Sections 1.5 & 1.6",
+        "Written Problems #1"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 5,
+      "topic": "Tangent Line Approximations and Derivative Rules",
+      "readings": ["1.8", "2.1"],
+      "assignments": [
+        "Week 5 Quiz",
+        "Blackboard: BB4 Linear approximations",
+        "Edfinity Homework: Sections 1.8 & 2.1"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 6,
+      "topic": "Trig Derivatives, Product and Quotient Rules",
+      "readings": ["2.2", "2.3"],
+      "assignments": [
+        "Week 6 Quiz",
+        "Blackboard: BB5 Derivatives of sine and cosine",
+        "Edfinity Homework: Sections 2.2 & 2.3"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 7,
+      "topic": "Other Trig Derivatives and The Chain Rule",
+      "readings": ["2.4", "2.5"],
+      "assignments": [
+        "Week 7 Quiz",
+        "Blackboard: BB6 The chain rule",
+        "Edfinity Homework: Sections 2.4 & 2.5",
+        "Written Problems #2"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 8,
+      "topic": "Inverse Functions and Implicit Differentiation",
+      "readings": ["2.6", "2.7"],
+      "assignments": [
+        "Week 8 Quiz",
+        "Blackboard: BB7 Inverse Functions",
+        "Edfinity Homework: Sections 2.6 & 2.7"
+      ],
+      "assessments": ["Midterm Exam"],
+      "notes": "Midterm closes Monday, October 20"
+    },
+    {
+      "week": 9,
+      "topic": "L'Hôpital's Rule and Finding Extreme Values",
+      "readings": ["2.8", "3.1"],
+      "assignments": [
+        "Blackboard: BB8 L'hopital's Rule",
+        "Edfinity Homework: Sections 2.8 & 3.1",
+        "Written Problems #3"
+      ],
+      "assessments": [],
+      "notes": "No Week 9 Quiz"
+    },
+    {
+      "week": 10,
+      "topic": "Families of Functions and Global Optimization",
+      "readings": ["3.2", "3.3"],
+      "assignments": [
+        "Week 10 Quiz",
+        "Blackboard: BB9 Optimization with Calculus",
+        "Edfinity Homework: Sections 3.2 & 3.3"
+      ],
+      "assessments": [],
+      "notes": "October 31: Last day for withdrawal"
+    },
+    {
+      "week": 11,
+      "topic": "Applied Optimization, Related Rates, Distance from Velocity",
+      "readings": ["3.4", "3.5", "4.1"],
+      "assignments": [
+        "Week 11 Quiz",
+        "Blackboard: BB10 Related Rates",
+        "Edfinity Homework: Sections 3.4, 3.5 & 4.1",
+        "Written Problems #4"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 12,
+      "topic": "Riemann Sums and The Definite Integral",
+      "readings": ["4.2", "4.3"],
+      "assignments": [
+        "Week 12 Quiz",
+        "Blackboard: BB11 Summation Notation",
+        "Edfinity Homework: Sections 4.1 - 4.3"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 13,
+      "topic": "Fundamental Theorem of Calculus and Antiderivatives",
+      "readings": ["4.4", "5.1", "5.2"],
+      "assignments": [
+        "Week 13 Quiz",
+        "Blackboard: BB12 Riemann Sums and Antiderivatives",
+        "Edfinity Homework: Sections 4.4, 5.1-5.2",
+        "Written Problems #5"
+      ],
+      "assessments": [],
+      "notes": ""
+    },
+    {
+      "week": 14,
+      "topic": "Integration by Substitution and Parts",
+      "readings": ["5.3", "5.4"],
+      "assignments": [
+        "Week 14 Quiz",
+        "Blackboard: BB13 Techniques of Integration",
+        "Edfinity Homework: Sections 5.3 & 5.4"
+      ],
+      "assessments": [],
+      "notes": "Non-Teaching Day Wednesday, Fall Break Thursday-Friday"
+    },
+    {
+      "week": 15,
+      "topic": "Review and Final Preparation",
+      "readings": [],
+      "assignments": [
+        "Blackboard BB14: Looking Ahead",
+        "Final exam review materials"
+      ],
+      "assessments": [],
+      "notes": "Last day of classes December 5"
+    }
   ],
-  "finals": {"topic": "Final Exam", "assessments": ["Final Exam (Proctored)"], "notes": "Comprehensive final exam"}
+  "finals": {
+    "topic": "Final Exam",
+    "assessments": ["Final Exam (Proctored)"],
+    "notes": "Due by Friday, December 12 at 11:59 PM"
+  }
 }
