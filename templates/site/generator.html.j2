@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Iframe Code Generator</title>
+    <style>
+      body { 
+        font-family: system-ui, sans-serif; 
+        max-width: 800px; 
+        margin: 2rem auto; 
+        padding: 1rem;
+        line-height: 1.6;
+      }
+      h1 { color: #0051c3; }
+      .form-group { margin: 1rem 0; }
+      label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+      select, input { 
+        width: 100%; 
+        padding: 0.5rem; 
+        border: 1px solid #ddd; 
+        border-radius: 4px; 
+        font-size: 1rem;
+      }
+      .code-output {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 1rem;
+        margin: 1rem 0;
+        font-family: 'Courier New', monospace;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+      button {
+        background: #0051c3;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+      button:hover { background: #003d94; }
+      .preview {
+        border: 1px solid #ccc;
+        margin: 1rem 0;
+        min-height: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Iframe Code Generator</h1>
+    <p>Generate iframe embedding code for course materials in Blackboard Ultra.</p>
+
+    <div class="form-group">
+      <label for="course">Course:</label>
+      <select id="course">
+        <option value="">Select Course</option>
+        <option value="MATH221">MATH221 - Applied Calculus</option>
+        <option value="MATH251">MATH251 - Calculus I</option>
+        <option value="STAT253">STAT253 - Statistics</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="type">Content Type:</label>
+      <select id="type">
+        <option value="">Select Type</option>
+        <option value="syllabus">Syllabus</option>
+        <option value="schedule">Schedule</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="height">Height (pixels):</label>
+      <input type="number" id="height" value="600" min="300" max="1200">
+    </div>
+
+    <button onclick="generateCode()">Generate Iframe Code</button>
+
+    <div id="output" class="code-output" style="display: none;"></div>
+
+    <h3>Preview:</h3>
+    <div id="preview" class="preview"></div>
+
+    <script>
+      const baseUrl = window.location.origin;
+      
+      function generateCode() {
+        const course = document.getElementById('course').value;
+        const type = document.getElementById('type').value;
+        const height = document.getElementById('height').value;
+
+        if (!course || !type) {
+          alert('Please select both course and content type.');
+          return;
+        }
+
+        const url = `${baseUrl}/courses/${course}/fall-2025/${type}/embed/`;
+        const iframeCode = `<iframe src="${url}" width="100%" height="${height}" frameborder="0" style="border: 1px solid #ccc; border-radius: 4px;"></iframe>`;
+
+        document.getElementById('output').style.display = 'block';
+        document.getElementById('output').textContent = iframeCode;
+
+        // Update preview
+        document.getElementById('preview').innerHTML = iframeCode;
+      }
+
+      // Auto-generate when all fields are filled
+      ['course', 'type', 'height'].forEach(id => {
+        document.getElementById(id).addEventListener('change', () => {
+          const course = document.getElementById('course').value;
+          const type = document.getElementById('type').value;
+          if (course && type) {
+            generateCode();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

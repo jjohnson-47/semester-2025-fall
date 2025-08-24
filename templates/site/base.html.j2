@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Course Page{% endblock %}</title>
+    {% if not EMBED_MODE %}
+    <link rel="stylesheet" href="/assets/css/course.css">
+    {% else %}
+    <style>
+      /* Minimal embed-safe defaults to avoid external dependencies */
+      :root { --content-max: 1000px; }
+      body { margin: 0; font-family: system-ui, sans-serif; }
+      .embed-content { max-width: var(--content-max); margin: 0 auto; padding: 1rem; }
+    </style>
+    {% endif %}
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    {% if not EMBED_MODE %}
+    <header style="border-bottom:1px solid #eee;padding:0.75rem 1rem;margin-bottom:1rem">
+      <strong>Course Pages</strong>
+    </header>
+    {% endif %}
+    {% block body %}{% endblock %}
+    {% if not EMBED_MODE %}
+    <footer style="border-top:1px solid #eee;margin-top:2rem;padding:1rem;color:#666">
+      <small>Generated {{ now().strftime('%Y-%m-%d %H:%M') }}</small>
+    </footer>
+    {% endif %}
+  </body>
+  </html>
+

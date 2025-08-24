@@ -1,0 +1,32 @@
+{% extends "base.html.j2" %}
+{% set EMBED_MODE = false %}
+{% block title %}{{ course_code }} Schedule{% endblock %}
+{% block body %}
+<main class="full-content" style="max-width:1000px;margin:0 auto;padding:1rem">
+  <h1 style="margin-top:0">{{ course_code }} – Course Schedule</h1>
+  <link rel="stylesheet" href="/assets/courses/{{ course_code }}.css">
+
+  <section aria-labelledby="section-overview">
+    <h2 id="section-overview">Overview</h2>
+    <p>Term: {{ semester }} {{ year }}</p>
+    <p>Section: {{ course_section | default('901') }}</p>
+  </section>
+
+  <section aria-labelledby="section-instructor">
+    <h2 id="section-instructor">Instructor</h2>
+    <p><strong>{{ instructor.name }}</strong> &lt;<a href="mailto:{{ instructor.email }}">{{ instructor.email }}</a>&gt;</p>
+  </section>
+
+  {% if schedule_content %}
+  <section aria-labelledby="section-schedule">
+    <h2 id="section-schedule">Course Schedule</h2>
+    <div>{{ schedule_content | safe }}</div>
+  </section>
+  {% endif %}
+
+  <section aria-labelledby="section-policies">
+    <h2 id="section-policies">Additional Information</h2>
+    <p>See Blackboard for detailed assignment descriptions and submission requirements.</p>
+  </section>
+</main>
+{% endblock %}

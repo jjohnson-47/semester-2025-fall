@@ -1,0 +1,28 @@
+{% extends "base.html.j2" %}
+{% set EMBED_MODE = true %}
+{% block title %}{{ course_code }} Syllabus (Embed){% endblock %}
+{% block body %}
+<main class="embed-content">
+  <h1 style="margin-top:0">{{ course_code }} – {{ course_name_full }}</h1>
+  <section aria-labelledby="section-overview">
+    <h2 id="section-overview">Overview</h2>
+    <p>Term: {{ semester }} {{ year }}</p>
+    <p>Section: {{ course_section | default('901') }}</p>
+  </section>
+
+  <section aria-labelledby="section-instructor">
+    <h2 id="section-instructor">Instructor</h2>
+    <p><strong>{{ instructor.name }}</strong> &lt;<a href="mailto:{{ instructor.email }}">{{ instructor.email }}</a>&gt;</p>
+  </section>
+
+  {% if schedule_markdown %}
+  <section aria-labelledby="section-schedule">
+    <h2 id="section-schedule">Schedule (Summary)</h2>
+    <div>{{ schedule_markdown | markdown | safe }}</div>
+  </section>
+  {% endif %}
+
+  <p style="margin-top:1rem;font-size:0.9rem;color:#666">For official syllabus details, see Blackboard.</p>
+</main>
+{% endblock %}
+
