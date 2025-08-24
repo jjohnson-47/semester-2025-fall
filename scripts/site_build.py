@@ -21,6 +21,7 @@ import argparse
 import json
 import os
 import shutil
+import sys
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -28,8 +29,6 @@ from typing import Any
 
 # Ensure project root is on path
 PROJECT_ROOT = Path(__file__).parent.parent
-import sys
-
 sys.path.insert(0, str(PROJECT_ROOT))
 
 # Reuse existing builders for data/context
@@ -97,7 +96,7 @@ def build_syllabus_pages(
     course_code: str,
     sb: SyllabusBuilder,
     schedule_builder: ScheduleBuilder,
-    env,
+    env: str,  # noqa: ARG001
     term: str,
     out_dir: Path,
     jinja_templates: Path,
@@ -172,6 +171,81 @@ def write_manifest(
     (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
 
+def create_default_index(courses: list[str], term: str) -> str:  # noqa: ARG001
+    """Create default index.html content for the landing page."""
+    course_divs = "\n        ".join(f'<div class="course">{course}</div>' for course in courses)
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Materials - Fall 2025</title>
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 20px;
+            text-align: center;
+            color: #333;
+        }}
+        h1 {{
+            color: #0051c3;
+            font-size: 2.5em;
+            margin-bottom: 0.5em;
+        }}
+        p {{
+            font-size: 1.2em;
+            line-height: 1.6;
+            color: #666;
+        }}
+        .status {{
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }}
+        .courses {{
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }}
+        .course {{
+            padding: 10px 20px;
+            background: #e8f4f8;
+            border-radius: 5px;
+            font-weight: 500;
+        }}
+        code {{
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: "Courier New", monospace;
+        }}
+    </style>
+</head>
+<body>
+    <h1>Course Materials</h1>
+    <p>Fall 2025 Semester</p>
+
+    <div class="status">
+        <p><strong>🚧 Site Under Construction</strong></p>
+        <p>Course materials will be available here soon.</p>
+    </div>
+
+    <div class="courses">
+        {course_divs}
+    </div>
+
+    <p style="margin-top: 50px; font-size: 0.9em; color: #999;">
+        API Status: <code><a href="/manifest.json" style="color: inherit;">manifest.json</a></code> available
+    </p>
+</body>
+</html>"""
+
+
 def copy_cf_headers_redirects(out_dir: Path, env: str) -> None:
     """Copy Cloudflare headers and redirects to the site root if present."""
     cf_dir = PROJECT_ROOT / "cloudflare"
@@ -188,6 +262,18 @@ def copy_cf_headers_redirects(out_dir: Path, env: str) -> None:
 
 def build_site(cfg: SiteConfig, include_docs: list[str], exclude_docs: list[str]) -> None:
     ensure_dir(cfg.out_dir)
+
+    # Create or preserve index.html
+    index_path = cfg.out_dir / "index.html"
+    if not index_path.exists():
+        # Create default index.html
+        index_content = create_default_index(cfg.courses, cfg.term)
+        index_path.write_text(index_content)
+        preserve_index = False
+    else:
+        # Preserve existing index.html
+        index_content = index_path.read_text()
+        preserve_index = True
     # Prepare shared builders
     sb = SyllabusBuilder(template_dir="templates", output_dir="build/syllabi")
     schedule_builder = ScheduleBuilder(output_dir="build/schedules")
@@ -202,8 +288,8 @@ def build_site(cfg: SiteConfig, include_docs: list[str], exclude_docs: list[str]
     ensure_dir(out_assets)
 
     # Determine doc filters
-    allowlist = set(d.strip().lower() for d in include_docs if d)
-    denylist = set(d.strip().lower() for d in exclude_docs if d)
+    allowlist = {d.strip().lower() for d in include_docs if d}
+    denylist = {d.strip().lower() for d in exclude_docs if d}
 
     for course in cfg.courses:
         # Copy just-needed assets (safe if missing)
@@ -233,6 +319,10 @@ def build_site(cfg: SiteConfig, include_docs: list[str], exclude_docs: list[str]
     # Write manifest and copy CF config
     write_manifest(cfg.out_dir, cfg.term, cfg.courses, results)
     copy_cf_headers_redirects(cfg.out_dir, cfg.env)
+
+    # Restore index.html if it was preserved
+    if preserve_index and index_content:
+        index_path.write_text(index_content)
 
 
 def parse_args() -> argparse.Namespace:
