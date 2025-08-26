@@ -4,8 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ course.code }} Schedule — {{ semester.name }} {{ semester.year }}</title>
-    <link rel="stylesheet" href="../css/course.css">
-    <link rel="stylesheet" href="../css/courses/{{ course.code }}.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/course.css">
+    <link rel="stylesheet" href="/assets/css/courses/{{ course.code }}.css">
     <style>
       /* Page-specific overrides for schedule layout */
       .course-info, .important-dates {
@@ -14,10 +17,65 @@
         border-radius: var(--border-radius);
         margin: var(--spacing-md) 0;
       }
+      
+      /* Schedule-specific styling */
+      .schedule-table {
+        margin-top: var(--spacing-lg);
+      }
+      
+      .week-header {
+        font-weight: 600;
+        text-align: center;
+        background: var(--bg-secondary);
+      }
+      
+      .holiday-row {
+        background-color: var(--bg-highlight, #fff9e6);
+      }
+      
+      .exam-row td {
+        font-weight: 500;
+      }
+      
+      .finals-row {
+        background: linear-gradient(135deg, #fff5f5, #fff0f0);
+        font-weight: 600;
+      }
+      
+      .legend {
+        margin-top: var(--spacing-xl);
+        padding: var(--spacing-md);
+        background: var(--bg-secondary);
+        border-radius: var(--border-radius);
+      }
+      
+      .legend-item {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        margin: 0.25rem;
+        border-radius: var(--border-radius);
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+      
+      .legend-item.holiday {
+        background-color: #fff9e6;
+        color: #d97706;
+      }
+      
+      .legend-item.exam {
+        background-color: #f0f9ff;
+        color: #0369a1;
+      }
+      
+      .legend-item.finals {
+        background-color: #fff5f5;
+        color: #dc2626;
+      }
     </style>
   </head>
   <body>
-    <div class="container">
+    <div class="syllabus-container">
       <h1>Course Schedule</h1>
 
       <div class="course-info">
@@ -44,7 +102,7 @@
       <h2>Weekly Schedule</h2>
       <p><em>This schedule is subject to change. Updates are posted in Blackboard.</em></p>
 
-      <table>
+      <table class="schedule-table evaluation-table">
         <thead>
           <tr>
             <th style="width: 8%;">Week</th>

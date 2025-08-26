@@ -1,0 +1,346 @@
+/* Root CSS - Professional baseline styling for all courses */
+
+/* CSS Custom Properties (Variables) */
+:root {
+  /* Typography - Blackboard-compatible fonts */
+  --font-family-primary: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-secondary: "Open Sans", Georgia, "Times New Roman", serif;
+  --font-family-mono: "Courier New", Monaco, Consolas, monospace;
+  
+  /* Font Sizes */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* Layout */
+  --content-max-width: 65ch;
+  --content-wide-max-width: 80ch;
+  --border-radius: 0.375rem;
+  --border-radius-lg: 0.5rem;
+  
+  /* Colors - Blackboard-compatible accessible palette */
+  --color-primary: #0066cc;        /* Blue - Blackboard accessible */
+  --color-primary-light: #3399ff;
+  --color-primary-dark: #004499;
+  
+  --color-secondary: #666666;      /* Gray - Blackboard accessible */
+  --color-secondary-light: #999999;
+  --color-secondary-dark: #333333;
+  
+  --color-accent: #009900;         /* Green - Blackboard accessible */
+  --color-accent-light: #33cc33;
+  
+  --color-text: #000000;           /* Black - Blackboard accessible */
+  --color-text-light: #666666;    /* Gray - Blackboard accessible */
+  --color-text-muted: #999999;
+  
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-highlight: #fef3c7;
+  
+  /* Border */
+  --border-color: #e5e7eb;
+  --border-color-dark: #d1d5db;
+  
+  /* Shadows */
+  --box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text: #f9fafb;
+    --color-text-light: #d1d5db;
+    --color-text-muted: #9ca3af;
+    
+    --bg-primary: #111827;
+    --bg-secondary: #1f2937;
+    --bg-tertiary: #374151;
+    --bg-highlight: #451a03;
+    
+    --border-color: #374151;
+    --border-color-dark: #4b5563;
+  }
+}
+
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--color-text);
+  background-color: var(--bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.25;
+  margin-bottom: var(--spacing-md);
+  color: var(--color-primary);
+}
+
+h1 {
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--spacing-xl);
+  border-bottom: 3px solid var(--color-primary);
+  padding-bottom: var(--spacing-md);
+}
+
+h2 {
+  font-size: var(--font-size-2xl);
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--spacing-sm);
+}
+
+h3 {
+  font-size: var(--font-size-xl);
+  margin-top: var(--spacing-lg);
+  color: var(--color-secondary-dark);
+}
+
+h4 {
+  font-size: var(--font-size-lg);
+  color: var(--color-secondary-dark);
+}
+
+p {
+  margin-bottom: var(--spacing-md);
+  max-width: var(--content-max-width);
+}
+
+/* Links */
+a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.125em;
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+  text-decoration: none;
+}
+
+/* Lists */
+ul, ol {
+  margin-bottom: var(--spacing-md);
+  padding-left: var(--spacing-xl);
+}
+
+li {
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--spacing-lg);
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+}
+
+thead {
+  background-color: var(--bg-secondary);
+}
+
+th, td {
+  padding: var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+th {
+  font-weight: 600;
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+tbody tr:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* Form elements */
+input, select, textarea {
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--bg-primary);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Utility classes */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-muted { color: var(--color-text-muted); }
+.text-small { font-size: var(--font-size-sm); }
+.font-mono { font-family: var(--font-family-mono); }
+
+.mb-0 { margin-bottom: 0; }
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+
+.mt-0 { margin-top: 0; }
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+
+/* Blackboard iframe optimizations */
+.blackboard-iframe-content {
+  padding: 1rem;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Enhanced mobile support for Blackboard Ultra */
+@media screen and (max-width: 768px) {
+  body {
+    font-size: 0.875rem;
+    padding: 0.5rem;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  h2 {
+    font-size: 1.25rem;
+    margin-top: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  h3 {
+    font-size: 1.1rem;
+    margin-top: 0.75rem;
+  }
+  
+  table {
+    font-size: 0.8rem;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .syllabus-container {
+    padding: 0.5rem;
+    margin: 0;
+  }
+  
+  /* Stack table cells on very small screens */
+  @media screen and (max-width: 480px) {
+    table, thead, tbody, th, td, tr {
+      display: block;
+    }
+    
+    th {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    
+    tr {
+      border: 1px solid var(--border-color);
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+    }
+    
+    td {
+      border: none;
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
+      padding: 0.5rem 0.5rem 0.5rem 35%;
+      white-space: normal;
+      text-align: left;
+    }
+    
+    td:before {
+      content: attr(data-label) ": ";
+      position: absolute;
+      left: 0.5rem;
+      width: 30%;
+      padding-right: 0.5rem;
+      white-space: nowrap;
+      font-weight: bold;
+      text-align: left;
+    }
+  }
+}
+
+/* Remove anchor navigation (not supported in Blackboard) */
+a[href^="#"] {
+  color: var(--color-text);
+  text-decoration: none;
+  cursor: default;
+}
+
+/* Print styles */
+@media print {
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #ffffff;
+    --color-text: #000000;
+    --color-primary: #000000;
+    --box-shadow: none;
+  }
+  
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+  
+  table, img {
+    page-break-inside: avoid;
+  }
+  
+  .no-print {
+    display: none;
+  }
+}

@@ -1,0 +1,103 @@
+/* STAT253 Statistics - Course-specific styling */
+
+:root {
+  /* STAT253 Theme: Blackboard-compatible purple-green palette */
+  --course-primary: #663399;      /* Blackboard accessible purple */
+  --course-accent: #009900;       /* Blackboard accessible green */
+  --course-highlight: #f7f0ff;    /* Light purple background */
+  --course-border: #cc99ff;       /* Light purple border */
+  
+  /* Override global colors for this course */
+  --color-primary: var(--course-primary);
+  --color-accent: var(--course-accent);
+  --bg-highlight: var(--course-highlight);
+}
+
+/* Course-specific header styling */
+h1 {
+  background: linear-gradient(135deg, var(--course-primary), var(--course-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Statistics-themed content emphasis */
+.important-dates {
+  background: var(--course-highlight);
+  border-left: 4px solid var(--course-primary);
+  border-top: 2px solid var(--course-accent);
+  border-radius: var(--border-radius);
+}
+
+/* Data table styling for statistics */
+th {
+  background: linear-gradient(135deg, var(--course-highlight), #fff7ed);
+  color: var(--course-primary);
+}
+
+tbody tr:nth-child(even) {
+  background: rgba(207, 250, 254, 0.3);
+}
+
+/* Subtle course identifier with data visualization theme */
+.syllabus-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    var(--course-primary) 0%,
+    var(--course-accent) 50%,
+    var(--course-primary) 100%
+  );
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
+.syllabus-container {
+  position: relative;
+}
+
+/* Statistics-specific styling for data tables */
+.evaluation-table {
+  border: 2px solid var(--course-border);
+  box-shadow: 0 4px 6px -1px rgba(8, 145, 178, 0.1);
+}
+
+.evaluation-table td:last-child {
+  font-weight: 600;
+  color: var(--course-accent);
+}
+
+/* Chart-like styling for grade distribution */
+.grading-scale-table tr:hover {
+  background: linear-gradient(90deg, var(--course-highlight), transparent);
+}
+
+/* Enhanced links for statistical resources */
+a {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+a::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--course-accent);
+  transition: width 0.3s ease;
+}
+
+a:hover::after {
+  width: 100%;
+}
+
+a:hover {
+  color: var(--course-primary);
+  text-decoration: none;
+}

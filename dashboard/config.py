@@ -83,7 +83,7 @@ class Config:
         "http://localhost:3000",
         "http://127.0.0.1:5055",
         "https://blackboard.alaska.edu",
-        "https://production.jeffsthings-courses.pages.dev",
+        "https://courses.jeffsthings.com",
         "https://preview.jeffsthings-courses.pages.dev",
     ]
 
@@ -96,7 +96,7 @@ class Config:
 
     # Public hosting URL for iframe generation (production deployment)
     PUBLIC_BASE_URL = os.environ.get(
-        "PUBLIC_BASE_URL", "https://production.jeffsthings-courses.pages.dev"
+        "PUBLIC_BASE_URL", "https://courses.jeffsthings.com"
     )
 
     @staticmethod

@@ -4,6 +4,9 @@
 .PHONY: all init validate calendar syllabi schedules weekly packages clean help
 .DEFAULT_GOAL := help
 
+# Build mode feature flag (legacy | v2). Default remains legacy for safety.
+BUILD_MODE ?= legacy
+
 # Configuration
 UV := uv
 PYTHON := uv run python
@@ -48,6 +51,10 @@ help: ## Show this help message
 	@echo ""
 	@echo "$(GREEN)Course-specific builds:$(NC)"
 	@echo "  $(YELLOW)make course COURSE=MATH221$(NC)  Build specific course materials"
+	@echo ""
+	@echo "$(GREEN)V2 Pipeline (experimental):$(NC)"
+	@echo "  $(YELLOW)make pipeline$(NC)            Run unified pipeline (no-op scaffold)"
+	@echo "  $(YELLOW)BUILD_MODE=v2 make all$(NC)  Reserved for future cutover"
 
 # Initialize environment
 init: ## Sync UV dependencies
@@ -116,6 +123,13 @@ all: validate calendar syllabi schedules weekly packages ## Complete build for a
 	@echo "$(GREEN)✓ All builds complete!$(NC)"
 	@echo "$(GREEN)════════════════════════════════════$(NC)"
 	@ls -la $(BUILD_DIR)/
+
+# Experimental unified pipeline wrapper (does not affect legacy build)
+.PHONY: pipeline
+pipeline: ## Run unified build pipeline (scaffold)
+	@echo "$(BLUE)Running v2 unified pipeline (scaffold)...$(NC)"
+	@$(PYTHON) scripts/build_pipeline.py --courses $(COURSES)
+	@echo "$(GREEN)✓ Pipeline run complete$(NC)"
 
 # Clean build artifacts
 clean: ## Remove all generated files

@@ -1,0 +1,44 @@
+workstreams:
+  - title: "A1: Schema & Migration — Stable IDs and _meta headers"
+    labels: [refactor, agent, schema]
+    body: |
+      Implement schema versioning (v1.1.0), add `_meta` headers, and write migrator for stable IDs across course JSON.
+      - Create `scripts/utils/schema/versions/` with v1.1.0 schemas
+      - Implement `scripts/schema/migrator.py` and `scripts/migrations/add_stable_ids.py`
+      - Dry-run, test, then apply to repository fixtures
+  - title: "A2: Rules Engine — Normalized models and provenance"
+    labels: [refactor, agent, rules]
+    body: |
+      Build `NormalizedCourse/Field`, rule protocol, and CourseRulesEngine. Ensure deterministic outputs and provenance.
+  - title: "A3: Date Authority — Centralize due-date rules"
+    labels: [refactor, agent, rules]
+    body: |
+      Implement DateRules consuming SemesterCalendar; encode no-weekend and holiday-shift policies; add property/contract tests.
+  - title: "A4: Service Layer — CourseService, ValidationGateway, ChangeDetector"
+    labels: [refactor, agent, services]
+    body: |
+      Unify access patterns; cache normalized data; aggregate validations; fingerprint changes and impacts.
+  - title: "A5: Build Pipeline — Staged pipeline + reports"
+    labels: [refactor, agent, pipeline]
+    body: |
+      Implement validate → normalize → project → generate → package → report with per-course reports and manifests.
+  - title: "A6: Template Migration — Remove logic from templates"
+    labels: [refactor, agent, templates]
+    body: |
+      Project pre-computed fields for templates; refactor includes/partials; golden test coverage for contexts.
+  - title: "A7: Builders Integration — Project-based inputs"
+    labels: [refactor, agent, builders]
+    body: |
+      Adapt `build_syllabi.py`, `build_schedules.py`, `build_bb_packages.py` to consume service projections; maintain CLI.
+  - title: "A8: Dashboard Integration — Intelligence view & state mgmt"
+    labels: [refactor, agent, dashboard]
+    body: |
+      Implement `dashboard/services/task_intelligence.py` and `dashboard/state/manager.py`; wire minimal routes and tests.
+  - title: "A9: QA & Tooling — Contracts, goldens, property tests, coverage"
+    labels: [refactor, agent, qa]
+    body: |
+      Expand tests (contracts, goldens, property); enforce ≥85% coverage; pre-commit; bandit; xdist sharding.
+  - title: "A10: Docs & Change Management — ADRs and guides"
+    labels: [refactor, agent, docs]
+    body: |
+      Produce ADRs, migration guide, and developer runbooks; update diagrams and READMEs.

@@ -105,6 +105,12 @@ class SyllabusBuilder:
         data["course_name_full"] = os.getenv(f"{course_code}_FULL", "")
         data["course_name_short"] = os.getenv(f"{course_code}_SHORT", "")
 
+        # Map RSI content from nested structure to template format
+        if "rsi" in data and isinstance(data["rsi"], dict):
+            rsi_data = data["rsi"]
+            if "course_policies" in rsi_data and "interaction" in rsi_data["course_policies"]:
+                data["rsi"] = {"text": rsi_data["course_policies"]["interaction"]}
+
         return data
 
     def _load_global_data(self, data: dict[str, Any]) -> None:

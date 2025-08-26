@@ -59,6 +59,43 @@ def copy_if_exists(src: Path, dst: Path) -> None:
         shutil.copy2(src, dst)
 
 
+def convert_to_embed_version(html_content: str, course_code: str) -> str:
+    """Convert full syllabus HTML to embed-friendly version."""
+    # CSS paths are already absolute, no conversion needed
+    
+    # Add iframe-specific styles for better embedding
+    iframe_styles = """
+    <style>
+        /* Iframe embedding optimizations */
+        body { 
+            margin: 0; 
+            padding: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        .syllabus-container {
+            box-shadow: none;
+            border-radius: 0;
+            padding: 0;
+        }
+        /* Make tables responsive in iframe */
+        table {
+            font-size: 0.9rem;
+        }
+        /* Ensure links work in iframe */
+        a {
+            target: '_blank';
+        }
+    </style>
+    """
+    
+    # Insert iframe styles before closing head tag
+    if "</head>" in html_content:
+        html_content = html_content.replace("</head>", iframe_styles + "\n</head>")
+    
+    return html_content
+
+
 def copy_js_assets(out_assets: Path) -> None:
     """Copy JavaScript assets to the site assets directory."""
     src_js_dir = PROJECT_ROOT / "assets" / "js"
@@ -85,7 +122,7 @@ def copy_course_assets(course_code: str, out_assets: Path) -> None:
     legacy_course_specific_css = PROJECT_ROOT / "build" / "css" / "courses" / f"{course_code}.css"
 
     dst_course_css = out_assets / "css" / "course.css"
-    dst_course_specific_css = out_assets / "courses" / f"{course_code}.css"
+    dst_course_specific_css = out_assets / "css" / "courses" / f"{course_code}.css"
 
     # Copy preferred assets if available; otherwise copy legacy if present
     if src_course_css.exists():
@@ -112,40 +149,40 @@ def build_syllabus_pages(
     out_dir: Path,
     jinja_templates: Path,
 ) -> dict[str, str]:
-    """Render full + embed syllabus pages for a course.
+    """Copy and adapt high-quality syllabus pages from build/ directory.
 
     Returns a mapping of doc -> variant URLs (relative paths for manifest).
     """
-    # Load context using existing data pipeline
-    data = sb.load_course_data(course_code)
-
-    # Build schedule markdown (ensures calendar integration stays in sync)
-    schedule_path = Path(schedule_builder.build_schedule(course_code))
-    schedule_md_full = schedule_path.read_text(encoding="utf-8") if schedule_path.exists() else ""
-    schedule_lines = schedule_md_full.splitlines()
-    if schedule_lines and schedule_lines[0].startswith("# "):
-        schedule_md_body = "\n".join(schedule_lines[1:]).lstrip()
-    else:
-        schedule_md_body = schedule_md_full
-
-    # Prepare Jinja environment for site templates
-    env_site = create_jinja_env(str(jinja_templates))
-    template_full = env_site.get_template("syllabus_full.html.j2")
-    template_embed = env_site.get_template("syllabus_embed.html.j2")
-
+    # Use existing high-quality syllabi from build/ directory
+    build_dir = PROJECT_ROOT / "build" / "syllabi"
+    syllabus_html_path = build_dir / f"{course_code}.html"
+    syllabus_with_calendar_path = build_dir / f"{course_code}_with_calendar.html"
+    
     # Output directories
     base = out_dir / "courses" / course_code / term / "syllabus"
     base_embed = base / "embed"
     ensure_dir(base)
     ensure_dir(base_embed)
-
-    # Render pages
-    html_full = template_full.render(**data, EMBED_MODE=False, schedule_markdown=schedule_md_body)
-    html_embed = template_embed.render(**data, EMBED_MODE=True, schedule_markdown=schedule_md_body)
-
-    (base / "index.html").write_text(html_full, encoding="utf-8")
-    (base_embed / "index.html").write_text(html_embed, encoding="utf-8")
-
+    
+    if not syllabus_html_path.exists():
+        print(f"Warning: {syllabus_html_path} not found. Run 'make syllabi' first.")
+        # Create placeholder
+        placeholder_html = f"""<!doctype html>
+<html><head><title>{course_code} Syllabus</title></head>
+<body><p>Syllabus not yet generated. Run <code>make syllabi</code> first.</p></body></html>"""
+        (base / "index.html").write_text(placeholder_html, encoding="utf-8")
+        (base_embed / "index.html").write_text(placeholder_html, encoding="utf-8")
+    else:
+        # Read the high-quality syllabus HTML
+        full_html = syllabus_html_path.read_text(encoding="utf-8")
+        
+        # Create embed version by making it iframe-friendly
+        embed_html = convert_to_embed_version(full_html, course_code)
+        
+        # Write the full and embed versions
+        (base / "index.html").write_text(full_html, encoding="utf-8")
+        (base_embed / "index.html").write_text(embed_html, encoding="utf-8")
+    
     # Relative URLs for manifest
     rel_full = f"/courses/{course_code}/{term}/syllabus/"
     rel_embed = f"/courses/{course_code}/{term}/syllabus/embed/"
@@ -161,53 +198,39 @@ def build_schedule_pages(
     out_dir: Path,
     jinja_templates: Path,
 ) -> dict[str, str]:
-    """Render full + embed schedule pages for a course.
+    """Copy and adapt high-quality schedule pages from build/ directory.
 
     Returns a mapping of doc -> variant URLs (relative paths for manifest).
     """
-    # Load context using existing data pipeline
-    data = sb.load_course_data(course_code)
-
-    # Build schedule HTML content
-    schedule_path = Path(schedule_builder.build_schedule(course_code))
-    schedule_html_content = ""
-    if schedule_path.exists():
-        # Read the existing HTML file and extract the body content
-        schedule_html_full = schedule_path.read_text(encoding="utf-8")
-        # Extract the main content by finding the div with class container or body content
-        if '<div class="container">' in schedule_html_full:
-            start = schedule_html_full.find('<div class="container">')
-            end = schedule_html_full.rfind("</div>") + 6
-            schedule_html_content = schedule_html_full[start:end]
-        else:
-            # Fallback: use everything between body tags
-            if "<body>" in schedule_html_full and "</body>" in schedule_html_full:
-                start = schedule_html_full.find("<body>") + 6
-                end = schedule_html_full.find("</body>")
-                schedule_html_content = schedule_html_full[start:end]
-
-    # Prepare Jinja environment for site templates
-    env_site = create_jinja_env(str(jinja_templates))
-    template_full = env_site.get_template("schedule_full.html.j2")
-    template_embed = env_site.get_template("schedule_embed.html.j2")
-
+    # Use existing high-quality schedules from build/ directory
+    build_dir = PROJECT_ROOT / "build" / "schedules"
+    schedule_html_path = build_dir / f"{course_code}_schedule.html"
+    
     # Output directories
     base = out_dir / "courses" / course_code / term / "schedule"
     base_embed = base / "embed"
     ensure_dir(base)
     ensure_dir(base_embed)
-
-    # Render pages
-    html_full = template_full.render(
-        **data, EMBED_MODE=False, schedule_content=schedule_html_content
-    )
-    html_embed = template_embed.render(
-        **data, EMBED_MODE=True, schedule_content=schedule_html_content
-    )
-
-    (base / "index.html").write_text(html_full, encoding="utf-8")
-    (base_embed / "index.html").write_text(html_embed, encoding="utf-8")
-
+    
+    if not schedule_html_path.exists():
+        print(f"Warning: {schedule_html_path} not found. Run 'make schedules' first.")
+        # Create placeholder
+        placeholder_html = f"""<!doctype html>
+<html><head><title>{course_code} Schedule</title></head>
+<body><p>Schedule not yet generated. Run <code>make schedules</code> first.</p></body></html>"""
+        (base / "index.html").write_text(placeholder_html, encoding="utf-8")
+        (base_embed / "index.html").write_text(placeholder_html, encoding="utf-8")
+    else:
+        # Read the high-quality schedule HTML
+        full_html = schedule_html_path.read_text(encoding="utf-8")
+        
+        # Create embed version by making it iframe-friendly
+        embed_html = convert_to_embed_version(full_html, course_code)
+        
+        # Write the full and embed versions
+        (base / "index.html").write_text(full_html, encoding="utf-8")
+        (base_embed / "index.html").write_text(embed_html, encoding="utf-8")
+    
     # Relative URLs for manifest
     rel_full = f"/courses/{course_code}/{term}/schedule/"
     rel_embed = f"/courses/{course_code}/{term}/schedule/embed/"
@@ -304,8 +327,8 @@ def create_default_index(courses: list[str], term: str) -> str:  # noqa: ARG001
     <p>Fall 2025 Semester</p>
 
     <div class="status">
-        <p><strong>🚧 Site Under Construction</strong></p>
-        <p>Course materials will be available here soon.</p>
+        <p><strong>✅ Course Materials Available</strong></p>
+        <p>Select a course from the navigation above to access syllabi and schedules.</p>
     </div>
 
     <div class="courses">

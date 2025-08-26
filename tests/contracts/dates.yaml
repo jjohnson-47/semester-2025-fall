@@ -1,0 +1,15 @@
+contracts:
+  - name: no_weekend_dues
+    description: Assignments must not fall on Saturday or Sunday.
+    rules:
+      - key: weekday
+        operator: not_in
+        values: [6, 7]  # ISO weekday (Mon=1..Sun=7); adjust as needed
+
+  - name: holiday_shift
+    description: Due dates that land in major breaks should shift as policy dictates.
+    rules:
+      - key: in_holiday
+        operator: equals
+        value: false
+

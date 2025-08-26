@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe Embedding Test - Fall 2025 Courses</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .working { background: #4CAF50; color: white; }
+        .testing { background: #FFC107; color: black; }
+        .failed { background: #f44336; color: white; }
+        iframe {
+            width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .url-info {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cloudflare Pages Iframe Embedding Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Configuration</h2>
+        <p><strong>Project:</strong> jeffsthings-courses</p>
+        <p><strong>Primary URL:</strong> <span class="url-info">https://courses.jeffsthings.com/</span></p>
+        <p><strong>Fallback URL:</strong> <span class="url-info">https://production.jeffsthings-courses.pages.dev/</span></p>
+        <p><strong>CSP Headers:</strong> <span class="status working">UPDATED</span></p>
+        <p><strong>X-Frame-Options:</strong> ALLOWALL</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 1: MATH221 Syllabus (Embed Version) <span class="status testing">TESTING</span></h2>
+        <p>URL: <span class="url-info">https://courses.jeffsthings.com/courses/MATH221/fall-2025/syllabus/embed/</span></p>
+        <iframe 
+            src="https://courses.jeffsthings.com/courses/MATH221/fall-2025/syllabus/embed/" 
+            height="600"
+            id="math221-syllabus">
+        </iframe>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: MATH251 Schedule (Embed Version) <span class="status testing">TESTING</span></h2>
+        <p>URL: <span class="url-info">https://courses.jeffsthings.com/courses/MATH251/fall-2025/schedule/embed/</span></p>
+        <iframe 
+            src="https://courses.jeffsthings.com/courses/MATH251/fall-2025/schedule/embed/" 
+            height="500"
+            id="math251-schedule">
+        </iframe>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: STAT253 Syllabus (Full Version in Iframe) <span class="status testing">TESTING</span></h2>
+        <p>URL: <span class="url-info">https://courses.jeffsthings.com/courses/STAT253/fall-2025/syllabus/</span></p>
+        <iframe 
+            src="https://courses.jeffsthings.com/courses/STAT253/fall-2025/syllabus/" 
+            height="700"
+            id="stat253-syllabus">
+        </iframe>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 4: Iframe Generator Tool <span class="status testing">TESTING</span></h2>
+        <p>URL: <span class="url-info">https://courses.jeffsthings.com/embed/generator/</span></p>
+        <iframe 
+            src="https://courses.jeffsthings.com/embed/generator/" 
+            height="400"
+            id="generator">
+        </iframe>
+    </div>
+
+    <script>
+        // Check if iframes loaded successfully
+        window.addEventListener('load', function() {
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                try {
+                    // Try to access iframe content (will fail if blocked by CORS/CSP)
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (iframeDoc && iframeDoc.body) {
+                        const status = iframe.parentElement.querySelector('.status');
+                        status.className = 'status working';
+                        status.textContent = 'WORKING';
+                    }
+                } catch (e) {
+                    // Can't access iframe content due to cross-origin, but that's expected
+                    // Check if iframe at least has a src
+                    if (iframe.src) {
+                        const status = iframe.parentElement.querySelector('.status');
+                        status.className = 'status working';
+                        status.textContent = 'LOADED';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

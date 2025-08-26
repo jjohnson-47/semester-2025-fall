@@ -1,0 +1,106 @@
+/* MATH221 Applied Calculus - Course-specific styling */
+/* Theme: Professional blue with mathematical precision */
+
+:root {
+  /* MATH221 Theme: Blackboard-compatible blue palette */
+  --course-primary: #0066cc;      /* Blackboard accessible blue */
+  --course-secondary: #3399ff;    /* Lighter blue variant */
+  --course-accent: #004499;       /* Darker blue accent */
+  --course-light: #f0f7ff;        /* Very light blue background */
+  --course-border: #99ccff;       /* Light blue border */
+  
+  /* Override global colors for this course */
+  --color-primary: var(--course-primary);
+  --color-accent: var(--course-accent);
+  --bg-highlight: var(--course-light);
+}
+
+/* Course-specific header styling - fallback safe */
+h1 {
+  color: var(--course-primary);
+  border-bottom-color: var(--course-primary);
+  position: relative;
+}
+
+h1::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--course-primary), var(--course-accent));
+  border-radius: 2px;
+}
+
+/* Mathematical content emphasis */
+.important-dates {
+  background: var(--course-light);
+  border-left: 4px solid var(--course-primary);
+  border-radius: var(--border-radius);
+  position: relative;
+}
+
+.important-dates::before {
+  content: '📅';
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  opacity: 0.3;
+}
+
+/* Professional table styling */
+th {
+  background-color: var(--course-light);
+  color: var(--course-primary);
+  border-bottom: 2px solid var(--course-border);
+  position: relative;
+}
+
+tbody tr:hover {
+  background-color: rgba(30, 64, 175, 0.03);
+}
+
+/* Subtle course branding */
+.syllabus-container {
+  border-top: 4px solid var(--course-primary);
+  position: relative;
+}
+
+/* Math-specific styling for tables */
+table {
+  border: 1px solid var(--course-border);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+/* Enhanced links with mathematical feel */
+a {
+  color: var(--course-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--course-border);
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: var(--course-accent);
+  text-decoration-color: var(--course-accent);
+}
+
+/* Section headers */
+h2 {
+  color: var(--course-primary);
+  border-bottom-color: var(--course-border);
+}
+
+h3 {
+  color: var(--course-secondary);
+}
+
+/* Mathematical precision in spacing */
+.header-info {
+  background: var(--course-light);
+  border: 1px solid var(--course-border);
+}

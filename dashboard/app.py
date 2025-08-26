@@ -1166,6 +1166,156 @@ def embed_generator() -> str:
     return html
 
 
+@app.route("/api/syllabus/download/<course_code>.<format>")
+def download_syllabus(course_code: str, format: str) -> ResponseReturnValue:
+    """Download syllabus as HTML or DOCX."""
+    import subprocess
+    import tempfile
+    
+    if format not in ["html", "docx"]:
+        return jsonify({"error": "Invalid format. Use 'html' or 'docx'"}), 400
+    
+    # Get variant from query parameter
+    variant = request.args.get('variant', 'embed')
+    
+    # Get the HTML file from site directory (production-ready version)
+    if variant == 'with_calendar':
+        html_path = Config.PROJECT_ROOT / "site" / "courses" / course_code / "fall-2025" / "syllabus" / "index.html"
+    else:
+        html_path = Config.PROJECT_ROOT / "site" / "courses" / course_code / "fall-2025" / "syllabus" / "embed" / "index.html"
+    
+    if not html_path.exists():
+        return jsonify({"error": "Syllabus HTML not found. Try rebuilding site."}), 404
+    
+    if format == "html":
+        # Return the HTML file directly
+        return send_file(
+            html_path,
+            as_attachment=True,
+            download_name=f"{course_code}_syllabus_fall2025.html",
+            mimetype="text/html"
+        )
+    
+    elif format == "docx":
+        # Convert HTML to DOCX using pandoc
+        with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as tmp_docx:
+            try:
+                # Use pandoc to convert HTML to DOCX
+                cmd = [
+                    "pandoc",
+                    str(html_path),
+                    "-f", "html",
+                    "-t", "docx",
+                    "-o", tmp_docx.name
+                ]
+                
+                # Add reference doc if it exists
+                ref_doc = Config.PROJECT_ROOT / "assets" / "reference.docx"
+                if ref_doc.exists():
+                    cmd.extend(["--reference-doc", str(ref_doc)])
+                
+                result = subprocess.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    cwd=Config.PROJECT_ROOT
+                )
+                
+                if result.returncode != 0:
+                    return jsonify({"error": f"Pandoc conversion failed: {result.stderr}"}), 500
+                
+                # Send the DOCX file
+                return send_file(
+                    tmp_docx.name,
+                    as_attachment=True,
+                    download_name=f"{course_code}_syllabus_fall2025.docx",
+                    mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )
+            finally:
+                # Clean up temp file after sending
+                import os
+                if os.path.exists(tmp_docx.name):
+                    os.unlink(tmp_docx.name)
+
+
+@app.route("/api/schedule/download/<course_code>.<format>")
+def download_schedule(course_code: str, format: str) -> ResponseReturnValue:
+    """Download schedule as HTML or DOCX."""
+    import subprocess
+    import tempfile
+    
+    if format not in ["html", "docx"]:
+        return jsonify({"error": "Invalid format. Use 'html' or 'docx'"}), 400
+    
+    # Build the schedule first to ensure it's up to date
+    from scripts.build_schedules import ScheduleBuilder
+    try:
+        builder = ScheduleBuilder(output_dir="build/schedules")
+        builder.build_schedule(course_code)
+    except Exception as e:
+        return jsonify({"error": f"Failed to build schedule: {str(e)}"}), 500
+    
+    # Get the HTML file from site directory (production-ready version)
+    html_path = Config.PROJECT_ROOT / "site" / "courses" / course_code / "fall-2025" / "schedule" / "index.html"
+    
+    if not html_path.exists():
+        # Try embed version
+        html_path = Config.PROJECT_ROOT / "site" / "courses" / course_code / "fall-2025" / "schedule" / "embed" / "index.html"
+    
+    if not html_path.exists():
+        return jsonify({"error": "Schedule HTML not found. Try rebuilding site."}), 404
+    
+    if format == "html":
+        # Return the HTML file directly
+        return send_file(
+            html_path,
+            as_attachment=True,
+            download_name=f"{course_code}_schedule_fall2025.html",
+            mimetype="text/html"
+        )
+    
+    elif format == "docx":
+        # Convert HTML to DOCX using pandoc
+        with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as tmp_docx:
+            try:
+                # Use pandoc to convert HTML to DOCX
+                cmd = [
+                    "pandoc",
+                    str(html_path),
+                    "-f", "html",
+                    "-t", "docx",
+                    "-o", tmp_docx.name
+                ]
+                
+                # Add reference doc if it exists
+                ref_doc = Config.PROJECT_ROOT / "assets" / "reference.docx"
+                if ref_doc.exists():
+                    cmd.extend(["--reference-doc", str(ref_doc)])
+                
+                result = subprocess.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    cwd=Config.PROJECT_ROOT
+                )
+                
+                if result.returncode != 0:
+                    return jsonify({"error": f"Pandoc conversion failed: {result.stderr}"}), 500
+                
+                # Send the DOCX file
+                return send_file(
+                    tmp_docx.name,
+                    as_attachment=True,
+                    download_name=f"{course_code}_schedule_fall2025.docx",
+                    mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )
+            finally:
+                # Clean up temp file after sending
+                import os
+                if os.path.exists(tmp_docx.name):
+                    os.unlink(tmp_docx.name)
+
+
 @app.route("/api/export/docx")
 def export_docx() -> ResponseReturnValue:
     """Export all syllabi and schedules as DOCX files using pandoc."""
@@ -1272,6 +1422,30 @@ def export_docx() -> ResponseReturnValue:
         return jsonify({"error": f"Pandoc conversion failed: {e}"}), 500
     except Exception as e:
         return jsonify({"error": f"Export failed: {e}"}), 500
+
+
+@app.route("/api/site/preview/start", methods=["POST"])
+def start_site_preview():
+    """Start the local site preview server."""
+    try:
+        import subprocess
+        import threading
+        
+        def run_server():
+            # Start the site preview server in the background
+            subprocess.Popen([
+                "python", "-m", "http.server", "8000",
+                "-d", str(Config.PROJECT_ROOT / "site")
+            ])
+        
+        # Start server in a separate thread
+        threading.Thread(target=run_server, daemon=True).start()
+        
+        return jsonify({"success": True, "message": "Site preview server starting at http://localhost:8000"})
+        
+    except Exception as e:
+        logger.error(f"Error starting site preview: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 @app.route("/api/orchestrate", methods=["POST"])

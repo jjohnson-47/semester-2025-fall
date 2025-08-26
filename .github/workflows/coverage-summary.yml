@@ -1,0 +1,73 @@
+name: Coverage Summary & Docs Consistency
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+
+jobs:
+  gather-and-summarize:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download coverage XML artifacts from CI
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: CI
+          run_id: ${{ github.event.workflow_run.id }}
+          name: |
+            coverage-unit-xml
+            coverage-int-xml
+          path: coverage_artifacts
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Merge coverage and create summary
+        run: |
+          python scripts/ops/coverage_merge.py \
+            --inputs coverage_artifacts/coverage.xml coverage_artifacts/coverage.xml \
+            --out-xml combined-coverage.xml \
+            --out-md coverage-summary.md || true
+          # The action-download-artifact places both with same names in subdirs; try to glob
+          if [ ! -f combined-coverage.xml ]; then \
+            XMLS=$(ls -1 coverage_artifacts/**/coverage.xml 2>/dev/null | tr '\n' ' '); \
+            python scripts/ops/coverage_merge.py --inputs $XMLS --out-xml combined-coverage.xml --out-md coverage-summary.md; \
+          fi
+          echo "## Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          cat coverage-summary.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload combined coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: combined-coverage
+          path: |
+            combined-coverage.xml
+            coverage-summary.md
+
+  docs-consistency:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate documentation consistency
+        run: |
+          python scripts/ops/doc_consistency_check.py
+
+      - name: Post result to job summary
+        if: success()
+        run: echo "Documentation consistency check passed." >> $GITHUB_STEP_SUMMARY
+

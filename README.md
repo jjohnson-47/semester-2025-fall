@@ -17,6 +17,19 @@ The Fall 2025 semester preparation was successfully completed using Claude Code'
 
 **Status**: ✅ **Fall 2025 Semester Preparation Complete** (All 167 tasks completed successfully)
 
+### 🌟 Content Delivery Architecture
+
+**Content Factory** (this repository): 
+- JSON configuration files
+- Jinja2 templates
+- Build automation scripts
+- Task management dashboard
+
+**Content Delivery** ([jeffsthings-courses](https://github.com/jjohnson-47/jeffsthings-courses)):
+- Static site generation from factory output
+- Production deployment at https://courses.jeffsthings.com/
+- Blackboard Ultra iframe integration
+
 ### Courses Managed
 
 | Course | Title | CRN | Credits |

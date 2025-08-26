@@ -1,0 +1,69 @@
+/* MATH251 Calculus I - Course-specific styling */
+
+:root {
+  /* MATH251 Theme: Blackboard-compatible blue-green palette */
+  --course-primary: #0066cc;      /* Blackboard accessible blue */
+  --course-accent: #009900;       /* Blackboard accessible green */
+  --course-highlight: #f0f7ff;    /* Light blue background */
+  --course-border: #99ccff;       /* Light blue border */
+  
+  /* Override global colors for this course */
+  --color-primary: var(--course-primary);
+  --color-accent: var(--course-accent);
+  --bg-highlight: var(--course-highlight);
+}
+
+/* Course-specific header styling */
+h1 {
+  background: linear-gradient(135deg, var(--course-primary), var(--course-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Calculus-themed content emphasis */
+.important-dates {
+  background: var(--course-highlight);
+  border-left: 4px solid var(--course-primary);
+  border-radius: var(--border-radius);
+}
+
+/* Table styling for calculus course */
+th {
+  background: linear-gradient(135deg, var(--course-highlight), #f0fdf4);
+  color: var(--course-primary);
+}
+
+/* Subtle course identifier */
+.syllabus-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--course-primary), var(--course-accent));
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
+.syllabus-container {
+  position: relative;
+}
+
+/* Calculus-specific styling for derivative/integral content */
+.evaluation-table {
+  border: 2px solid var(--course-border);
+  box-shadow: 0 4px 6px -1px rgba(30, 64, 175, 0.1);
+}
+
+/* Enhanced links for calculus resources */
+a {
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+a:hover {
+  color: var(--course-accent);
+  border-bottom-color: var(--course-accent);
+  text-decoration: none;
+}

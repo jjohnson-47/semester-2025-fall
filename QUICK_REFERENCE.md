@@ -164,7 +164,7 @@ Quick ways to use agents:
 
 ## URLs
 
-- **Production**: <https://production.jeffsthings-courses.pages.dev/>
+- **Production**: <https://courses.jeffsthings.com/>
 - **Preview**: https://[hash].jeffsthings-courses.pages.dev/
 - **GitHub**: Your repository
 - **Manifest**: /manifest.json

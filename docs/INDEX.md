@@ -2,7 +2,7 @@
 
 ## 📚 Overview
 
-Complete documentation for the Fall 2025 Semester Course Management System.
+Complete documentation for the Fall 2025 Semester Course Management System. This project serves as a **content factory** that generates course materials delivered through the [jeffsthings-courses](https://github.com/jjohnson-47/jeffsthings-courses) system at **https://courses.jeffsthings.com/**.
 
 ## 📂 Documentation Structure
 
@@ -14,6 +14,7 @@ Complete documentation for the Fall 2025 Semester Course Management System.
 - [Claude Code Orchestration](../.claude-task-orchestration.md) - AI agent coordination system
 - [Task Templates](../.claude-task-templates.md) - Ready-to-use agent task patterns
 - [Orchestration Triggers](../.claude-orchestration-triggers.md) - Automatic agent coordination
+- [Content Delivery Architecture](../README.md#-content-delivery-architecture) - Factory → Delivery system overview
 
 ### Reference Documentation
 

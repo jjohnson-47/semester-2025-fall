@@ -164,9 +164,9 @@
             <div class="row align-items-center">
                 <div class="col-md-6">
                     <h1 class="h3 mb-0">
-                        <i class="bi bi-file-earmark-text"></i> Syllabus & Schedule Preview
+                        <i class="bi bi-file-earmark-text"></i> Production Content Preview
                     </h1>
-                    <p class="mb-0 mt-2 opacity-75">Fall 2025 Semester</p>
+                    <p class="mb-0 mt-2 opacity-75">Showing the same content that will be embedded in Blackboard</p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <a href="/" class="btn btn-light">
@@ -218,6 +218,9 @@
                                 <button class="btn btn-sm btn-outline-primary" onclick="printPreview()">
                                     <i class="bi bi-printer"></i> Print
                                 </button>
+                                <button class="btn btn-sm btn-outline-success" onclick="startSitePreview()">
+                                    <i class="bi bi-play-circle"></i> Start Site Preview
+                                </button>
                                 <button class="btn btn-sm btn-outline-secondary" onclick="refreshPreview()">
                                     <i class="bi bi-arrow-clockwise"></i> Refresh
                                 </button>
@@ -255,8 +258,8 @@
                             </div>
                         </div>
                         <div class="tab-pane fade" id="schedule-tab">
-                            <div id="schedule-container" class="p-4">
-                                <!-- Schedule content will be loaded here -->
+                            <div id="schedule-container" class="position-relative">
+                                <iframe id="schedule-frame" class="preview-frame"></iframe>
                             </div>
                         </div>
                         <div class="tab-pane fade" id="combined-tab">
@@ -374,10 +377,23 @@
         function loadSyllabus() {
             const course = document.getElementById('course-selector').value;
             const includeCalendar = document.getElementById('include-calendar').checked;
-            const variant = includeCalendar ? 'with_calendar' : '';
-
-            const url = `/syllabi/${course}${variant ? '?variant=' + variant : ''}`;
-            document.getElementById('syllabus-frame').src = url;
+            
+            // Use the same production-optimized content from site/
+            const baseUrl = 'http://localhost:8000'; // Local site preview
+            const url = `${baseUrl}/courses/${course}/fall-2025/syllabus/${includeCalendar ? '' : 'embed/'}`;
+            
+            const frame = document.getElementById('syllabus-frame');
+            
+            // Add error handling for when site server isn't running
+            frame.onerror = function() {
+                console.log('Site server not available, attempting to start...');
+                startSitePreview().then(() => {
+                    // Retry after server starts
+                    setTimeout(() => frame.src = url, 2000);
+                });
+            };
+            
+            frame.src = url;
 
             // Update stats and dates based on course
             updateCourseInfo(course);
@@ -385,31 +401,32 @@
 
         function loadSchedule() {
             const course = document.getElementById('course-selector').value;
-            const container = document.getElementById('schedule-container');
-
-            // Show loading
-            container.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div></div>';
-
-            // Fetch schedule content
-            fetch(`/api/schedule/${course}`)
-                .then(response => response.text())
-                .then(html => {
-                    container.innerHTML = html;
-                })
-                .catch(error => {
-                    container.innerHTML = `
-                        <div class="alert alert-warning">
-                            <i class="bi bi-exclamation-triangle"></i>
-                            Schedule not available.
-                            <a href="#" onclick="buildSchedule('${course}')">Build now</a>
-                        </div>
-                    `;
+            
+            // Use the same production-optimized content from site/
+            const baseUrl = 'http://localhost:8000'; // Local site preview
+            const url = `${baseUrl}/courses/${course}/fall-2025/schedule/embed/`;
+            
+            const frame = document.getElementById('schedule-frame');
+            
+            // Add error handling for when site server isn't running
+            frame.onerror = function() {
+                console.log('Site server not available for schedule, attempting to start...');
+                startSitePreview().then(() => {
+                    // Retry after server starts
+                    setTimeout(() => frame.src = url, 2000);
                 });
+            };
+            
+            frame.src = url;
         }
 
         function loadCombined() {
             const course = document.getElementById('course-selector').value;
-            document.getElementById('combined-frame').src = `/syllabi/${course}?variant=with_calendar`;
+            
+            // Use the same production-optimized content from site/ (full version with calendar)
+            const baseUrl = 'http://localhost:8000'; // Local site preview
+            const url = `${baseUrl}/courses/${course}/fall-2025/syllabus/`;
+            document.getElementById('combined-frame').src = url;
         }
 
         function toggleComparisonMode() {
@@ -465,6 +482,25 @@
 
         function refreshPreview() {
             loadSyllabus();
+        }
+        
+        function startSitePreview() {
+            // Start the local site preview server
+            return fetch('/api/site/preview/start', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Site preview server started at http://localhost:8000');
+                        return true;
+                    } else {
+                        console.error('Error starting site preview:', data.message);
+                        return false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error starting site preview:', error);
+                    return false;
+                });
         }
 
         function buildSchedule(course) {

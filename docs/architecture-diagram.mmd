@@ -1,0 +1,154 @@
+%% Repository Architecture (Fall 2025)
+%% Open this in a Mermaid-compatible viewer
+flowchart TB
+  %% ----- SOURCES -----
+  subgraph S[Data Sources]
+    direction TB
+    AC[academic-calendar.json]
+    VAR[variables/semester.json]
+    PROF[profiles/instructor.json]
+    GLOB[global/*.json]
+    subgraph CData[Per-Course Data]
+      direction TB
+      CCDESC[course_description.json]
+      CCMETA[course_meta.json]
+      CCSCHED[schedule.json]
+      CCDUE[due_dates.json (optional)]
+      CCPOL[policies: grading, goals, outcomes, RSI, ...]
+    end
+  end
+
+  %% ----- VALIDATION -----
+  VAL["scripts/validate_json.py\n+ scripts/utils/schema/*.schema.json"]
+  AC --> VAL
+  VAR --> VAL
+  PROF --> VAL
+  GLOB --> VAL
+  CCDESC --> VAL
+  CCMETA --> VAL
+  CCSCHED --> VAL
+  CCDUE --> VAL
+  CCPOL --> VAL
+
+  %% ----- CALENDAR SERVICE -----
+  CAL["scripts/utils/semester_calendar.py\n(SemesterCalendar)"]
+  AC --> CAL
+  CAL --> WEEKS[Weeks (Mon–Fri) + Holidays + Finals]
+  CAL --> DATES[Key Dates (start/end, add/drop, withdrawal, finals)]
+  CAL --> ICS[ICS generation per course]
+
+  %% ----- JINJA ENV -----
+  J2["scripts/utils/jinja_env.py\n+ templates/*.j2 (filters, helpers)"]
+
+  %% ----- BUILDERS -----
+  subgraph B[Builders]
+    direction TB
+    SCH["scripts/build_schedules.py\n(ScheduleBuilder)"]
+    SYL["scripts/build_syllabi.py\n(SyllabusBuilder)"]
+    BB["scripts/build_bb_packages.py\n(BlackboardPackageBuilder)"]
+    WEEK["scripts/weekgen.py\n(weekly overviews)"]
+  end
+
+  %% Schedule builder inputs/outputs
+  CCSCHED --> SCH
+  CCDUE --> SCH
+  WEEKS --> SCH
+  SCH --> B_SCHED_MD[build/schedules/*_schedule.md]
+  SCH --> B_SCHED_HTML[build/schedules/*_schedule.html]
+
+  %% Syllabus builder inputs/outputs
+  J2 --> SYL
+  VAR --> SYL
+  PROF --> SYL
+  GLOB --> SYL
+  CAL --> SYL
+  CCDESC --> SYL
+  CCMETA --> SYL
+  CCSCHED --> SYL
+  CCDUE --> SYL
+  CCPOL --> SYL
+  SYL --> B_SYL_HTML[build/syllabi/*.html]
+  SYL --> B_SYL_MD[build/syllabi/*.md]
+  SYL --> B_SYL_CAL[build/syllabi/*_with_calendar.html/.md]
+  SYL --> B_SYL_PDF[(optional) build/syllabi/*.pdf]
+
+  %% Blackboard packaging
+  B_SYL_HTML --> BB
+  B_SCHED_MD --> BB
+  BB --> B_ZIP[build/blackboard/*_package.zip]
+
+  %% Weekly overviews
+  WEEKS --> WEEK
+  WEEK --> B_WEEK[build/weekly/*]
+
+  %% ----- MAKE ORCHESTRATION -----
+  MAKE[Makefile]
+  MAKE -->|init| UV[uv sync deps]
+  MAKE -->|validate| VAL
+  MAKE -->|calendar| CAL
+  MAKE -->|syllabi| SYL
+  MAKE -->|schedules| SCH
+  MAKE -->|weekly| WEEK
+  MAKE -->|packages| BB
+  MAKE -->|build-site| SITEB
+  MAKE -->|dash| D_APP
+  MAKE -->|test| TESTS
+  MAKE -->|lint/format| TOOLING
+
+  %% ----- DASHBOARD -----
+  subgraph D[Dashboard (Flask)]
+    direction TB
+    D_APP[dashboard/app.py]
+    D_CFG[dashboard/config.py]
+    D_ORCH[dashboard/orchestrator.py]
+    D_TOOLS[dashboard/tools/*\n(generate_tasks.py, reprioritize.py, validate.py, contracts)]
+    D_TMPL[dashboard/templates/*]
+    D_STATE[(dashboard/state/*.json)]
+  end
+
+  D_TOOLS --> D_STATE
+  D_APP --> D_STATE
+  D_APP --> D_TMPL
+  D_APP --> D_ORCH
+  %% Preview generated artifacts in UI (non-owning references)
+  D_APP -. preview .-> B_SYL_HTML
+  D_APP -. preview .-> B_SCHED_HTML
+
+  %% ----- PUBLIC SITE BUILDER -----
+  subgraph P[Public Site Build]
+    direction TB
+    SITEB["scripts/site_build.py\n(public site generator)"]
+    HEADERS[cloudflare/_headers.{preview|prod}, _redirects, functions/]
+    ASSETS[assets/css, assets/js, assets/css/courses/*]
+    STPL[templates/site/*.j2]
+    S_OUT_DIR[site/]
+    MAN[site/manifest.json]
+    FULL[site/courses/<COURSE>/<term>/(syllabus|schedule)/index.html]
+    EMBED[site/courses/.../(syllabus|schedule)/embed/index.html]
+    S_ASSETS[site/assets/*]
+  end
+
+  B_SYL_HTML --> SITEB
+  B_SCHED_HTML --> SITEB
+  ASSETS --> SITEB
+  STPL --> SITEB
+  HEADERS --> SITEB
+
+  SITEB --> S_OUT_DIR
+  S_OUT_DIR --> MAN
+  S_OUT_DIR --> FULL
+  S_OUT_DIR --> EMBED
+  S_OUT_DIR --> S_ASSETS
+
+  %% ----- DEPLOYMENT / DELIVERY -----
+  DEPLOY[Cloudflare Pages (preview/prod)]
+  S_OUT_DIR --> DEPLOY
+  LMS[Blackboard Ultra (iframe embeds)]
+  DEPLOY --> LMS
+
+  %% ----- TESTS / CI / TOOLING -----
+  TESTS[tests/*]
+  TOOLING[pyproject.toml\n(ruff, mypy, pytest, coverage)]
+  CI[ci-* targets]
+  MAKE -->|ci-validate/build/test/lint| CI
+  TESTS -. coverage .-> TOOLING
