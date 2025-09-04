@@ -35,6 +35,7 @@ Environment Variables:
 See dashboard/API_DOCUMENTATION.md for complete API reference.
 """
 
+import contextlib
 import json
 
 # Set up logging
@@ -51,11 +52,9 @@ from flask.typing import ResponseReturnValue
 
 from dashboard.config import Config
 from dashboard.db import Database, DatabaseConfig
-from dashboard.tools.queue_select import Candidate, select_now_queue
-from dashboard.tools.scoring import score_task
-from dashboard.services.prioritization import PrioritizationService, PrioritizationConfig
-from dashboard.services.retro import generate_weekly_retro
 from dashboard.orchestrator import AgentCoordinator, TaskOrchestrator
+from dashboard.services.prioritization import PrioritizationConfig, PrioritizationService
+from dashboard.services.retro import generate_weekly_retro
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +78,6 @@ else:
         with _db.connect() as _c:
             cnt = _c.execute("select count(*) from tasks").fetchone()[0]
         if int(cnt) == 0 and (Config.STATE_DIR / "tasks.json").exists():
-            from dashboard.db import Database as _D
             _db.import_tasks_json(Config.STATE_DIR / "tasks.json")
             logger.info("Imported tasks.json into SQLite (bootstrap)")
     except Exception as _imp_exc:  # pragma: no cover
@@ -97,11 +95,32 @@ try:
 
     _scheduler = BackgroundScheduler(daemon=True)
     # Hourly refresh (lightweight enough locally)
-    _scheduler.add_job(lambda: _prio.refresh_now_queue(timebox=90, k=3), "interval", hours=1, id="hourly_refresh", replace_existing=True)
+    _scheduler.add_job(
+        lambda: _prio.refresh_now_queue(timebox=90, k=3),
+        "interval",
+        hours=1,
+        id="hourly_refresh",
+        replace_existing=True,
+    )
     # Morning refresh at 08:00 local
-    _scheduler.add_job(lambda: _prio.refresh_now_queue(timebox=90, k=3), "cron", hour=8, minute=0, id="morning_refresh", replace_existing=True)
+    _scheduler.add_job(
+        lambda: _prio.refresh_now_queue(timebox=90, k=3),
+        "cron",
+        hour=8,
+        minute=0,
+        id="morning_refresh",
+        replace_existing=True,
+    )
     # Weekly retro Sunday 17:00 local
-    _scheduler.add_job(lambda: generate_weekly_retro(_db, Config.STATE_DIR / 'retro'), "cron", day_of_week='sun', hour=17, minute=0, id="weekly_retro", replace_existing=True)
+    _scheduler.add_job(
+        lambda: generate_weekly_retro(_db, Config.STATE_DIR / "retro"),
+        "cron",
+        day_of_week="sun",
+        hour=17,
+        minute=0,
+        id="weekly_retro",
+        replace_existing=True,
+    )
     _scheduler.start()
     logger.info("APScheduler started with hourly + morning refresh jobs")
 except Exception as _sched_exc:  # pragma: no cover
@@ -250,7 +269,9 @@ def index() -> str:
         for r in conn.execute("select task_id, score from scores").fetchall():
             score_map[r["task_id"]] = float(r["score"])  # type: ignore[index]
         # Identify quick-added tasks via events
-        qa_rows = conn.execute("select distinct task_id from events where field='source' and to_val='quick_add'").fetchall()
+        qa_rows = conn.execute(
+            "select distinct task_id from events where field='source' and to_val='quick_add'"
+        ).fetchall()
         quick_added_ids = {r["task_id"] for r in qa_rows}
     for t in tasks:
         if t.get("id") in score_map:
@@ -267,7 +288,9 @@ def index() -> str:
             now_queue_data = json.load(f)
             all_queue_tasks = now_queue_data.get("queue", [])
             # Filter out completed tasks from Now Queue
-            now_queue = [task for task in all_queue_tasks if task.get("status") not in ["done", "completed"]]
+            now_queue = [
+                task for task in all_queue_tasks if task.get("status") not in ["done", "completed"]
+            ]
             # Annotate quick-added based on events
             for q in now_queue:
                 if q.get("id") in quick_added_ids:
@@ -402,7 +425,16 @@ def api_update_task(task_id: str) -> ResponseReturnValue:
     if not existing:
         return jsonify({"error": "Task not found"}), 404
 
-    allowed = {"status", "title", "due_at", "est_minutes", "weight", "category", "notes", "checklist"}
+    allowed = {
+        "status",
+        "title",
+        "due_at",
+        "est_minutes",
+        "weight",
+        "category",
+        "notes",
+        "checklist",
+    }
     updates = {k: v for k, v in body.items() if k in allowed}
     if not updates:
         return jsonify({"error": "No updatable fields provided"}), 400
@@ -418,18 +450,25 @@ def api_update_task(task_id: str) -> ResponseReturnValue:
         if k == "checklist":
             try:
                 import json as _json
+
                 _val = _json.dumps(v)
             except Exception:
                 _val = str(v)
             _db.add_event(task_id, k, None, _val)
         else:
-            _db.add_event(task_id, k, str(existing.get(k)) if existing.get(k) is not None else None, str(v) if v is not None else None)
+            _db.add_event(
+                task_id,
+                k,
+                str(existing.get(k)) if existing.get(k) is not None else None,
+                str(v) if v is not None else None,
+            )
 
     # Serialize checklist to JSON string for storage
     updates_to_store = dict(updates)
     if "checklist" in updates_to_store:
         try:
             import json as _json
+
             updates_to_store["checklist"] = _json.dumps(updates_to_store["checklist"])  # type: ignore[index]
         except Exception:
             pass
@@ -437,17 +476,17 @@ def api_update_task(task_id: str) -> ResponseReturnValue:
 
     # If marking done, remove from DB+JSON now queue
     if updates.get("status") in {"done", "completed"}:
-        try:
+        with contextlib.suppress(Exception):
             _db.remove_from_now_queue(task_id)
-        except Exception:
-            pass
         # Also update JSON now_queue
         now_queue_file = STATE_DIR / "now_queue.json"
         if now_queue_file.exists():
             try:
                 with open(now_queue_file) as f:
                     now_payload = json.load(f)
-                now_payload["queue"] = [t for t in now_payload.get("queue", []) if t.get("id") != task_id]
+                now_payload["queue"] = [
+                    t for t in now_payload.get("queue", []) if t.get("id") != task_id
+                ]
                 now_payload.setdefault("metadata", {})["updated"] = datetime.now().isoformat()
                 with open(now_queue_file, "w") as f:
                     json.dump(now_payload, f, indent=2)
@@ -475,17 +514,19 @@ def api_stats() -> ResponseReturnValue:
     review = statuses.count("review")
     done = statuses.count("done") + statuses.count("completed")
     blocked = sum(1 for t in tasks if t.get("status") == "blocked")
-    return jsonify({
-        "total": total,
-        "todo": todo,
-        "doing": doing,
-        "review": review,
-        "done": done,
-        "blocked": blocked,
-        # Back-compat fields
-        "completed": done,
-        "in_progress": doing,
-    })
+    return jsonify(
+        {
+            "total": total,
+            "todo": todo,
+            "doing": doing,
+            "review": review,
+            "done": done,
+            "blocked": blocked,
+            # Back-compat fields
+            "completed": done,
+            "in_progress": doing,
+        }
+    )
 
 
 @app.route("/api/tasks/bulk-update", methods=["POST"])
@@ -517,7 +558,12 @@ def api_bulk_update() -> ResponseReturnValue:
             continue
         # Log events
         for k, v in update_params.items():
-            _db.add_event(tid, k, str(existing.get(k)) if existing.get(k) is not None else None, str(v) if v is not None else None)
+            _db.add_event(
+                tid,
+                k,
+                str(existing.get(k)) if existing.get(k) is not None else None,
+                str(v) if v is not None else None,
+            )
         if _db.update_task_fields(tid, update_params):
             updated_count += 1
 
@@ -626,6 +672,7 @@ def api_export() -> ResponseReturnValue:
         ]
 
         from datetime import datetime as _dt
+
         for task in tasks:
             # Accept due_date or due_at (date-only or ISO timestamp)
             dstr = task.get("due_date") or task.get("due_at") or ""
@@ -636,7 +683,7 @@ def api_export() -> ResponseReturnValue:
                     due = _dt.fromisoformat(dstr).strftime("%Y%m%d")
                 except Exception:
                     # Fallback: use first 10 chars if looks like YYYY-MM-DD
-                    if len(dstr) >= 10 and dstr[4] == '-' and dstr[7] == '-':
+                    if len(dstr) >= 10 and dstr[4] == "-" and dstr[7] == "-":
                         due = dstr[:10].replace("-", "")
             if len(due) == 8:  # YYYYMMDD
                 ics_lines.extend(
@@ -694,22 +741,27 @@ def api_task(task_id: str) -> ResponseReturnValue:
 
     # Log events
     for k, v in updates.items():
-        _db.add_event(task_id, k, str(existing.get(k)) if existing.get(k) is not None else None, str(v) if v is not None else None)
+        _db.add_event(
+            task_id,
+            k,
+            str(existing.get(k)) if existing.get(k) is not None else None,
+            str(v) if v is not None else None,
+        )
 
     _db.update_task_fields(task_id, updates)
 
     # If completed, remove from queue both DB and JSON
     if updates.get("status") in {"done", "completed"}:
-        try:
+        with contextlib.suppress(Exception):
             _db.remove_from_now_queue(task_id)
-        except Exception:
-            pass
         now_queue_file = STATE_DIR / "now_queue.json"
         if now_queue_file.exists():
             try:
                 with open(now_queue_file) as f:
                     now_payload = json.load(f)
-                now_payload["queue"] = [t for t in now_payload.get("queue", []) if t.get("id") != task_id]
+                now_payload["queue"] = [
+                    t for t in now_payload.get("queue", []) if t.get("id") != task_id
+                ]
                 now_payload.setdefault("metadata", {})["updated"] = datetime.now().isoformat()
                 with open(now_queue_file, "w") as f:
                     json.dump(now_payload, f, indent=2)
@@ -743,7 +795,12 @@ def api_bulk_update_tasks_list() -> ResponseReturnValue:
         if not updates:
             continue
         for k, v in updates.items():
-            _db.add_event(tid, k, str(existing.get(k)) if existing.get(k) is not None else None, str(v) if v is not None else None)
+            _db.add_event(
+                tid,
+                k,
+                str(existing.get(k)) if existing.get(k) is not None else None,
+                str(v) if v is not None else None,
+            )
         if _db.update_task_fields(tid, updates):
             updated_count += 1
 
@@ -797,10 +854,10 @@ def filtered_view(view_name: str) -> str:
                     continue
 
     elif view_name == "blocked":
-        filtered_tasks = [t for t in data["tasks"] if t.get("status") == "blocked"]
+        filtered_tasks = [t for t in tasks if t.get("status") == "blocked"]
 
     elif view_name == "doing":
-        filtered_tasks = [t for t in data["tasks"] if t.get("status") == "doing"]
+        filtered_tasks = [t for t in tasks if t.get("status") == "doing"]
 
     # Add display helpers
     for task in filtered_tasks:
@@ -873,12 +930,14 @@ def syllabi_listing() -> str:
             # Skip calendar versions
             if "_with_calendar" not in syllabus_file.name:
                 course_code = syllabus_file.stem
-                syllabi.append({
-                    "code": course_code,
-                    "name": get_course_name(course_code),
-                    "url": f"/syllabi/{course_code}",
-                    "with_calendar_url": f"/syllabi/{course_code}_with_calendar"
-                })
+                syllabi.append(
+                    {
+                        "code": course_code,
+                        "name": get_course_name(course_code),
+                        "url": f"/syllabi/{course_code}",
+                        "with_calendar_url": f"/syllabi/{course_code}_with_calendar",
+                    }
+                )
 
     return render_template("syllabi_listing.html", syllabi=syllabi)  # type: ignore[no-any-return]
 
@@ -892,12 +951,14 @@ def schedules_listing() -> str:
     if schedules_dir.exists():
         for schedule_file in sorted(schedules_dir.glob("*_schedule.html")):
             course_code = schedule_file.stem.replace("_schedule", "")
-            schedules.append({
-                "code": course_code,
-                "name": get_course_name(course_code),
-                "url": f"/schedules/{course_code}",
-                "embed_url": f"/embed/schedule/{course_code}"
-            })
+            schedules.append(
+                {
+                    "code": course_code,
+                    "name": get_course_name(course_code),
+                    "url": f"/schedules/{course_code}",
+                    "embed_url": f"/embed/schedule/{course_code}",
+                }
+            )
 
     return render_template("schedules_listing.html", schedules=schedules)  # type: ignore[no-any-return]
 
@@ -907,7 +968,7 @@ def get_course_name(course_code: str) -> str:
     course_names = {
         "MATH221": "Applied Calculus",
         "MATH251": "Calculus I",
-        "STAT253": "Applied Statistics"
+        "STAT253": "Applied Statistics",
     }
     return course_names.get(course_code, course_code)
 
@@ -1056,12 +1117,12 @@ def view_schedule(course_code: str) -> ResponseReturnValue:
             return f"Schedule not found for {course_code}", 404
 
     # Read and serve the HTML directly with proper headers
-    with open(schedule_file, encoding='utf-8') as f:
+    with open(schedule_file, encoding="utf-8") as f:
         content = f.read()
 
-    response = Response(content, mimetype='text/html')
-    response.headers['Content-Type'] = 'text/html; charset=utf-8'
-    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response = Response(content, mimetype="text/html")
+    response.headers["Content-Type"] = "text/html; charset=utf-8"
+    response.headers["X-Content-Type-Options"] = "nosniff"
     return response
 
 
@@ -1081,12 +1142,12 @@ def view_syllabus(course_code: str) -> ResponseReturnValue:
 
     if html_path.exists():
         # Read and serve the HTML directly with proper headers
-        with open(html_path, encoding='utf-8') as f:
+        with open(html_path, encoding="utf-8") as f:
             content = f.read()
 
-        response = Response(content, mimetype='text/html')
-        response.headers['Content-Type'] = 'text/html; charset=utf-8'
-        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response = Response(content, mimetype="text/html")
+        response.headers["Content-Type"] = "text/html; charset=utf-8"
+        response.headers["X-Content-Type-Options"] = "nosniff"
         return response
     elif md_path.exists():
         # Read markdown and render it with basic HTML wrapper
@@ -1119,7 +1180,7 @@ def view_syllabus(course_code: str) -> ResponseReturnValue:
     else:
         abort(
             404,
-            f"Syllabus not found for {course_code}{' (with calendar)' if variant=='with_calendar' else ''}",
+            f"Syllabus not found for {course_code}{' (with calendar)' if variant == 'with_calendar' else ''}",
         )
 
 
@@ -1357,13 +1418,30 @@ def download_syllabus(course_code: str, format: str) -> ResponseReturnValue:
         return jsonify({"error": "Invalid format. Use 'html' or 'docx'"}), 400
 
     # Get variant from query parameter
-    variant = request.args.get('variant', 'embed')
+    variant = request.args.get("variant", "embed")
 
     # Get the HTML file from site directory (production-ready version)
-    if variant == 'with_calendar':
-        html_path = Config.PROJECT_ROOT / "site" / "courses" / course_code / "fall-2025" / "syllabus" / "index.html"
+    if variant == "with_calendar":
+        html_path = (
+            Config.PROJECT_ROOT
+            / "site"
+            / "courses"
+            / course_code
+            / "fall-2025"
+            / "syllabus"
+            / "index.html"
+        )
     else:
-        html_path = Config.PROJECT_ROOT / "site" / "courses" / course_code / "fall-2025" / "syllabus" / "embed" / "index.html"
+        html_path = (
+            Config.PROJECT_ROOT
+            / "site"
+            / "courses"
+            / course_code
+            / "fall-2025"
+            / "syllabus"
+            / "embed"
+            / "index.html"
+        )
 
     if not html_path.exists():
         return jsonify({"error": "Syllabus HTML not found. Try rebuilding site."}), 404
@@ -1374,7 +1452,7 @@ def download_syllabus(course_code: str, format: str) -> ResponseReturnValue:
             html_path,
             as_attachment=True,
             download_name=f"{course_code}_syllabus_fall2025.html",
-            mimetype="text/html"
+            mimetype="text/html",
         )
 
     elif format == "docx":
@@ -1382,13 +1460,7 @@ def download_syllabus(course_code: str, format: str) -> ResponseReturnValue:
         with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as tmp_docx:
             try:
                 # Use pandoc to convert HTML to DOCX
-                cmd = [
-                    "pandoc",
-                    str(html_path),
-                    "-f", "html",
-                    "-t", "docx",
-                    "-o", tmp_docx.name
-                ]
+                cmd = ["pandoc", str(html_path), "-f", "html", "-t", "docx", "-o", tmp_docx.name]
 
                 # Add reference doc if it exists
                 ref_doc = Config.PROJECT_ROOT / "assets" / "reference.docx"
@@ -1396,10 +1468,7 @@ def download_syllabus(course_code: str, format: str) -> ResponseReturnValue:
                     cmd.extend(["--reference-doc", str(ref_doc)])
 
                 result = subprocess.run(
-                    cmd,
-                    capture_output=True,
-                    text=True,
-                    cwd=Config.PROJECT_ROOT
+                    cmd, capture_output=True, text=True, cwd=Config.PROJECT_ROOT
                 )
 
                 if result.returncode != 0:
@@ -1410,11 +1479,12 @@ def download_syllabus(course_code: str, format: str) -> ResponseReturnValue:
                     tmp_docx.name,
                     as_attachment=True,
                     download_name=f"{course_code}_syllabus_fall2025.docx",
-                    mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 )
             finally:
                 # Clean up temp file after sending
                 import os
+
                 if os.path.exists(tmp_docx.name):
                     os.unlink(tmp_docx.name)
 
@@ -1430,6 +1500,7 @@ def download_schedule(course_code: str, format: str) -> ResponseReturnValue:
 
     # Build the schedule first to ensure it's up to date
     from scripts.build_schedules import ScheduleBuilder
+
     try:
         builder = ScheduleBuilder(output_dir="build/schedules")
         builder.build_schedule(course_code)
@@ -1437,11 +1508,28 @@ def download_schedule(course_code: str, format: str) -> ResponseReturnValue:
         return jsonify({"error": f"Failed to build schedule: {str(e)}"}), 500
 
     # Get the HTML file from site directory (production-ready version)
-    html_path = Config.PROJECT_ROOT / "site" / "courses" / course_code / "fall-2025" / "schedule" / "index.html"
+    html_path = (
+        Config.PROJECT_ROOT
+        / "site"
+        / "courses"
+        / course_code
+        / "fall-2025"
+        / "schedule"
+        / "index.html"
+    )
 
     if not html_path.exists():
         # Try embed version
-        html_path = Config.PROJECT_ROOT / "site" / "courses" / course_code / "fall-2025" / "schedule" / "embed" / "index.html"
+        html_path = (
+            Config.PROJECT_ROOT
+            / "site"
+            / "courses"
+            / course_code
+            / "fall-2025"
+            / "schedule"
+            / "embed"
+            / "index.html"
+        )
 
     if not html_path.exists():
         return jsonify({"error": "Schedule HTML not found. Try rebuilding site."}), 404
@@ -1452,7 +1540,7 @@ def download_schedule(course_code: str, format: str) -> ResponseReturnValue:
             html_path,
             as_attachment=True,
             download_name=f"{course_code}_schedule_fall2025.html",
-            mimetype="text/html"
+            mimetype="text/html",
         )
 
     elif format == "docx":
@@ -1460,13 +1548,7 @@ def download_schedule(course_code: str, format: str) -> ResponseReturnValue:
         with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as tmp_docx:
             try:
                 # Use pandoc to convert HTML to DOCX
-                cmd = [
-                    "pandoc",
-                    str(html_path),
-                    "-f", "html",
-                    "-t", "docx",
-                    "-o", tmp_docx.name
-                ]
+                cmd = ["pandoc", str(html_path), "-f", "html", "-t", "docx", "-o", tmp_docx.name]
 
                 # Add reference doc if it exists
                 ref_doc = Config.PROJECT_ROOT / "assets" / "reference.docx"
@@ -1474,10 +1556,7 @@ def download_schedule(course_code: str, format: str) -> ResponseReturnValue:
                     cmd.extend(["--reference-doc", str(ref_doc)])
 
                 result = subprocess.run(
-                    cmd,
-                    capture_output=True,
-                    text=True,
-                    cwd=Config.PROJECT_ROOT
+                    cmd, capture_output=True, text=True, cwd=Config.PROJECT_ROOT
                 )
 
                 if result.returncode != 0:
@@ -1488,11 +1567,12 @@ def download_schedule(course_code: str, format: str) -> ResponseReturnValue:
                     tmp_docx.name,
                     as_attachment=True,
                     download_name=f"{course_code}_schedule_fall2025.docx",
-                    mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 )
             finally:
                 # Clean up temp file after sending
                 import os
+
                 if os.path.exists(tmp_docx.name):
                     os.unlink(tmp_docx.name)
 
@@ -1614,15 +1694,16 @@ def start_site_preview():
 
         def run_server():
             # Start the site preview server in the background
-            subprocess.Popen([
-                "python", "-m", "http.server", "8000",
-                "-d", str(Config.PROJECT_ROOT / "site")
-            ])
+            subprocess.Popen(
+                ["python", "-m", "http.server", "8000", "-d", str(Config.PROJECT_ROOT / "site")]
+            )
 
         # Start server in a separate thread
         threading.Thread(target=run_server, daemon=True).start()
 
-        return jsonify({"success": True, "message": "Site preview server starting at http://localhost:8000"})
+        return jsonify(
+            {"success": True, "message": "Site preview server starting at http://localhost:8000"}
+        )
 
     except Exception as e:
         logger.error(f"Error starting site preview: {e}")
@@ -1634,7 +1715,7 @@ def api_reprioritize() -> ResponseReturnValue:
     """Regenerate the Now Queue using DB-backed prioritization service."""
     try:
         # Refresh via service; exports JSON snapshot for UI compatibility
-        refreshed = _prio.refresh_now_queue(timebox=int(request.args.get("timebox", 90) or 90))
+        _prio.refresh_now_queue(timebox=int(request.args.get("timebox", 90) or 90))
         # Report count from DB queue if available, else from snapshot
         q = _db.get_now_queue()
         count = len(q)
@@ -1646,7 +1727,7 @@ def api_reprioritize() -> ResponseReturnValue:
                     count = len(payload.get("queue", []))
                 except Exception:
                     pass
-        return jsonify({"success": True, "message": f"Now Queue regenerated", "task_count": count})
+        return jsonify({"success": True, "message": "Now Queue regenerated", "task_count": count})
     except Exception as e:
         logger.error(f"Error during reprioritization: {e}")
         return jsonify({"error": str(e)}), 500
@@ -1733,9 +1814,9 @@ def api_health() -> ResponseReturnValue:
 @app.route("/api/phase", methods=["GET"])
 def api_phase() -> ResponseReturnValue:
     """Return current phase and weights."""
-    health = _prio.health()
+    _prio.health()
     # Use health to confirm DB works; phase computed during refresh endpoints; quick compute here:
-    from dashboard.tools.phase import load_semester_start, detect_phase, phase_weights
+    from dashboard.tools.phase import detect_phase, load_semester_start, phase_weights
 
     sem = load_semester_start(Path("academic-calendar.json"))
     if sem is None:
@@ -1775,7 +1856,9 @@ def api_now_queue_refresh() -> ResponseReturnValue:
     include_courses: set[str] | None = None
     if courses_param:
         include_courses = {c.strip() for c in courses_param.split(",") if c.strip()}
-    queue_ids = _prio.refresh_now_queue(timebox=timebox, k=3, heavy_threshold=heavy_threshold, include_courses=include_courses)
+    queue_ids = _prio.refresh_now_queue(
+        timebox=timebox, k=3, heavy_threshold=heavy_threshold, include_courses=include_courses
+    )
     return jsonify({"queue": queue_ids, "count": len(queue_ids)})
 
 
@@ -1783,6 +1866,7 @@ def api_now_queue_refresh() -> ResponseReturnValue:
 def api_analytics_summary() -> ResponseReturnValue:
     """Simple analytics summary from events: velocity and aging."""
     import datetime as _dt
+
     now = _dt.datetime.utcnow()
     week_ago = now - _dt.timedelta(days=7)
 
@@ -1796,7 +1880,9 @@ def api_analytics_summary() -> ResponseReturnValue:
         cats = {}
         if done_ids:
             q_marks = ",".join(["?"] * len(done_ids))
-            rows = conn.execute(f"select category from tasks where id in ({q_marks})", done_ids).fetchall()
+            rows = conn.execute(
+                f"select category from tasks where id in ({q_marks})", done_ids
+            ).fetchall()
             for r in rows:
                 c = (r["category"] or "uncat").lower()
                 cats[c] = cats.get(c, 0) + 1
@@ -1810,10 +1896,15 @@ def api_analytics_summary() -> ResponseReturnValue:
 
     top_cat = max(cats.items(), key=lambda kv: kv[1])[0] if cats else None
     aging = {r["status"]: r["n"] for r in aging_rows}
-    return jsonify({
-        "velocity": {"total": len(done_ids), "top_category": top_cat},
-        "aging": {"todo_gt7": int(aging.get("todo", 0)), "review_gt7": int(aging.get("review", 0))},
-    })
+    return jsonify(
+        {
+            "velocity": {"total": len(done_ids), "top_category": top_cat},
+            "aging": {
+                "todo_gt7": int(aging.get("todo", 0)),
+                "review_gt7": int(aging.get("review", 0)),
+            },
+        }
+    )
 
 
 @app.route("/api/retro/weekly", methods=["GET"])
@@ -1825,6 +1916,7 @@ def api_retro_weekly() -> ResponseReturnValue:
     if files:
         try:
             import json as _json
+
             return jsonify(_json.load(open(files[0])))
         except Exception:
             pass
@@ -1836,7 +1928,9 @@ def api_retro_weekly() -> ResponseReturnValue:
 def api_quick_add() -> ResponseReturnValue:
     """Create a task from a compact payload (JSON Schema validated; optional AI structuring stub)."""
     payload = request.get_json(silent=True) or {}
-    use_ai = request.args.get("use_ai") in ("1", "true", "yes") or os.environ.get("LLM_ENABLED") in ("1", "true", "yes")
+    use_ai = request.args.get("use_ai") in ("1", "true", "yes") or os.environ.get(
+        "LLM_ENABLED"
+    ) in ("1", "true", "yes")
 
     # If AI toggle requested and free-text provided, do a minimal heuristic structuring
     if use_ai and "text" in payload and not payload.get("title"):
@@ -1844,36 +1938,52 @@ def api_quick_add() -> ResponseReturnValue:
         # Heuristic: [COURSE] Title (cat:category, est:minutes, due:YYYY-MM-DD)
         course = None
         if text.startswith("[") and "]" in text:
-            course = text[1:text.index("]")]
-            text = text[text.index("]")+1:].strip()
+            course = text[1 : text.index("]")]
+            text = text[text.index("]") + 1 :].strip()
         title = text
         import re
-        cat = None; est = None; due = None
+
+        cat = None
+        est = None
+        due = None
         m = re.search(r"cat:([a-zA-Z_]+)", text)
-        if m: cat = m.group(1)
+        if m:
+            cat = m.group(1)
         m = re.search(r"est:(\d+)", text)
-        if m: est = int(m.group(1))
+        if m:
+            est = int(m.group(1))
         m = re.search(r"due:(\d{4}-\d{2}-\d{2})", text)
-        if m: due = m.group(1)
+        if m:
+            due = m.group(1)
         payload.setdefault("course", course)
         payload.setdefault("title", title)
-        if cat: payload.setdefault("category", cat)
-        if est: payload.setdefault("est_minutes", est)
-        if due: payload.setdefault("due_at", due)
+        if cat:
+            payload.setdefault("category", cat)
+        if est:
+            payload.setdefault("est_minutes", est)
+        if due:
+            payload.setdefault("due_at", due)
 
     # Validate against schema
     try:
-        from jsonschema import validate, Draft202012Validator  # type: ignore
         import json as _json
+
+        from jsonschema import Draft202012Validator  # type: ignore
+
         schema_path = Config.PROJECT_ROOT / "dashboard" / "schema" / "quick_add.schema.json"
-        schema = _json.load(open(schema_path))
+        with open(schema_path, encoding="utf-8") as _f:
+            schema = _json.load(_f)
         v = Draft202012Validator(schema)
         errors = sorted(v.iter_errors(payload), key=lambda e: e.path)
         if errors:
-            return jsonify({
-                "error": "Schema validation failed",
-                "details": [f"{'/'.join(map(str, e.path)) or '<root>'}: {e.message}" for e in errors],
-            }), 400
+            return jsonify(
+                {
+                    "error": "Schema validation failed",
+                    "details": [
+                        f"{'/'.join(map(str, e.path)) or '<root>'}: {e.message}" for e in errors
+                    ],
+                }
+            ), 400
     except Exception as _val_exc:
         logger.debug("Quick add schema validation skipped: %s", _val_exc)
 
@@ -1902,10 +2012,8 @@ def api_quick_add() -> ResponseReturnValue:
     except Exception:
         pass
     _db.add_event(task_id, "create", None, "created")
-    try:
+    with contextlib.suppress(Exception):
         _db.add_event(task_id, "source", None, "quick_add")
-    except Exception:
-        pass
 
     # Export snapshot
     try:

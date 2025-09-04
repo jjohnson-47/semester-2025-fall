@@ -100,7 +100,9 @@ def main() -> None:  # pragma: no cover - CLI
     ap.add_argument("--course", required=True, help="Course code, e.g., MATH221")
     ap.add_argument("--in", dest="in_path", required=True, help="Input schedule.json")
     ap.add_argument("--out", required=True, help="Output path for migrated schedule")
-    ap.add_argument("--vars", default="variables/semester.json", help="Variables file to infer term")
+    ap.add_argument(
+        "--vars", default="variables/semester.json", help="Variables file to infer term"
+    )
     args = ap.parse_args()
 
     sched = json.loads(Path(args.in_path).read_text(encoding="utf-8"))
@@ -112,4 +114,3 @@ def main() -> None:  # pragma: no cover - CLI
 
 if __name__ == "__main__":
     main()
-

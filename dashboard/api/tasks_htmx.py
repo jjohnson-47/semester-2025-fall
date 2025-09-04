@@ -4,15 +4,15 @@ HTMX-specific task endpoints with out-of-band swap support.
 Implements dependency-aware updates following HTMX 2.x patterns.
 """
 
+import contextlib
 from typing import cast
 
 from flask import render_template, request
 
 from dashboard.api import api_bp
-from dashboard.services.dependency_service import DependencyService
-from flask import current_app
-from dashboard.db import Database, DatabaseConfig
 from dashboard.config import Config
+from dashboard.db import Database, DatabaseConfig
+from dashboard.services.dependency_service import DependencyService
 
 
 @api_bp.route("/tasks/<task_id>/status", methods=["POST"])
@@ -204,21 +204,19 @@ def quick_add_task() -> str | tuple[str, int]:
 
     if True:  # DB-only; legacy TaskService path removed
         db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
-        try:
+        with contextlib.suppress(Exception):
             db.initialize()
-        except Exception:
-            pass
-        db.create_task({
-            "course": task_data["course"],
-            "title": task_data["title"],
-            "status": "todo",
-            "category": task_data.get("category"),
-            "notes": task_data.get("description"),
-        })
-        try:
+        db.create_task(
+            {
+                "course": task_data["course"],
+                "title": task_data["title"],
+                "status": "todo",
+                "category": task_data.get("category"),
+                "notes": task_data.get("description"),
+            }
+        )
+        with contextlib.suppress(Exception):
             db.export_snapshot_to_json(Config.TASKS_FILE)
-        except Exception:
-            pass
     else:
         pass
 

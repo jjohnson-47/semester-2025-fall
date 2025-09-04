@@ -336,6 +336,7 @@ class TestSmokeTests:
         try:
             # Test imports by verifying app exists
             from dashboard.app import app
+
             assert hasattr(app, "route")
 
             from dashboard.tools import generate_tasks, validate

@@ -3,24 +3,23 @@
 Export API endpoints for different formats.
 """
 
+import contextlib
 import csv
 import json
 from datetime import datetime
 from io import StringIO
-
-from flask import Response, request, current_app
 from pathlib import Path
+
+from flask import Response, current_app, request
 from flask.typing import ResponseReturnValue
 
 from dashboard.api import api_bp
-from dashboard.db import Database, DatabaseConfig
 from dashboard.config import Config
+from dashboard.db import Database, DatabaseConfig
 
 _db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
-try:
+with contextlib.suppress(Exception):
     _db.initialize()
-except Exception:
-    pass
 
 
 @api_bp.route("/export/csv", methods=["GET"])
@@ -158,7 +157,9 @@ def export_ics() -> ResponseReturnValue:
 
     # Filter tasks with due dates (support DB 'due_at')
     if course:
-        tasks = [t for t in tasks if t.get("course") == course and (t.get("due_date") or t.get("due_at"))]
+        tasks = [
+            t for t in tasks if t.get("course") == course and (t.get("due_date") or t.get("due_at"))
+        ]
     else:
         tasks = [t for t in tasks if t.get("due_date") or t.get("due_at")]
 

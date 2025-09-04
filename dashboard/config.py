@@ -97,9 +97,7 @@ class Config:
     API_FORCE_DB = os.environ.get("API_FORCE_DB", "false").lower() in {"1", "true", "yes"}
 
     # Public hosting URL for iframe generation (production deployment)
-    PUBLIC_BASE_URL = os.environ.get(
-        "PUBLIC_BASE_URL", "https://courses.jeffsthings.com"
-    )
+    PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "https://courses.jeffsthings.com")
 
     @staticmethod
     def init_app(app: Any) -> None:

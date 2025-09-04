@@ -189,6 +189,15 @@ pytest tests/golden/ tests/contracts/ tests/property/ -v
 python tests/semantic/test_html_diff_v2.py
 ```
 
+### Deprecations (Fall 2025)
+
+- Some compatibility shims exist to complete merges of pre‑refactor branches:
+  - `scripts/build_pipeline_impl.py` → use `scripts/build_pipeline.py`
+  - `scripts/rules/dates_full.py` → use `scripts/rules/dates.py`
+  - `scripts/schema/migrator.py` → use `scripts.migrations.add_stable_ids`
+  - `scripts/utils/schema/versions/v1_1_0.py` (module file) → import from the package path
+- These emit `DeprecationWarning` and will be removed after Fall 2025. See `docs/DEPRECATIONS.md`.
+
 ### Migration Path
 
 **Phase 1: Validation & Testing** (Current)

@@ -11,10 +11,8 @@ import json
 import pytest
 
 from dashboard import create_app
-from dashboard.db import Database, DatabaseConfig
 from dashboard.config import Config
 from dashboard.db import Database, DatabaseConfig
-from dashboard.config import Config
 
 
 @pytest.fixture
@@ -67,22 +65,26 @@ def test_tasks_crud_and_filters(app, client):
         db.initialize()
         # Clear any existing
         with db.connect() as conn:
-            conn.execute("delete from deps"); conn.execute("delete from now_queue"); conn.execute("delete from tasks")
+            conn.execute("delete from deps")
+            conn.execute("delete from now_queue")
+            conn.execute("delete from tasks")
         for t in _seed_tasks():
             status = t["status"]
             if status == "in_progress":
                 status = "doing"
             elif status == "completed":
                 status = "done"
-            db.create_task({
-                "id": t["id"],
-                "course": t["course"],
-                "title": t["title"],
-                "status": status,
-                "category": t.get("category"),
-                "due_at": t.get("due_date"),
-                "notes": t.get("description"),
-            })
+            db.create_task(
+                {
+                    "id": t["id"],
+                    "course": t["course"],
+                    "title": t["title"],
+                    "status": status,
+                    "category": t.get("category"),
+                    "due_at": t.get("due_date"),
+                    "notes": t.get("description"),
+                }
+            )
 
     # GET list and filter
     resp = client.get("/api/tasks?course=MATH221")
@@ -150,22 +152,26 @@ def test_stats_endpoints(app, client):
         db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
         db.initialize()
         with db.connect() as conn:
-            conn.execute("delete from deps"); conn.execute("delete from now_queue"); conn.execute("delete from tasks")
+            conn.execute("delete from deps")
+            conn.execute("delete from now_queue")
+            conn.execute("delete from tasks")
         for t in _seed_tasks():
             status = t["status"]
             if status == "in_progress":
                 status = "doing"
             elif status == "completed":
                 status = "done"
-            db.create_task({
-                "id": t["id"],
-                "course": t["course"],
-                "title": t["title"],
-                "status": status,
-                "category": t.get("category"),
-                "due_at": t.get("due_date"),
-                "notes": t.get("description"),
-            })
+            db.create_task(
+                {
+                    "id": t["id"],
+                    "course": t["course"],
+                    "title": t["title"],
+                    "status": status,
+                    "category": t.get("category"),
+                    "due_at": t.get("due_date"),
+                    "notes": t.get("description"),
+                }
+            )
 
     # Overall stats
     resp = client.get("/api/stats")
@@ -191,22 +197,26 @@ def test_export_endpoints(app, client):
         db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
         db.initialize()
         with db.connect() as conn:
-            conn.execute("delete from deps"); conn.execute("delete from now_queue"); conn.execute("delete from tasks")
+            conn.execute("delete from deps")
+            conn.execute("delete from now_queue")
+            conn.execute("delete from tasks")
         for t in _seed_tasks():
             status = t["status"]
             if status == "in_progress":
                 status = "doing"
             elif status == "completed":
                 status = "done"
-            db.create_task({
-                "id": t["id"],
-                "course": t["course"],
-                "title": t["title"],
-                "status": status,
-                "category": t.get("category"),
-                "due_at": t.get("due_date"),
-                "notes": t.get("description"),
-            })
+            db.create_task(
+                {
+                    "id": t["id"],
+                    "course": t["course"],
+                    "title": t["title"],
+                    "status": status,
+                    "category": t.get("category"),
+                    "due_at": t.get("due_date"),
+                    "notes": t.get("description"),
+                }
+            )
 
     # JSON export
     resp = client.get("/api/export/json?course=MATH221")

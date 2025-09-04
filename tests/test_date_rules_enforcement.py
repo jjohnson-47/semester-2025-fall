@@ -35,4 +35,3 @@ def test_weekend_avoidance() -> None:
 def test_format_due_output() -> None:
     s = DateRules.format_due("2025-09-01", 2, 0)  # Wed of that week
     assert s.startswith("(due Wed ") and s.endswith(")")
-

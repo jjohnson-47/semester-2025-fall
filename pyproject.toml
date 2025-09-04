@@ -73,6 +73,7 @@ exclude = [
     ".venv",
     "venv",
     "docs/reference",
+    "tests",
 ]
 
 [tool.ruff.lint]

@@ -278,9 +278,7 @@ class TestHTMXEndpoints:
                     }
                 ]
             }
-            response = client.post(
-                "/api/tasks/quick-add", data={"title": "MATH221 New Quick Task"}
-            )
+            response = client.post("/api/tasks/quick-add", data={"title": "MATH221 New Quick Task"})
             assert response.status_code == 200
 
     def test_filtered_tasks_with_special_filters(self, client, mock_dependency_service):

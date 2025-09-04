@@ -41,4 +41,3 @@ def test_migrate_schedule_structure(tmp_path: Path) -> None:
     assert isinstance(wk["assignments"][0], dict) and "id" in wk["assignments"][0]
     assert isinstance(wk["assessments"][0], dict) and "id" in wk["assessments"][0]
     assert migrated["finals"]["assessments"][0]["id"].startswith("2025FA-MATH221-FIN-")
-

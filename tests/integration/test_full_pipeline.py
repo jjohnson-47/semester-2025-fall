@@ -46,15 +46,12 @@ class TestFullPipeline:
             pipeline.run(force=False)
 
             # Check that stages were called
-            assert hasattr(pipeline, 'stages')
+            assert hasattr(pipeline, "stages")
             assert len(pipeline.stages) > 0
 
             # Verify stage order
             stage_names = [name for name, _ in pipeline.stages]
-            expected_order = [
-                "validate", "normalize", "project",
-                "generate", "package", "report"
-            ]
+            expected_order = ["validate", "normalize", "project", "generate", "package", "report"]
             assert stage_names == expected_order
 
         except Exception as e:
@@ -69,8 +66,8 @@ class TestFullPipeline:
 
             # Should return a result
             assert result is not None
-            assert hasattr(result, 'ok')
-            assert hasattr(result, 'messages')
+            assert hasattr(result, "ok")
+            assert hasattr(result, "messages")
 
             # Check for v1.1.0 compatibility
             if not result.ok:
@@ -110,8 +107,7 @@ class TestFullPipeline:
     def test_v2_syllabus_builder_uses_projection(self, temp_output_dir):
         """Test that Syllabus builder uses projection data in v2 mode."""
         syllabus_builder = SyllabusBuilder(
-            template_dir="templates",
-            output_dir=str(temp_output_dir / "syllabi")
+            template_dir="templates", output_dir=str(temp_output_dir / "syllabi")
         )
         os.environ["BUILD_MODE"] = "v2"
         try:
@@ -121,7 +117,8 @@ class TestFullPipeline:
             weeks = data["calendar"].get("weeks", [])
             if weeks:
                 any_formatted = any(
-                    bool(w.get("formatted_assignments") or w.get("formatted_assessments")) for w in weeks
+                    bool(w.get("formatted_assignments") or w.get("formatted_assessments"))
+                    for w in weeks
                 )
                 assert any_formatted, "Expected formatted assignments/assessments in v2"
         finally:
@@ -154,8 +151,7 @@ class TestFullPipeline:
             validation_results[course_id] = result.ok
 
         # At least one course should validate
-        assert any(validation_results.values()), \
-            "No courses passed validation"
+        assert any(validation_results.values()), "No courses passed validation"
 
         # Step 2: Run pipeline
         pipeline = BuildPipeline(all_courses)
@@ -165,14 +161,14 @@ class TestFullPipeline:
         for course_id in all_courses:
             if validation_results[course_id]:
                 # Build schedule
-                schedule_builder = ScheduleBuilder(
-                    output_dir=str(temp_output_dir / "schedules")
-                )
+                schedule_builder = ScheduleBuilder(output_dir=str(temp_output_dir / "schedules"))
                 try:
                     schedule_builder.build_schedule(course_id)
 
                     # Check output exists
-                    schedule_file = temp_output_dir / "schedules" / f"{course_id.lower()}_schedule.html"
+                    (
+                        temp_output_dir / "schedules" / f"{course_id.lower()}_schedule.html"
+                    )
                     # File might not exist if builder uses stubs
 
                 except Exception:
@@ -222,9 +218,7 @@ class TestFullPipeline:
 
         # Test holiday shift
         holidays = ["Fall Break Thu-Fri"]
-        shifted, add_days = rules.apply_holiday_shift(
-            4, holidays, "Homework", False
-        )
+        shifted, add_days = rules.apply_holiday_shift(4, holidays, "Homework", False)
         assert shifted == 0  # Monday
         assert add_days == 7  # Next week
 
@@ -275,7 +269,7 @@ class TestFullPipeline:
                     "week": 1,
                     "topic": "Introduction",
                     "assignments": ["HW1"],
-                    "assessments": ["Quiz 1"]
+                    "assessments": ["Quiz 1"],
                 }
             ]
         }
@@ -289,12 +283,8 @@ class TestFullPipeline:
                 {
                     "week": 1,
                     "topic": "Introduction",
-                    "assignments": [
-                        {"id": "2025FA-MATH221-HW-01", "title": "HW1"}
-                    ],
-                    "assessments": [
-                        {"id": "2025FA-MATH221-QUIZ-01", "title": "Quiz 1"}
-                    ]
+                    "assignments": [{"id": "2025FA-MATH221-HW-01", "title": "HW1"}],
+                    "assessments": [{"id": "2025FA-MATH221-QUIZ-01", "title": "Quiz 1"}],
                 }
             ]
         }
@@ -308,11 +298,8 @@ class TestFullPipeline:
                 {
                     "week": 1,
                     "topic": "Introduction",
-                    "assignments": [
-                        "HW1",
-                        {"id": "2025FA-MATH221-HW-02", "title": "HW2"}
-                    ],
-                    "assessments": ["Quiz 1"]
+                    "assignments": ["HW1", {"id": "2025FA-MATH221-HW-02", "title": "HW2"}],
+                    "assessments": ["Quiz 1"],
                 }
             ]
         }

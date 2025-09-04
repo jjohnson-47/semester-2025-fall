@@ -59,12 +59,15 @@ def generate_stable_id(prefix: str, course: str, type_code: str, seq: int) -> st
 def create_stable_course_id(course: str, term: str, year: int) -> str:
     """Generate stable course instance ID."""
     import hashlib
+
     id_string = f"{course.lower()}-{term.lower()}-{year}"
     hash_suffix = hashlib.sha256(id_string.encode()).hexdigest()[:8]
     return f"{course.lower()}-{term.lower()}-{year}-{hash_suffix}"
 
 
-def migrate_schedule_with_provenance(course: str, schedule: dict[str, Any], prefix: str) -> dict[str, Any]:
+def migrate_schedule_with_provenance(
+    course: str, schedule: dict[str, Any], prefix: str
+) -> dict[str, Any]:
     """Add stable IDs to assignments and assessments with full provenance tracking."""
     migration_timestamp = datetime.now(UTC).isoformat()
 
@@ -89,9 +92,9 @@ def migrate_schedule_with_provenance(course: str, schedule: dict[str, Any], pref
                 "rule": "stable_id_migration_v2",
                 "timestamp": migration_timestamp,
                 "description": f"Enhanced stable ID migration for {course} with full provenance tracking",
-                "transformation_count": 0  # Will be updated
+                "transformation_count": 0,  # Will be updated
             }
-        ]
+        ],
     }
 
     transformation_count = 0
@@ -104,21 +107,23 @@ def migrate_schedule_with_provenance(course: str, schedule: dict[str, Any], pref
             code = classify_item(label, is_assessment=False)
             sid = generate_stable_id(prefix, course, code, _next(code))
 
-            new_items.append({
-                "id": sid,
-                "title": label,
-                "_provenance": {
-                    "source": "original",
-                    "original_value": label,
-                    "transformation": "string_to_object_with_stable_id",
-                    "timestamp": migration_timestamp,
-                    "rule": "stable_id_assignment_migration",
-                    "week": week_idx,
-                    "position": item_idx + 1,
-                    "classification": code,
-                    "confidence": 1.0
+            new_items.append(
+                {
+                    "id": sid,
+                    "title": label,
+                    "_provenance": {
+                        "source": "original",
+                        "original_value": label,
+                        "transformation": "string_to_object_with_stable_id",
+                        "timestamp": migration_timestamp,
+                        "rule": "stable_id_assignment_migration",
+                        "week": week_idx,
+                        "position": item_idx + 1,
+                        "classification": code,
+                        "confidence": 1.0,
+                    },
                 }
-            })
+            )
             transformation_count += 1
 
         if new_items:
@@ -131,21 +136,23 @@ def migrate_schedule_with_provenance(course: str, schedule: dict[str, Any], pref
             code = classify_item(label, is_assessment=True)
             sid = generate_stable_id(prefix, course, code, _next(code))
 
-            new_tests.append({
-                "id": sid,
-                "title": label,
-                "_provenance": {
-                    "source": "original",
-                    "original_value": label,
-                    "transformation": "string_to_object_with_stable_id",
-                    "timestamp": migration_timestamp,
-                    "rule": "stable_id_assessment_migration",
-                    "week": week_idx,
-                    "position": item_idx + 1,
-                    "classification": code,
-                    "confidence": 1.0
+            new_tests.append(
+                {
+                    "id": sid,
+                    "title": label,
+                    "_provenance": {
+                        "source": "original",
+                        "original_value": label,
+                        "transformation": "string_to_object_with_stable_id",
+                        "timestamp": migration_timestamp,
+                        "rule": "stable_id_assessment_migration",
+                        "week": week_idx,
+                        "position": item_idx + 1,
+                        "classification": code,
+                        "confidence": 1.0,
+                    },
                 }
-            })
+            )
             transformation_count += 1
 
         if new_tests:
@@ -159,21 +166,23 @@ def migrate_schedule_with_provenance(course: str, schedule: dict[str, Any], pref
         for item_idx, label in enumerate(finals_tests):
             sid = generate_stable_id(prefix, course, "FIN", _next("FIN"))
 
-            out_tests.append({
-                "id": sid,
-                "title": label,
-                "_provenance": {
-                    "source": "original",
-                    "original_value": label,
-                    "transformation": "string_to_object_with_stable_id",
-                    "timestamp": migration_timestamp,
-                    "rule": "stable_id_finals_migration",
-                    "week": "finals",
-                    "position": item_idx + 1,
-                    "classification": "FIN",
-                    "confidence": 1.0
+            out_tests.append(
+                {
+                    "id": sid,
+                    "title": label,
+                    "_provenance": {
+                        "source": "original",
+                        "original_value": label,
+                        "transformation": "string_to_object_with_stable_id",
+                        "timestamp": migration_timestamp,
+                        "rule": "stable_id_finals_migration",
+                        "week": "finals",
+                        "position": item_idx + 1,
+                        "classification": "FIN",
+                        "confidence": 1.0,
+                    },
                 }
-            })
+            )
             transformation_count += 1
 
         if out_tests:
@@ -183,21 +192,24 @@ def migrate_schedule_with_provenance(course: str, schedule: dict[str, Any], pref
     out["_meta"]["provenance"][0]["transformation_count"] = transformation_count
 
     # Add summary provenance
-    out["_meta"]["provenance"].append({
-        "rule": "migration_summary",
-        "timestamp": migration_timestamp,
-        "description": f"Successfully migrated {transformation_count} items to stable ID format",
-        "statistics": {
-            "total_items": transformation_count,
-            "assignments": sum(len(wk.get("assignments", [])) for wk in out.get("weeks", [])),
-            "assessments": sum(len(wk.get("assessments", [])) for wk in out.get("weeks", [])),
-            "finals": len(out.get("finals", {}).get("assessments", [])),
-            "sequence_counters": dict(seq_map)
+    out["_meta"]["provenance"].append(
+        {
+            "rule": "migration_summary",
+            "timestamp": migration_timestamp,
+            "description": f"Successfully migrated {transformation_count} items to stable ID format",
+            "statistics": {
+                "total_items": transformation_count,
+                "assignments": sum(len(wk.get("assignments", [])) for wk in out.get("weeks", [])),
+                "assessments": sum(len(wk.get("assessments", [])) for wk in out.get("weeks", [])),
+                "finals": len(out.get("finals", {}).get("assessments", [])),
+                "sequence_counters": dict(seq_map),
+            },
         }
-    })
+    )
 
     # Calculate checksum of content (excluding _meta)
     import hashlib
+
     content_for_checksum = {k: v for k, v in out.items() if k != "_meta"}
     content_json = json.dumps(content_for_checksum, sort_keys=True)
     checksum = hashlib.sha256(content_json.encode()).hexdigest()

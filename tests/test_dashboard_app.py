@@ -37,10 +37,13 @@ def client():
         # Rebind module-level _db to temp DB and ensure clean state
         with patch("dashboard.app._db", Database(DatabaseConfig(Path(tmpdir) / "tasks.db"))):
             from dashboard.app import _db as _db_mod
+
             try:
                 _db_mod.initialize()
                 with _db_mod.connect() as conn:
-                    conn.execute("delete from deps"); conn.execute("delete from now_queue"); conn.execute("delete from tasks")
+                    conn.execute("delete from deps")
+                    conn.execute("delete from now_queue")
+                    conn.execute("delete from tasks")
             except Exception:
                 pass
             yield client
@@ -88,6 +91,7 @@ def sample_tasks():
 
 class TestTaskManager:
     """Legacy TaskManager tests removed in v2 cleanup."""
+
     pass
 
     @pytest.mark.unit
@@ -124,21 +128,24 @@ class TestDashboardRoutes:
         """Test GET /api/tasks endpoint."""
         # Seed DB with sample tasks
         from dashboard.app import _db as _db_mod
+
         for t in sample_tasks["tasks"]:
             st = t["status"]
             if st == "in_progress":
                 st = "doing"
             if st == "completed":
                 st = "done"
-            _db_mod.create_task({
-                "id": t["id"],
-                "course": t["course"],
-                "title": t["title"],
-                "status": st,
-                "category": t.get("category"),
-                "due_at": t.get("due_date"),
-                "notes": t.get("description"),
-            })
+            _db_mod.create_task(
+                {
+                    "id": t["id"],
+                    "course": t["course"],
+                    "title": t["title"],
+                    "status": st,
+                    "category": t.get("category"),
+                    "due_at": t.get("due_date"),
+                    "notes": t.get("description"),
+                }
+            )
         response = client.get("/api/tasks")
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -149,21 +156,24 @@ class TestDashboardRoutes:
         """Test filtering tasks by course."""
         # Seed DB
         from dashboard.app import _db as _db_mod
+
         for t in sample_tasks["tasks"]:
             st = t["status"]
             if st == "in_progress":
                 st = "doing"
             if st == "completed":
                 st = "done"
-            _db_mod.create_task({
-                "id": t["id"],
-                "course": t["course"],
-                "title": t["title"],
-                "status": st,
-                "category": t.get("category"),
-                "due_at": t.get("due_date"),
-                "notes": t.get("description"),
-            })
+            _db_mod.create_task(
+                {
+                    "id": t["id"],
+                    "course": t["course"],
+                    "title": t["title"],
+                    "status": st,
+                    "category": t.get("category"),
+                    "due_at": t.get("due_date"),
+                    "notes": t.get("description"),
+                }
+            )
         response = client.get("/api/tasks?course=MATH221")
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -175,21 +185,24 @@ class TestDashboardRoutes:
         """Test filtering tasks by status."""
         # Seed DB
         from dashboard.app import _db as _db_mod
+
         for t in sample_tasks["tasks"]:
             st = t["status"]
             if st == "in_progress":
                 st = "doing"
             if st == "completed":
                 st = "done"
-            _db_mod.create_task({
-                "id": t["id"],
-                "course": t["course"],
-                "title": t["title"],
-                "status": st,
-                "category": t.get("category"),
-                "due_at": t.get("due_date"),
-                "notes": t.get("description"),
-            })
+            _db_mod.create_task(
+                {
+                    "id": t["id"],
+                    "course": t["course"],
+                    "title": t["title"],
+                    "status": st,
+                    "category": t.get("category"),
+                    "due_at": t.get("due_date"),
+                    "notes": t.get("description"),
+                }
+            )
         response = client.get("/api/tasks?status=completed")
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -201,6 +214,7 @@ class TestDashboardRoutes:
         """Test PUT /api/tasks/<task_id> endpoint."""
         # seed a task
         from dashboard.app import _db as _db_mod
+
         _db_mod.create_task({"id": "task-001", "course": "MATH221", "title": "T", "status": "todo"})
         response = client.put("/api/tasks/task-001", json={"status": "completed"})
         assert response.status_code == 200
@@ -218,11 +232,24 @@ class TestDashboardRoutes:
         """Test GET /api/stats endpoint."""
         # Seed DB
         from dashboard.app import _db as _db_mod
+
         for t in sample_tasks["tasks"]:
             st = t["status"]
-            if st == "in_progress": st = "doing"
-            if st == "completed": st = "done"
-            _db_mod.create_task({"id": t["id"], "course": t["course"], "title": t["title"], "status": st, "category": t.get("category"), "due_at": t.get("due_date"), "notes": t.get("description")})
+            if st == "in_progress":
+                st = "doing"
+            if st == "completed":
+                st = "done"
+            _db_mod.create_task(
+                {
+                    "id": t["id"],
+                    "course": t["course"],
+                    "title": t["title"],
+                    "status": st,
+                    "category": t.get("category"),
+                    "due_at": t.get("due_date"),
+                    "notes": t.get("description"),
+                }
+            )
         response = client.get("/api/stats")
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -325,11 +352,24 @@ class TestDashboardIntegration:
         """Test bulk task operations."""
         # Seed DB
         from dashboard.app import _db as _db_mod
+
         for t in sample_tasks["tasks"]:
             st = t["status"]
-            if st == "in_progress": st = "doing"
-            if st == "completed": st = "done"
-            _db_mod.create_task({"id": t["id"], "course": t["course"], "title": t["title"], "status": st, "category": t.get("category"), "due_at": t.get("due_date"), "notes": t.get("description")})
+            if st == "in_progress":
+                st = "doing"
+            if st == "completed":
+                st = "done"
+            _db_mod.create_task(
+                {
+                    "id": t["id"],
+                    "course": t["course"],
+                    "title": t["title"],
+                    "status": st,
+                    "category": t.get("category"),
+                    "due_at": t.get("due_date"),
+                    "notes": t.get("description"),
+                }
+            )
         # Bulk update all MATH221 tasks
         response = client.post(
             "/api/tasks/bulk-update",
@@ -341,11 +381,24 @@ class TestDashboardIntegration:
         """Test exporting tasks to different formats."""
         # Seed DB
         from dashboard.app import _db as _db_mod
+
         for t in sample_tasks["tasks"]:
             st = t["status"]
-            if st == "in_progress": st = "doing"
-            if st == "completed": st = "done"
-            _db_mod.create_task({"id": t["id"], "course": t["course"], "title": t["title"], "status": st, "category": t.get("category"), "due_at": t.get("due_date"), "notes": t.get("description")})
+            if st == "in_progress":
+                st = "doing"
+            if st == "completed":
+                st = "done"
+            _db_mod.create_task(
+                {
+                    "id": t["id"],
+                    "course": t["course"],
+                    "title": t["title"],
+                    "status": st,
+                    "category": t.get("category"),
+                    "due_at": t.get("due_date"),
+                    "notes": t.get("description"),
+                }
+            )
         # Export as CSV
         response = client.get("/api/export?format=csv")
         assert response.status_code == 200

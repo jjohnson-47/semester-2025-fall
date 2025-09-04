@@ -3,7 +3,7 @@
 
 Provides a proper architectural approach to CSS management that:
 - Integrates with the template rendering system
-- Supports both local and production deployment contexts  
+- Supports both local and production deployment contexts
 - Maintains course-specific styling paradigm
 - Embeds styles inline for standalone HTML files
 """
@@ -16,14 +16,16 @@ from typing import Any
 
 class DeploymentContext(Enum):
     """Deployment context for style rendering."""
-    LOCAL = "local"        # Standalone HTML files with embedded CSS
+
+    LOCAL = "local"  # Standalone HTML files with embedded CSS
     PRODUCTION = "production"  # Site deployment with external CSS files
-    IFRAME = "iframe"      # Blackboard iframe embedding
+    IFRAME = "iframe"  # Blackboard iframe embedding
 
 
 @dataclass
 class StyleConfiguration:
     """Style system configuration."""
+
     deployment_context: DeploymentContext = DeploymentContext.LOCAL
     base_css_path: Path = Path("assets/css/course.css")
     courses_css_dir: Path = Path("assets/css/courses")
@@ -37,7 +39,7 @@ class StyleConfiguration:
 
 class StyleSystem:
     """Manages styles for course material generation.
-    
+
     This is the proper architectural component for CSS management in v2.
     It integrates with the template system to provide context-aware styling.
     """
@@ -45,28 +47,28 @@ class StyleSystem:
     # Course-specific color themes (Blackboard-compatible)
     COURSE_COLORS = {
         "MATH221": {
-            "primary": "#0066cc",      # Blue
+            "primary": "#0066cc",  # Blue
             "primary_light": "#3399ff",
             "primary_dark": "#004499",
-            "accent": "#009900",        # Green
+            "accent": "#009900",  # Green
         },
         "MATH251": {
-            "primary": "#006600",      # Green
+            "primary": "#006600",  # Green
             "primary_light": "#339933",
             "primary_dark": "#004400",
-            "accent": "#0066cc",        # Blue
+            "accent": "#0066cc",  # Blue
         },
         "STAT253": {
-            "primary": "#cc6600",      # Orange
+            "primary": "#cc6600",  # Orange
             "primary_light": "#ff9933",
             "primary_dark": "#994400",
-            "accent": "#006666",        # Teal
-        }
+            "accent": "#006666",  # Teal
+        },
     }
 
     def __init__(self, config: StyleConfiguration | None = None):
         """Initialize style system.
-        
+
         Args:
             config: Style configuration, defaults to LOCAL deployment
         """
@@ -74,13 +76,13 @@ class StyleSystem:
 
     def get_template_style_context(self, course_code: str) -> dict[str, Any]:
         """Get style context for template rendering.
-        
+
         This is the main integration point with the template system.
         It provides all necessary style information based on deployment context.
-        
+
         Args:
             course_code: Course identifier (e.g., MATH221)
-            
+
         Returns:
             Dictionary with style-related template variables:
             - style_mode: 'embedded' or 'linked'
@@ -91,31 +93,35 @@ class StyleSystem:
             - font_imports: Font import HTML
         """
         context = {
-            'style_mode': 'embedded' if self.config.should_embed() else 'linked',
-            'font_imports': self._get_font_imports(),
+            "style_mode": "embedded" if self.config.should_embed() else "linked",
+            "font_imports": self._get_font_imports(),
         }
 
         if self.config.should_embed():
             # For local deployment, embed CSS inline for standalone HTML
-            context.update({
-                'base_css_content': self._load_base_css(),
-                'course_css_content': self._load_course_css(course_code),
-                'has_embedded_styles': True,
-            })
+            context.update(
+                {
+                    "base_css_content": self._load_base_css(),
+                    "course_css_content": self._load_course_css(course_code),
+                    "has_embedded_styles": True,
+                }
+            )
         else:
             # For production deployment, use external CSS files
-            context.update({
-                'base_css_path': self._get_css_path('course.css'),
-                'course_css_path': self._get_css_path(f'courses/{course_code}.css'),
-                'has_embedded_styles': False,
-            })
+            context.update(
+                {
+                    "base_css_path": self._get_css_path("course.css"),
+                    "course_css_path": self._get_css_path(f"courses/{course_code}.css"),
+                    "has_embedded_styles": False,
+                }
+            )
 
         return context
 
     def _load_base_css(self) -> str:
         """Load base CSS content for embedding."""
         if self.config.base_css_path.exists():
-            return self.config.base_css_path.read_text(encoding='utf-8')
+            return self.config.base_css_path.read_text(encoding="utf-8")
         return self._get_fallback_css()
 
     def _load_course_css(self, course_code: str) -> str:
@@ -123,7 +129,7 @@ class StyleSystem:
         # First check for an existing course CSS file
         course_css = self.config.courses_css_dir / f"{course_code}.css"
         if course_css.exists():
-            return course_css.read_text(encoding='utf-8')
+            return course_css.read_text(encoding="utf-8")
 
         # Generate course-specific CSS from color themes
         if course_code in self.COURSE_COLORS:
@@ -131,12 +137,12 @@ class StyleSystem:
             return f"""
 /* Course-specific styles for {course_code} */
 :root {{
-    --color-primary: {colors['primary']};
-    --color-primary-light: {colors['primary_light']};
-    --color-primary-dark: {colors['primary_dark']};
-    --accent-color: {colors['accent']};
-    --course-theme-primary: {colors['primary']};
-    --course-theme-accent: {colors['accent']};
+    --color-primary: {colors["primary"]};
+    --color-primary-light: {colors["primary_light"]};
+    --color-primary-dark: {colors["primary_dark"]};
+    --accent-color: {colors["accent"]};
+    --course-theme-primary: {colors["primary"]};
+    --course-theme-accent: {colors["accent"]};
 }}
 
 /* Course-specific header styling */
@@ -231,7 +237,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
 }
 
-h1 { 
+h1 {
     color: var(--color-primary);
     border-bottom: 2px solid var(--color-primary);
     padding-bottom: 0.5rem;

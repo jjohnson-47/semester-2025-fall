@@ -3,20 +3,20 @@
 Statistics API endpoints.
 """
 
-from flask import jsonify, current_app
+import contextlib
 import json
 from pathlib import Path
+
+from flask import current_app, jsonify
 from flask.typing import ResponseReturnValue
 
 from dashboard.api import api_bp
-from dashboard.db import Database, DatabaseConfig
 from dashboard.config import Config
+from dashboard.db import Database, DatabaseConfig
 
 _db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
-try:
+with contextlib.suppress(Exception):
     _db.initialize()
-except Exception:
-    pass
 
 
 @api_bp.route("/stats", methods=["GET"])
@@ -86,11 +86,11 @@ def get_course_stats(course_code: str) -> ResponseReturnValue:
                 data = json.loads(p.read_text())
                 tasks = [t for t in data.get("tasks", []) if t.get("course") == course_code.upper()]
             else:
-                tasks = [t for t in _db.list_tasks(course=course_code.upper())]
+                tasks = list(_db.list_tasks(course=course_code.upper()))
         except Exception:
-            tasks = [t for t in _db.list_tasks(course=course_code.upper())]
+            tasks = list(_db.list_tasks(course=course_code.upper()))
     else:
-        tasks = [t for t in _db.list_tasks(course=course_code.upper())]
+        tasks = list(_db.list_tasks(course=course_code.upper()))
 
     if not tasks:
         return jsonify({"error": "No tasks found for this course"}), 404

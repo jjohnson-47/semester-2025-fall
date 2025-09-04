@@ -6,9 +6,9 @@ deterministic top-K selection that respects simple constraints.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import os
-from typing import Iterable, List
+from collections.abc import Iterable
+from dataclasses import dataclass
 
 
 @dataclass
@@ -21,7 +21,16 @@ class Candidate:
     status: str
 
 
-def _fallback_select(candidates: Iterable[Candidate], *, timebox: int, k: int, heavy_threshold: int, exclude_status: set[str] | None = None, min_courses: int | None = None, wip_cap: int | None = None) -> list[Candidate]:
+def _fallback_select(
+    candidates: Iterable[Candidate],
+    *,
+    timebox: int,
+    k: int,
+    heavy_threshold: int,
+    exclude_status: set[str] | None = None,
+    min_courses: int | None = None,
+    wip_cap: int | None = None,
+) -> list[Candidate]:
     """Deterministic fallback: filter invalid, sort by score, take top-K within timebox & ≤1 heavy."""
     ex = exclude_status or {"done", "blocked"}
     pool = [c for c in candidates if c.status not in ex]
@@ -41,13 +50,13 @@ def _fallback_select(candidates: Iterable[Candidate], *, timebox: int, k: int, h
         if is_heavy and heavy_count >= 1:
             continue
         # WIP cap
-        if wip_cap is not None and c.status == 'doing' and doing_count >= wip_cap:
+        if wip_cap is not None and c.status == "doing" and doing_count >= wip_cap:
             continue
         selected.append(c)
         time_used += minutes
         if is_heavy:
             heavy_count += 1
-        if c.status == 'doing':
+        if c.status == "doing":
             doing_count += 1
         courses.add(c.course)
     # Try to satisfy min_courses by swapping if needed (greedy)
@@ -57,7 +66,17 @@ def _fallback_select(candidates: Iterable[Candidate], *, timebox: int, k: int, h
     return selected
 
 
-def select_now_queue(candidates: Iterable[Candidate], *, timebox: int = 90, k: int = 3, heavy_threshold: int = 60, require_chain_heads: bool = True, min_courses: int | None = None, exclude_status: set[str] | None = None, wip_cap: int | None = None) -> List[Candidate]:
+def select_now_queue(
+    candidates: Iterable[Candidate],
+    *,
+    timebox: int = 90,
+    k: int = 3,
+    heavy_threshold: int = 60,
+    require_chain_heads: bool = True,
+    min_courses: int | None = None,
+    exclude_status: set[str] | None = None,
+    wip_cap: int | None = None,
+) -> list[Candidate]:
     """Select Now Queue using CP-SAT if available, otherwise fallback.
 
     Constraints:
@@ -73,7 +92,14 @@ def select_now_queue(candidates: Iterable[Candidate], *, timebox: int = 90, k: i
             raise ImportError("PRIO_USE_CPSAT disabled")
         from ortools.sat.python import cp_model  # type: ignore
     except Exception:
-        return _fallback_select(candidates, timebox=timebox, k=k, heavy_threshold=heavy_threshold, exclude_status=exclude_status, min_courses=min_courses)
+        return _fallback_select(
+            candidates,
+            timebox=timebox,
+            k=k,
+            heavy_threshold=heavy_threshold,
+            exclude_status=exclude_status,
+            min_courses=min_courses,
+        )
 
     ex = exclude_status or {"done", "blocked"}
     cand = [c for c in candidates if c.status not in ex]
@@ -100,7 +126,7 @@ def select_now_queue(candidates: Iterable[Candidate], *, timebox: int = 90, k: i
     courses: dict[str | None, list] = {}
     for c in cand:
         courses.setdefault(c.course, []).append(c)
-    if min_courses and len([c for c in courses.keys() if c]) >= min_courses:
+    if min_courses and len([c for c in courses if c]) >= min_courses:
         # Introduce boolean vars indicating if any task of a course is selected
         course_sel = {}
         for course, items in courses.items():
@@ -115,7 +141,7 @@ def select_now_queue(candidates: Iterable[Candidate], *, timebox: int = 90, k: i
 
     # WIP cap for doing status
     if wip_cap is not None:
-        model.Add(sum(x[c.id] for c in cand if c.status == 'doing') <= int(wip_cap))
+        model.Add(sum(x[c.id] for c in cand if c.status == "doing") <= int(wip_cap))
 
     # Objective: maximize Σ(score*100)
     model.Maximize(sum(int(round(c.score * 100)) * x[c.id] for c in cand))
@@ -126,6 +152,14 @@ def select_now_queue(candidates: Iterable[Candidate], *, timebox: int = 90, k: i
     res = solver.Solve(model)
 
     if res not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
-        return _fallback_select(cand, timebox=timebox, k=k, heavy_threshold=heavy_threshold, exclude_status=exclude_status, min_courses=min_courses, wip_cap=wip_cap)
+        return _fallback_select(
+            cand,
+            timebox=timebox,
+            k=k,
+            heavy_threshold=heavy_threshold,
+            exclude_status=exclude_status,
+            min_courses=min_courses,
+            wip_cap=wip_cap,
+        )
 
     return [c for c in cand if solver.Value(x[c.id]) == 1]

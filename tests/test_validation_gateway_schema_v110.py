@@ -43,4 +43,3 @@ def test_schedule_schema_v110_accepts_object_items() -> None:
     }
     res = vg.validate_schedule_v1_1_0(sched)
     assert res.ok, res.messages
-

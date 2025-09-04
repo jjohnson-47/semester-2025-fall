@@ -10,6 +10,7 @@ from typing import Any
 
 class AssignmentType(Enum):
     """Types of assignments with different due date rules."""
+
     HOMEWORK = "homework"
     QUIZ = "quiz"
     EXAM = "exam"
@@ -58,14 +59,14 @@ class Provenance:
             "actor": self.actor,
             "confidence": self.confidence,
             "original_value": self.original_value,
-            "transformation": self.transformation
+            "transformation": self.transformation,
         }
 
 
 @dataclass
 class NormalizedField:
     """A field with value and provenance tracking.
-    
+
     This is the atomic unit of normalized data. Every field
     in the normalized course tracks its origin and transformations.
     """
@@ -87,7 +88,7 @@ class NormalizedField:
         """Convenience accessor for confidence."""
         return self.provenance.confidence
 
-    def with_value(self, new_value: Any, rule: str = None) -> 'NormalizedField':
+    def with_value(self, new_value: Any, rule: str = None) -> "NormalizedField":
         """Create new field with updated value."""
         return NormalizedField(
             value=new_value,
@@ -95,12 +96,12 @@ class NormalizedField:
                 source=FieldSource.RULE_APPLIED,
                 rule=rule,
                 original_value=self.value,
-                confidence=self.confidence * 0.95  # Slight confidence decay
+                confidence=self.confidence * 0.95,  # Slight confidence decay
             ),
             field_name=self.field_name,
             field_type=self.field_type,
             validation_rules=self.validation_rules.copy(),
-            warnings=self.warnings.copy()
+            warnings=self.warnings.copy(),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -111,28 +112,23 @@ class NormalizedField:
             "field_name": self.field_name,
             "field_type": self.field_type,
             "validation_rules": self.validation_rules,
-            "warnings": self.warnings
+            "warnings": self.warnings,
         }
 
     @classmethod
-    def from_original(cls, value: Any, field_name: str = None) -> 'NormalizedField':
+    def from_original(cls, value: Any, field_name: str = None) -> "NormalizedField":
         """Create field from original source data."""
         return cls(
-            value=value,
-            provenance=Provenance(source=FieldSource.ORIGINAL),
-            field_name=field_name
+            value=value, provenance=Provenance(source=FieldSource.ORIGINAL), field_name=field_name
         )
 
     @classmethod
-    def from_default(cls, value: Any, field_name: str = None) -> 'NormalizedField':
+    def from_default(cls, value: Any, field_name: str = None) -> "NormalizedField":
         """Create field from default value."""
         return cls(
             value=value,
-            provenance=Provenance(
-                source=FieldSource.DEFAULT,
-                confidence=0.8
-            ),
-            field_name=field_name
+            provenance=Provenance(source=FieldSource.DEFAULT, confidence=0.8),
+            field_name=field_name,
         )
 
 
@@ -202,7 +198,7 @@ class CoursePolicy:
 @dataclass
 class NormalizedCourse:
     """Fully normalized course with all components.
-    
+
     This is the complete normalized representation of a course,
     with every field tracked for provenance.
     """
@@ -249,7 +245,7 @@ class NormalizedCourse:
         all_fields = []
 
         # Collect all fields
-        for attr_name in ['identity', 'instructor']:
+        for attr_name in ["identity", "instructor"]:
             obj = getattr(self, attr_name)
             if obj:
                 for field_name in obj.__dataclass_fields__:
@@ -287,7 +283,9 @@ class NormalizedCourse:
                 "name": self.instructor.name.to_dict(),
                 "email": self.instructor.email.to_dict() if self.instructor.email else None,
                 "office": self.instructor.office.to_dict() if self.instructor.office else None,
-                "office_hours": self.instructor.office_hours.to_dict() if self.instructor.office_hours else None,
+                "office_hours": self.instructor.office_hours.to_dict()
+                if self.instructor.office_hours
+                else None,
             },
             "schedule_weeks": [
                 {
@@ -320,8 +318,7 @@ class NormalizedCourse:
                 for policy in self.policies
             ],
             "important_dates": {
-                key: field.to_dict()
-                for key, field in self.important_dates.items()
+                key: field.to_dict() for key, field in self.important_dates.items()
             },
             "metadata": {
                 "normalized_at": self.normalized_at.isoformat(),
@@ -330,7 +327,7 @@ class NormalizedCourse:
                 "warnings": self.warnings,
                 "errors": self.errors,
                 "confidence": self.get_confidence(),
-            }
+            },
         }
 
         return result

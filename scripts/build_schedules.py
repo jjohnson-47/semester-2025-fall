@@ -232,10 +232,7 @@ class ScheduleBuilder:
             if projection_weeks:
                 for idx, pw in enumerate(projection_weeks, 1):
                     # Get corresponding calendar week for date calculation
-                    if idx <= len(instruction_weeks):
-                        cal_week = instruction_weeks[idx - 1]
-                    else:
-                        cal_week = None
+                    cal_week = instruction_weeks[idx - 1] if idx <= len(instruction_weeks) else None
 
                     # Always compute date_range from calendar to ensure alignment
                     date_range = ""
@@ -284,7 +281,7 @@ class ScheduleBuilder:
                             html_assessments.append(item)
 
                     rows.append(
-                        f"| {idx} | {date_range}{holidays_str} | {pw.get('topic','')} | {', '.join(assignments_with_dates)} | {', '.join(assessments_with_dates)} |"
+                        f"| {idx} | {date_range}{holidays_str} | {pw.get('topic', '')} | {', '.join(assignments_with_dates)} | {', '.join(assessments_with_dates)} |"
                     )
                     html_weeks.append(
                         {
@@ -296,7 +293,10 @@ class ScheduleBuilder:
                             "readings": pw.get("readings", []),
                             "assignments": html_assignments,
                             "assessments": html_assessments,
-                            "has_exam": any("exam" in a.lower() or "midterm" in a.lower() for a in pw.get("assessments", [])),
+                            "has_exam": any(
+                                "exam" in a.lower() or "midterm" in a.lower()
+                                for a in pw.get("assessments", [])
+                            ),
                             "is_finals": False,
                         }
                     )
@@ -463,7 +463,7 @@ class ScheduleBuilder:
                 "weeks": html_weeks,
                 "instructor": instructor,
                 "course_code": course_code,  # For style template
-                **style_context  # Include all style context
+                **style_context,  # Include all style context
             }
             html_out = tpl.render(**html_context)
             html_file = self.output_dir / f"{course_code}_schedule.html"

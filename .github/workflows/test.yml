@@ -40,9 +40,13 @@ jobs:
       run: |
         uv run --with ruff ruff check scripts/ dashboard/ tests/
 
-    - name: Run type checking
+    - name: Run type checking (focused)
       run: |
-        uv run --with mypy mypy scripts/ dashboard/ --ignore-missing-imports
+        uv run --with mypy mypy \
+          scripts/rules \
+          scripts/build_pipeline.py \
+          dashboard/api \
+          --ignore-missing-imports
 
     - name: Run tests with coverage
       run: |

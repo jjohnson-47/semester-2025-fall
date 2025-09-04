@@ -32,9 +32,7 @@ def extract_links(md: str) -> Iterable[str]:
 
 
 def is_relative_link(target: str) -> bool:
-    if target.startswith(("http://", "https://", "mailto:", "#")):
-        return False
-    return True
+    return not target.startswith(("http://", "https://", "mailto:", "#"))
 
 
 def check_links(files: list[Path]) -> list[tuple[Path, str]]:
@@ -118,4 +116,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

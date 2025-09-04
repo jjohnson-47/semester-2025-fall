@@ -5,4 +5,3 @@ course data into a normalized, provenance-rich representation.
 """
 
 from .models import NormalizedCourse, NormalizedField  # noqa: F401
-

@@ -20,4 +20,3 @@ def create_stable_id(course_code: str, term: str, year: int) -> str:
     basis = f"{cc}:{tt}:{yy}".encode()
     h = hashlib.sha1(basis).hexdigest()[:8]
     return f"{cc}-{tt}-{yy}-{h}"
-

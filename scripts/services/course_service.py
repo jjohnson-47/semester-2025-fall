@@ -7,8 +7,8 @@ managing data loading, normalization, transformation, and persistence.
 from __future__ import annotations
 
 import hashlib
-import os
 import json
+import os
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -23,6 +23,7 @@ from scripts.rules.models import NormalizedCourse
 @dataclass
 class MetaHeader:
     """Metadata header for course documents."""
+
     stable_id: str
     checksum: str
     version: str = "1.1.0"
@@ -52,19 +53,21 @@ class CourseProjection:
             "data": self.data,
             "metadata": self.metadata,
             "generated_at": self.generated_at.isoformat(),
-            "checksum": self.checksum
+            "checksum": self.checksum,
         }
 
 
 class CourseService:
     """Unified service for course operations."""
 
-    def __init__(self,
-                 content_dir: Path | str,
-                 cache_dir: Path | None = None,
-                 rules_engine: CourseRulesEngine | None = None):
+    def __init__(
+        self,
+        content_dir: Path | str,
+        cache_dir: Path | None = None,
+        rules_engine: CourseRulesEngine | None = None,
+    ):
         """Initialize the course service.
-        
+
         Args:
             content_dir: Path to content directory
             cache_dir: Path to cache directory for projections
@@ -101,7 +104,10 @@ class CourseService:
         """
         course_id = self._default_course_id or "MATH221"
         build_mode = os.environ.get("BUILD_MODE", "legacy").lower()
-        ctx: dict[str, Any] = {"course": {"code": course_id}, "metadata": {"build_mode": build_mode}}
+        ctx: dict[str, Any] = {
+            "course": {"code": course_id},
+            "metadata": {"build_mode": build_mode},
+        }
         if view == "schedule":
             if build_mode == "v2":
                 proj = self.get_projection(course_id, "schedule")
@@ -122,11 +128,11 @@ class CourseService:
 
     def load_course(self, course_id: str, force_reload: bool = False) -> NormalizedCourse:
         """Load and normalize a course.
-        
+
         Args:
             course_id: Course identifier (e.g., "MATH221")
             force_reload: Force reload even if cached
-            
+
         Returns:
             NormalizedCourse instance
         """
@@ -146,10 +152,10 @@ class CourseService:
 
     def _load_course_data(self, course_id: str) -> dict[str, Any]:
         """Load raw course data from files.
-        
+
         Args:
             course_id: Course identifier
-            
+
         Returns:
             Combined course data dictionary
         """
@@ -163,8 +169,8 @@ class CourseService:
             "course_code": course_id,
             "_meta": {
                 "version": "1.1.0",
-                "stable_id": create_stable_course_id(course_id, "fall", 2025)
-            }
+                "stable_id": create_stable_course_id(course_id, "fall", 2025),
+            },
         }
 
         # Load syllabus data
@@ -204,15 +210,16 @@ class CourseService:
 
         return combined_data
 
-    def get_projection(self, course_id: str, projection_type: str,
-                      force_regenerate: bool = False) -> CourseProjection:
+    def get_projection(
+        self, course_id: str, projection_type: str, force_regenerate: bool = False
+    ) -> CourseProjection:
         """Get a projected view of course data.
-        
+
         Args:
             course_id: Course identifier
             projection_type: Type of projection (syllabus, schedule, dashboard)
             force_regenerate: Force regeneration even if cached
-            
+
         Returns:
             CourseProjection instance
         """
@@ -252,27 +259,26 @@ class CourseService:
                 "name": course.instructor.name.value,
                 "email": course.instructor.email.value if course.instructor.email else None,
                 "office": course.instructor.office.value if course.instructor.office else None,
-                "office_hours": course.instructor.office_hours.value if course.instructor.office_hours else None
+                "office_hours": course.instructor.office_hours.value
+                if course.instructor.office_hours
+                else None,
             },
             "evaluation": [
                 {
                     "name": comp.name.value,
                     "weight": comp.weight.value,
-                    "description": comp.description.value if comp.description else None
+                    "description": comp.description.value if comp.description else None,
                 }
                 for comp in course.evaluation_components
             ],
             "policies": [
-                {
-                    "name": policy.name.value,
-                    "content": policy.content.value
-                }
+                {"name": policy.name.value, "content": policy.content.value}
                 for policy in course.policies
             ],
             "schedule_summary": {
                 "weeks": len(course.schedule_weeks),
-                "topics": [week.topic.value for week in course.schedule_weeks[:5]]  # First 5 weeks
-            }
+                "topics": [week.topic.value for week in course.schedule_weeks[:5]],  # First 5 weeks
+            },
         }
 
         checksum = hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
@@ -284,16 +290,17 @@ class CourseService:
             metadata={
                 "confidence": course.get_confidence(),
                 "warnings": course.warnings,
-                "rules_applied": course.normalization_rules
+                "rules_applied": course.normalization_rules,
             },
             generated_at=datetime.now(UTC),
-            checksum=checksum
+            checksum=checksum,
         )
 
     def _project_schedule(self, course: NormalizedCourse) -> CourseProjection:
         """Project course data for schedule view."""
         from scripts.rules.dates import DateRules
         from scripts.utils.semester_calendar import SemesterCalendar
+
         dr = DateRules()
         cal = SemesterCalendar()
         cal_weeks = cal.get_weeks()
@@ -301,15 +308,17 @@ class CourseService:
         weeks: list[dict[str, Any]] = []
         for week in course.schedule_weeks:
             wdates = week.dates.value if week.dates else None
-            start = None; end = None; holidays: list[str] = []
+            start = None
+            end = None
+            holidays: list[str] = []
             # Prefer semester calendar mapping by week number
             try:
                 wn = int(week.week_number.value)
-                cal_entry = next((cw for cw in cal_weeks if cw.get('number') == wn), None)
+                cal_entry = next((cw for cw in cal_weeks if cw.get("number") == wn), None)
                 if cal_entry:
-                    start = cal_entry.get('start')
-                    end = cal_entry.get('end')
-                    holidays = list(cal_entry.get('holidays') or [])
+                    start = cal_entry.get("start")
+                    end = cal_entry.get("end")
+                    holidays = list(cal_entry.get("holidays") or [])
             except Exception:
                 pass
             # Fallback to embedded week dates if provided
@@ -323,19 +332,28 @@ class CourseService:
             try:
                 if start and end:
                     from datetime import datetime as _dt
+
                     sdt = _dt.fromisoformat(str(start)) if isinstance(start, str) else None
                     edt = _dt.fromisoformat(str(end)) if isinstance(end, str) else None
                     if sdt and edt:
                         date_range = f"{sdt.strftime('%b %d')} - {edt.strftime('%b %d')}"
             except Exception:
                 pass
+
             # Format assignments/assessments with due labels when possible
-            def fmt(items: list[str], is_assessment: bool) -> list[str]:
+            def fmt(
+                items: list[str],
+                is_assessment: bool,
+                start=start,
+                holidays=holidays,
+            ) -> list[str]:
                 out: list[str] = []
-                for label in (items or []):
+                for label in items or []:
                     try:
                         if isinstance(label, str) and start:
-                            due = dr.apply_rules(label, str(start), holidays, is_assessment=is_assessment)
+                            due = dr.apply_rules(
+                                label, str(start), holidays, is_assessment=is_assessment
+                            )
                             out.append(f"{label} {due}")
                         else:
                             out.append(label)
@@ -343,16 +361,18 @@ class CourseService:
                         out.append(label)
                 return out
 
-            weeks.append({
-                "week": week.week_number.value,
-                "topic": week.topic.value,
-                "dates": wdates,
-                "date_range": date_range,
-                "readings": week.readings.value,
-                "assignments": fmt(week.assignments.value, is_assessment=False),
-                "assessments": fmt(week.assessments.value, is_assessment=True),
-                "notes": week.notes.value if week.notes else None,
-            })
+            weeks.append(
+                {
+                    "week": week.week_number.value,
+                    "topic": week.topic.value,
+                    "dates": wdates,
+                    "date_range": date_range,
+                    "readings": week.readings.value,
+                    "assignments": fmt(week.assignments.value, is_assessment=False),
+                    "assessments": fmt(week.assessments.value, is_assessment=True),
+                    "notes": week.notes.value if week.notes else None,
+                }
+            )
 
         data = {
             "course_code": course.identity.code.value,
@@ -368,10 +388,10 @@ class CourseService:
             data=data,
             metadata={
                 "total_weeks": len(course.schedule_weeks),
-                "has_dates": any(week.dates.value for week in course.schedule_weeks)
+                "has_dates": any(week.dates.value for week in course.schedule_weeks),
             },
             generated_at=datetime.now(UTC),
-            checksum=checksum
+            checksum=checksum,
         )
 
     def _project_dashboard(self, course: NormalizedCourse) -> CourseProjection:
@@ -396,14 +416,14 @@ class CourseService:
                 "total_assignments": total_assignments,
                 "total_assessments": total_assessments,
                 "evaluation_components": len(course.evaluation_components),
-                "confidence_score": course.get_confidence()
+                "confidence_score": course.get_confidence(),
             },
             "status": {
                 "is_valid": course.is_valid(),
                 "warnings": len(course.warnings),
-                "errors": len(course.errors)
+                "errors": len(course.errors),
             },
-            "last_updated": datetime.now(UTC).isoformat()
+            "last_updated": datetime.now(UTC).isoformat(),
         }
 
         checksum = hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
@@ -412,12 +432,9 @@ class CourseService:
             course_id=course.identity.code.value,
             projection_type="dashboard",
             data=data,
-            metadata={
-                "warnings": course.warnings,
-                "errors": course.errors
-            },
+            metadata={"warnings": course.warnings, "errors": course.errors},
             generated_at=datetime.now(UTC),
-            checksum=checksum
+            checksum=checksum,
         )
 
     def _save_projection(self, projection: CourseProjection) -> None:
@@ -427,15 +444,15 @@ class CourseService:
 
         projection_file = projection_dir / f"{projection.projection_type}.json"
 
-        with open(projection_file, 'w') as f:
+        with open(projection_file, "w") as f:
             json.dump(projection.to_dict(), f, indent=2, default=str)
 
     def validate_course(self, course_id: str) -> dict[str, Any]:
         """Validate a course and return validation results.
-        
+
         Args:
             course_id: Course identifier
-            
+
         Returns:
             Validation results dictionary
         """
@@ -447,12 +464,12 @@ class CourseService:
             "confidence": course.get_confidence(),
             "warnings": course.warnings,
             "errors": course.errors,
-            "rules_applied": course.normalization_rules
+            "rules_applied": course.normalization_rules,
         }
 
     def get_all_courses(self) -> list[str]:
         """Get list of all available courses.
-        
+
         Returns:
             List of course identifiers
         """
@@ -461,7 +478,4 @@ class CourseService:
         if not courses_dir.exists():
             return []
 
-        return [
-            d.name for d in courses_dir.iterdir()
-            if d.is_dir() and not d.name.startswith('.')
-        ]
+        return [d.name for d in courses_dir.iterdir() if d.is_dir() and not d.name.startswith(".")]

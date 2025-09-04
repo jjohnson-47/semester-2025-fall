@@ -7,6 +7,7 @@ code that imported as a module instead of the package path.
 from __future__ import annotations
 
 import warnings
+
 from scripts.utils.schema.versions.v1_1_0 import create_stable_id  # noqa: F401
 
 warnings.warn(

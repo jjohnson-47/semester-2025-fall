@@ -40,12 +40,15 @@ class TestDependencyService:
         # Force DB-backed behavior for testing
         # Patch the Database instance directly in the dependency_service module
         from dashboard.db import Database, DatabaseConfig
+
         test_db = Database(DatabaseConfig(db_path))
         test_db.initialize()
-        
-        with patch("dashboard.services.dependency_service.Config.API_FORCE_DB", True), \
-             patch("dashboard.services.dependency_service.Config.STATE_DIR", state_dir), \
-             patch("dashboard.services.dependency_service._db", test_db):
+
+        with (
+            patch("dashboard.services.dependency_service.Config.API_FORCE_DB", True),
+            patch("dashboard.services.dependency_service.Config.STATE_DIR", state_dir),
+            patch("dashboard.services.dependency_service._db", test_db),
+        ):
             yield test_db
 
     @pytest.fixture

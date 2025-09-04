@@ -38,6 +38,7 @@ def parse_coverage(path: Path) -> Totals:
     tree = ET.parse(path)
     root = tree.getroot()
     t = Totals()
+
     # Root attributes: lines-valid, lines-covered, branches-valid, branches-covered
     def _get(attr: str) -> int:
         val = root.attrib.get(attr)
@@ -103,4 +104,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

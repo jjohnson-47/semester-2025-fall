@@ -4,19 +4,19 @@ Dependency resolution service for task management.
 Handles complex task relationships and auto-unlocking.
 """
 
+import contextlib
 from datetime import datetime
 from typing import Any
 
-from dashboard.models import Task, TaskGraph, TaskStatus
-# Legacy TaskService removed; dependency service operates on DB exclusively.
-from dashboard.db import Database, DatabaseConfig
 from dashboard.config import Config
 
+# Legacy TaskService removed; dependency service operates on DB exclusively.
+from dashboard.db import Database, DatabaseConfig
+from dashboard.models import Task, TaskGraph, TaskStatus
+
 _db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
-try:  # ensure schema exists
+with contextlib.suppress(Exception):  # ensure schema exists
     _db.initialize()
-except Exception:
-    pass
 
 
 def _status_db_to_model(s: str) -> str:
@@ -77,7 +77,9 @@ class DependencyService:
                     task = Task.from_dict(model_dict)
                 except Exception:
                     # Fallback minimal fields
-                    task = Task(id=str(t.get("id")), course=str(t.get("course")), title=str(t.get("title")))
+                    task = Task(
+                        id=str(t.get("id")), course=str(t.get("course")), title=str(t.get("title"))
+                    )
                 graph.add_task(task)
             return graph
         else:
@@ -360,9 +362,13 @@ class DependencyService:
                                 "title": t.title,
                                 "status": _status_model_to_db(t.status.value),
                                 "parent_id": t.parent_id,
-                                "due_at": t.due_date.isoformat() if hasattr(t.due_date, "isoformat") and t.due_date else None,
+                                "due_at": t.due_date.isoformat()
+                                if hasattr(t.due_date, "isoformat") and t.due_date
+                                else None,
                                 "weight": t.weight,
-                                "category": t.category.value if hasattr(t.category, "value") else str(t.category),
+                                "category": t.category.value
+                                if hasattr(t.category, "value")
+                                else str(t.category),
                                 "notes": t.description,
                                 "depends_on": list(t.depends_on),
                             }
@@ -375,10 +381,8 @@ class DependencyService:
                 except Exception:
                     pass
             # Export snapshot JSON for compatibility
-            try:
+            with contextlib.suppress(Exception):
                 _db.export_snapshot_to_json(Config.TASKS_FILE)
-            except Exception:
-                pass
             return
         # JSON fallback removed in v2 cleanup
         return

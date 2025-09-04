@@ -3,10 +3,12 @@
 Main web views for the dashboard.
 """
 
-from flask import render_template
-from dashboard.config import Config
 import json
 from pathlib import Path
+
+from flask import render_template
+
+from dashboard.config import Config
 from dashboard.db import Database, DatabaseConfig
 from dashboard.views import main_bp
 
@@ -35,7 +37,13 @@ def tasks_view() -> str:
                 items = list(data.get("tasks", []))
         except Exception:
             pass
-    tasks = {"tasks": items, "total": len(items), "page": 1, "per_page": len(items), "total_pages": 1}
+    tasks = {
+        "tasks": items,
+        "total": len(items),
+        "page": 1,
+        "per_page": len(items),
+        "total_pages": 1,
+    }
     return render_template("tasks.html", tasks=tasks)  # type: ignore[no-any-return]
 
 

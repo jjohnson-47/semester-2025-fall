@@ -14,7 +14,7 @@ from typing import Any
 from flask import Blueprint, jsonify, request
 
 # Create blueprint for deployment routes
-deploy_bp = Blueprint('deploy', __name__, url_prefix='/api/deploy')
+deploy_bp = Blueprint("deploy", __name__, url_prefix="/api/deploy")
 
 # Project paths
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -49,7 +49,7 @@ class DeploymentManager:
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
                 cwd=str(cwd) if cwd else None,
-                env=cmd_env
+                env=cmd_env,
             )
 
             stdout, stderr = await process.communicate()
@@ -57,9 +57,9 @@ class DeploymentManager:
             result = {
                 "command": cmd,
                 "returncode": process.returncode,
-                "stdout": stdout.decode('utf-8'),
-                "stderr": stderr.decode('utf-8'),
-                "success": process.returncode == 0
+                "stdout": stdout.decode("utf-8"),
+                "stderr": stderr.decode("utf-8"),
+                "success": process.returncode == 0,
             }
 
             if not result["success"]:
@@ -76,16 +76,12 @@ class DeploymentManager:
                 "returncode": -1,
                 "stdout": "",
                 "stderr": str(e),
-                "success": False
+                "success": False,
             }
 
     def log(self, message: str, level: str = "info"):
         """Add a message to the deployment log."""
-        entry = {
-            "timestamp": datetime.now().isoformat(),
-            "level": level,
-            "message": message
-        }
+        entry = {"timestamp": datetime.now().isoformat(), "level": level, "message": message}
         self.deployment_log.append(entry)
 
         # Also write to file
@@ -98,9 +94,7 @@ class DeploymentManager:
         self.log("Starting site build with v2 mode")
 
         result = await self.run_command(
-            "make build-site",
-            cwd=PROJECT_ROOT,
-            env={"BUILD_MODE": "v2", "ENV": "production"}
+            "make build-site", cwd=PROJECT_ROOT, env={"BUILD_MODE": "v2", "ENV": "production"}
         )
 
         # Verify site was built
@@ -121,15 +115,9 @@ class DeploymentManager:
 
         if not WORKER_DIR.exists():
             self.log(f"Worker directory not found: {WORKER_DIR}", level="error")
-            return {
-                "success": False,
-                "stderr": f"Worker directory not found: {WORKER_DIR}"
-            }
+            return {"success": False, "stderr": f"Worker directory not found: {WORKER_DIR}"}
 
-        result = await self.run_command(
-            "pnpm sync",
-            cwd=WORKER_DIR
-        )
+        result = await self.run_command("pnpm sync", cwd=WORKER_DIR)
 
         if result["success"]:
             self.log("Content sync completed", level="success")
@@ -140,10 +128,7 @@ class DeploymentManager:
         """Deploy to Cloudflare Workers."""
         self.log("Deploying to Cloudflare Workers")
 
-        result = await self.run_command(
-            "pnpm deploy",
-            cwd=WORKER_DIR
-        )
+        result = await self.run_command("pnpm deploy", cwd=WORKER_DIR)
 
         if result["success"]:
             # Extract deployment URL from output
@@ -159,10 +144,7 @@ class DeploymentManager:
         """Verify the deployment is working."""
         self.log("Verifying deployment")
 
-        result = await self.run_command(
-            "pnpm verify",
-            cwd=WORKER_DIR
-        )
+        result = await self.run_command("pnpm verify", cwd=WORKER_DIR)
 
         if result["success"]:
             self.log("Deployment verification passed", level="success")
@@ -174,10 +156,7 @@ class DeploymentManager:
     async def execute_full_deployment(self) -> dict[str, Any]:
         """Execute the complete deployment pipeline."""
         if self.is_deploying:
-            return {
-                "status": "error",
-                "message": "Deployment already in progress"
-            }
+            return {"status": "error", "message": "Deployment already in progress"}
 
         self.is_deploying = True
         self.deployment_log = []
@@ -189,7 +168,7 @@ class DeploymentManager:
             "status": "success",
             "start_time": start_time.isoformat(),
             "steps": {},
-            "production_url": "https://courses.jeffsthings.com"
+            "production_url": "https://courses.jeffsthings.com",
         }
 
         try:
@@ -198,7 +177,7 @@ class DeploymentManager:
             build_result = await self.build_site()
             deployment_result["steps"]["build"] = {
                 "success": build_result["success"],
-                "duration": (datetime.now() - start_time).total_seconds()
+                "duration": (datetime.now() - start_time).total_seconds(),
             }
 
             if not build_result["success"]:
@@ -210,7 +189,7 @@ class DeploymentManager:
             sync_result = await self.sync_content()
             deployment_result["steps"]["sync"] = {
                 "success": sync_result["success"],
-                "duration": (datetime.now() - sync_start).total_seconds()
+                "duration": (datetime.now() - sync_start).total_seconds(),
             }
 
             if not sync_result["success"]:
@@ -222,7 +201,7 @@ class DeploymentManager:
             deploy_result = await self.deploy_worker()
             deployment_result["steps"]["deploy"] = {
                 "success": deploy_result["success"],
-                "duration": (datetime.now() - deploy_start).total_seconds()
+                "duration": (datetime.now() - deploy_start).total_seconds(),
             }
 
             if not deploy_result["success"]:
@@ -234,7 +213,7 @@ class DeploymentManager:
             verify_result = await self.verify_deployment()
             deployment_result["steps"]["verify"] = {
                 "success": verify_result["success"],
-                "duration": (datetime.now() - verify_start).total_seconds()
+                "duration": (datetime.now() - verify_start).total_seconds(),
             }
 
             # Calculate total duration
@@ -269,53 +248,53 @@ deployment_manager = DeploymentManager()
 
 
 # API Routes
-@deploy_bp.route('/trigger', methods=['POST'])
+@deploy_bp.route("/trigger", methods=["POST"])
 async def trigger_deployment():
     """Trigger a full deployment."""
     result = await deployment_manager.execute_full_deployment()
     return jsonify(result)
 
 
-@deploy_bp.route('/status', methods=['GET'])
+@deploy_bp.route("/status", methods=["GET"])
 def get_deployment_status():
     """Get current deployment status."""
     if deployment_manager.is_deploying:
-        return jsonify({
-            "status": "deploying",
-            "message": "Deployment in progress",
-            "log": deployment_manager.deployment_log[-10:]
-        })
+        return jsonify(
+            {
+                "status": "deploying",
+                "message": "Deployment in progress",
+                "log": deployment_manager.deployment_log[-10:],
+            }
+        )
     elif deployment_manager.current_deployment:
-        return jsonify({
-            "status": "idle",
-            "last_deployment": deployment_manager.current_deployment
-        })
+        return jsonify({"status": "idle", "last_deployment": deployment_manager.current_deployment})
     else:
-        return jsonify({
-            "status": "idle",
-            "message": "No deployments executed yet"
-        })
+        return jsonify({"status": "idle", "message": "No deployments executed yet"})
 
 
-@deploy_bp.route('/logs', methods=['GET'])
+@deploy_bp.route("/logs", methods=["GET"])
 def get_deployment_logs():
     """Get deployment logs."""
-    limit = request.args.get('limit', 50, type=int)
-    return jsonify({
-        "logs": deployment_manager.deployment_log[-limit:],
-        "total_entries": len(deployment_manager.deployment_log)
-    })
+    limit = request.args.get("limit", 50, type=int)
+    return jsonify(
+        {
+            "logs": deployment_manager.deployment_log[-limit:],
+            "total_entries": len(deployment_manager.deployment_log),
+        }
+    )
 
 
-@deploy_bp.route('/verify', methods=['GET'])
+@deploy_bp.route("/verify", methods=["GET"])
 async def verify_current_deployment():
     """Verify current deployment without deploying."""
     result = await deployment_manager.verify_deployment()
-    return jsonify({
-        "verified": result["success"],
-        "output": result.get("stdout", ""),
-        "errors": result.get("stderr", "")
-    })
+    return jsonify(
+        {
+            "verified": result["success"],
+            "output": result.get("stdout", ""),
+            "errors": result.get("stderr", ""),
+        }
+    )
 
 
 # Export for use in main app

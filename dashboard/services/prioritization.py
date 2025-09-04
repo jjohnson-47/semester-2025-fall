@@ -6,19 +6,20 @@ now_queue. It exports a JSON now_queue for compatibility with the UI.
 
 from __future__ import annotations
 
-import json
+import contextlib
 import gzip
+import json
 from dataclasses import dataclass
-from datetime import datetime, date
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from dashboard.db import Database
+from dashboard.tools.contracts import load_constraints, load_factors, load_phase_weights, load_yaml
 from dashboard.tools.dag import TaskDAG
 from dashboard.tools.phase import detect_phase, load_semester_start, phase_weights
 from dashboard.tools.queue_select import Candidate, select_now_queue
 from dashboard.tools.scoring import score_task
-from dashboard.tools.contracts import load_yaml, load_factors, load_constraints, load_phase_weights
 
 
 @dataclass
@@ -65,19 +66,19 @@ class PrioritizationService:
         files = sorted(snaps.glob("tasks_*.db.gz"))
         if len(files) > self.config.snapshot_rotate:
             for old in files[: -(self.config.snapshot_rotate)]:
-                try:
+                with contextlib.suppress(Exception):
                     old.unlink()
-                except Exception:
-                    pass
 
     # ------------------------------
     # Phase
     # ------------------------------
-    def _current_phase(self) -> Tuple[str, Dict[str, float]]:
+    def _current_phase(self) -> tuple[str, dict[str, float]]:
         semester_start = load_semester_start(self.config.calendar_path)
         if not semester_start:
             # Fallback
-            semester_start = datetime.strptime(self.config.semester_start_fallback, "%Y-%m-%d").date()  # type: ignore[arg-type]
+            semester_start = datetime.strptime(
+                self.config.semester_start_fallback, "%Y-%m-%d"
+            ).date()  # type: ignore[arg-type]
         key = detect_phase(semester_start)
         weights = phase_weights(key)
         return key, weights
@@ -85,7 +86,15 @@ class PrioritizationService:
     # ------------------------------
     # DAG + Scoring + Solver
     # ------------------------------
-    def refresh_now_queue(self, *, timebox: int = 90, k: int = 3, heavy_threshold: int | None = None, min_courses: int | None = None, include_courses: set[str] | None = None) -> List[str]:
+    def refresh_now_queue(
+        self,
+        *,
+        timebox: int = 90,
+        k: int = 3,
+        heavy_threshold: int | None = None,
+        min_courses: int | None = None,
+        include_courses: set[str] | None = None,
+    ) -> list[str]:
         """Compute scores and select Now Queue; persist to DB and export JSON."""
         # Snapshot first
         self.snapshot()
@@ -109,9 +118,9 @@ class PrioritizationService:
         ctx = {"phase_weights": weights_map, "recent_completions": 0}
 
         # Compute metrics + score per task
-        candidates: List[Candidate] = []
-        score_map: Dict[str, float] = {}
-        metrics_map: Dict[str, Dict[str, Any]] = {}
+        candidates: list[Candidate] = []
+        score_map: dict[str, float] = {}
+        metrics_map: dict[str, dict[str, Any]] = {}
         for t in tasks:
             tid = t["id"]
             status = t.get("status", "todo")
@@ -149,7 +158,9 @@ class PrioritizationService:
         # Adjust min_courses if user restricted courses
         eff_min_courses = min_courses if min_courses is not None else cq.min_courses
         if include_courses:
-            eff_min_courses = min(eff_min_courses or 0, len(include_courses)) if eff_min_courses else None
+            eff_min_courses = (
+                min(eff_min_courses or 0, len(include_courses)) if eff_min_courses else None
+            )
 
         selected = select_now_queue(
             candidates,
@@ -182,14 +193,19 @@ class PrioritizationService:
                 now_queue.append(enriched)
         now_payload = {
             "queue": now_queue,
-            "metadata": {"generated": datetime.now().isoformat(), "timebox": timebox, "phase": phase_key, "cycle": cycle},
+            "metadata": {
+                "generated": datetime.now().isoformat(),
+                "timebox": timebox,
+                "phase": phase_key,
+                "cycle": cycle,
+            },
         }
         with open(self.state_dir / "now_queue.json", "w") as f:
             json.dump(now_payload, f, indent=2)
 
         return queue_ids
 
-    def explain(self, task_id: str) -> Dict[str, Any]:
+    def explain(self, task_id: str) -> dict[str, Any]:
         """Return score explanation; compute on the fly if missing."""
         t = self.db.get_task(task_id)
         if not t:
@@ -213,7 +229,11 @@ class PrioritizationService:
         ctx = {"phase_weights": weights_map, "recent_completions": 0}
         weights = load_factors(self._contracts).weights
         total, contrib = score_task({**t, **metrics}, ctx, weights)
-        explain = sorted(({"factor": k, "contrib": round(v, 2)} for k, v in contrib.items()), key=lambda x: abs(x["contrib"]), reverse=True)
+        explain = sorted(
+            ({"factor": k, "contrib": round(v, 2)} for k, v in contrib.items()),
+            key=lambda x: abs(x["contrib"]),
+            reverse=True,
+        )
 
         # minimal cut
         cut = dag.minimal_unblocking_cut(task_id, k=2)
@@ -227,7 +247,7 @@ class PrioritizationService:
             "phase": phase_key,
         }
 
-    def health(self) -> Dict[str, Any]:
+    def health(self) -> dict[str, Any]:
         tasks = self.db.list_tasks()
         with self.db.connect() as conn:
             dep_rows = conn.execute("select task_id, blocks_id from deps").fetchall()

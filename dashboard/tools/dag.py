@@ -12,14 +12,15 @@ Operates on a tasks list (id, status, category, anchor, etc.) and a deps list
 from __future__ import annotations
 
 from collections import defaultdict, deque
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
+from collections.abc import Iterable
+from typing import Any
 
 
 class TaskDAG:
-    def __init__(self, tasks: Iterable[Dict[str, Any]], deps: Iterable[Tuple[str, str]]) -> None:
-        self.tasks: Dict[str, Dict[str, Any]] = {t["id"]: dict(t) for t in tasks if t.get("id")}
-        self.blockers: Dict[str, Set[str]] = defaultdict(set)
-        self.dependents: Dict[str, Set[str]] = defaultdict(set)
+    def __init__(self, tasks: Iterable[dict[str, Any]], deps: Iterable[tuple[str, str]]) -> None:
+        self.tasks: dict[str, dict[str, Any]] = {t["id"]: dict(t) for t in tasks if t.get("id")}
+        self.blockers: dict[str, set[str]] = defaultdict(set)
+        self.dependents: dict[str, set[str]] = defaultdict(set)
         for task_id, blocks_id in deps:
             if task_id in self.tasks and blocks_id in self.tasks:
                 self.blockers[task_id].add(blocks_id)
@@ -28,12 +29,12 @@ class TaskDAG:
     # ------------------------------
     # Cycle detection
     # ------------------------------
-    def find_cycle(self) -> Optional[List[str]]:
+    def find_cycle(self) -> list[str] | None:
         """Return a cycle path (list of ids) if present, else None."""
-        color: Dict[str, int] = {tid: 0 for tid in self.tasks}  # 0=unseen,1=visiting,2=done
-        parent: Dict[str, Optional[str]] = {tid: None for tid in self.tasks}
+        color: dict[str, int] = dict.fromkeys(self.tasks, 0)  # 0=unseen,1=visiting,2=done
+        parent: dict[str, str | None] = dict.fromkeys(self.tasks)
 
-        def dfs(u: str) -> Optional[List[str]]:
+        def dfs(u: str) -> list[str] | None:
             color[u] = 1
             for v in self.dependents.get(u, set()):
                 if color[v] == 0:
@@ -73,13 +74,13 @@ class TaskDAG:
                 return False
         return True
 
-    def chain_heads(self) -> Set[str]:
+    def chain_heads(self) -> set[str]:
         return {tid for tid in self.tasks if self.is_chain_head(tid)}
 
     # ------------------------------
     # Metrics
     # ------------------------------
-    def anchors(self) -> Set[str]:
+    def anchors(self) -> set[str]:
         return {tid for tid, t in self.tasks.items() if t.get("anchor")}
 
     def critical_depth(self, start: str) -> int:
@@ -88,8 +89,8 @@ class TaskDAG:
         if not A:
             return 0
         best = 0
-        q: deque[Tuple[str, int]] = deque([(start, 0)])
-        seen: Set[str] = set()
+        q: deque[tuple[str, int]] = deque([(start, 0)])
+        seen: set[str] = set()
         while q:
             u, d = q.popleft()
             if u in seen:
@@ -105,7 +106,7 @@ class TaskDAG:
         """Count of tasks reachable downstream from start (dependents closure)."""
         cnt = 0
         q: deque[str] = deque([start])
-        seen: Set[str] = set()
+        seen: set[str] = set()
         while q:
             u = q.popleft()
             if u in seen:
@@ -119,7 +120,7 @@ class TaskDAG:
     # ------------------------------
     # Minimal unblocking cut (greedy)
     # ------------------------------
-    def minimal_unblocking_cut(self, task_id: str, k: int = 2) -> List[str]:
+    def minimal_unblocking_cut(self, task_id: str, k: int = 2) -> list[str]:
         """Suggest up to k blockers whose completion unlocks the most downstream tasks (greedy)."""
         blockers = list(self.blockers.get(task_id, set()))
         if not blockers:
@@ -127,4 +128,3 @@ class TaskDAG:
         scores = [(b, self.downstream_unlocked(b)) for b in blockers]
         scores.sort(key=lambda kv: kv[1], reverse=True)
         return [b for b, _ in scores[:k]]
-

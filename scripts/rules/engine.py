@@ -27,7 +27,7 @@ class CourseRulesEngine:
 
     def __init__(self, date_rules: DateRules | None = None):
         """Initialize the rules engine.
-        
+
         Args:
             date_rules: DateRules instance for date normalization
         """
@@ -36,10 +36,10 @@ class CourseRulesEngine:
 
     def normalize(self, course_data: dict[str, Any]) -> NormalizedCourse:
         """Normalize course data with full provenance tracking.
-        
+
         Args:
             course_data: Raw course JSON data
-            
+
         Returns:
             NormalizedCourse with all fields tracked
         """
@@ -71,7 +71,7 @@ class CourseRulesEngine:
             evaluation_components=evaluation_components,
             policies=policies,
             important_dates=important_dates,
-            normalization_rules=self.applied_rules.copy()
+            normalization_rules=self.applied_rules.copy(),
         )
 
         # Apply validation
@@ -85,13 +85,11 @@ class CourseRulesEngine:
 
         # Required fields
         code = NormalizedField.from_original(
-            data.get("course_code", data.get("code", "UNKNOWN")),
-            field_name="code"
+            data.get("course_code", data.get("code", "UNKNOWN")), field_name="code"
         )
 
         name = NormalizedField.from_original(
-            data.get("course_name", data.get("name", "Unknown Course")),
-            field_name="name"
+            data.get("course_name", data.get("name", "Unknown Course")), field_name="name"
         )
 
         # Optional fields
@@ -115,23 +113,13 @@ class CourseRulesEngine:
             # Try to parse term like "Fall 2025"
             term_match = re.match(r"(\w+)\s+(\d{4})", term_str)
             if term_match:
-                term = NormalizedField.from_original(
-                    term_match.group(1), field_name="term"
-                )
-                year = NormalizedField.from_original(
-                    int(term_match.group(2)), field_name="year"
-                )
+                term = NormalizedField.from_original(term_match.group(1), field_name="term")
+                year = NormalizedField.from_original(int(term_match.group(2)), field_name="year")
             else:
                 term = NormalizedField.from_original(term_str, field_name="term")
 
         return CourseIdentity(
-            code=code,
-            name=name,
-            title=title,
-            credits=credits,
-            format=format,
-            term=term,
-            year=year
+            code=code, name=name, title=title, credits=credits, format=format, term=term, year=year
         )
 
     def _extract_instructor(self, data: dict[str, Any]) -> InstructorInfo:
@@ -142,45 +130,36 @@ class CourseRulesEngine:
 
         # Name is required
         name = NormalizedField.from_original(
-            instructor_data.get("name", "TBD"),
-            field_name="instructor_name"
+            instructor_data.get("name", "TBD"), field_name="instructor_name"
         )
 
         # Optional fields
         email = None
         if "email" in instructor_data:
             email = NormalizedField.from_original(
-                instructor_data["email"],
-                field_name="instructor_email"
+                instructor_data["email"], field_name="instructor_email"
             )
 
         office = None
         if "office" in instructor_data:
             office = NormalizedField.from_original(
-                instructor_data["office"],
-                field_name="instructor_office"
+                instructor_data["office"], field_name="instructor_office"
             )
 
         office_hours = None
         if "office_hours" in instructor_data:
             office_hours = NormalizedField.from_original(
-                instructor_data["office_hours"],
-                field_name="instructor_office_hours"
+                instructor_data["office_hours"], field_name="instructor_office_hours"
             )
 
         phone = None
         if "phone" in instructor_data:
             phone = NormalizedField.from_original(
-                instructor_data["phone"],
-                field_name="instructor_phone"
+                instructor_data["phone"], field_name="instructor_phone"
             )
 
         return InstructorInfo(
-            name=name,
-            email=email,
-            office=office,
-            office_hours=office_hours,
-            phone=phone
+            name=name, email=email, office=office, office_hours=office_hours, phone=phone
         )
 
     def _extract_schedule(self, data: dict[str, Any]) -> list[ScheduleWeek]:
@@ -194,29 +173,23 @@ class CourseRulesEngine:
             if isinstance(week_data, dict):
                 week = ScheduleWeek(
                     week_number=NormalizedField.from_original(
-                        week_data.get("week", week_num),
-                        field_name="week_number"
+                        week_data.get("week", week_num), field_name="week_number"
                     ),
                     topic=NormalizedField.from_original(
-                        week_data.get("topic", "TBD"),
-                        field_name="topic"
+                        week_data.get("topic", "TBD"), field_name="topic"
                     ),
                     readings=NormalizedField.from_original(
-                        week_data.get("readings", []),
-                        field_name="readings"
+                        week_data.get("readings", []), field_name="readings"
                     ),
                     assignments=NormalizedField.from_original(
-                        week_data.get("assignments", []),
-                        field_name="assignments"
+                        week_data.get("assignments", []), field_name="assignments"
                     ),
                     assessments=NormalizedField.from_original(
-                        week_data.get("assessments", []),
-                        field_name="assessments"
+                        week_data.get("assessments", []), field_name="assessments"
                     ),
                     dates=NormalizedField.from_original(
-                        week_data.get("dates", ""),
-                        field_name="dates"
-                    )
+                        week_data.get("dates", ""), field_name="dates"
+                    ),
                 )
 
                 # Apply date rules if dates are present
@@ -233,13 +206,12 @@ class CourseRulesEngine:
 
         # Parse dates and check for weekend conflicts
         date_str = week.dates.value
-        if isinstance(date_str, str) and date_str:
-            # Handle date ranges like "Aug 26 - Aug 30"
-            if " - " in date_str:
-                start_str, end_str = date_str.split(" - ")
-                # For now, just mark if we would need to adjust
-                # Full implementation would parse and adjust dates
-                pass
+        # Handle date ranges like "Aug 26 - Aug 30"
+        if isinstance(date_str, str) and date_str and " - " in date_str:
+            start_str, end_str = date_str.split(" - ")
+            # For now, just mark if we would need to adjust
+            # Full implementation would parse and adjust dates
+            _ = (start_str, end_str)
 
     def _extract_evaluation(self, data: dict[str, Any]) -> list[EvaluationComponent]:
         """Extract evaluation components."""
@@ -254,28 +226,30 @@ class CourseRulesEngine:
                     component = EvaluationComponent(
                         name=NormalizedField.from_original(name, field_name="component_name"),
                         weight=NormalizedField.from_original(
-                            info.get("weight", 0),
-                            field_name="component_weight"
+                            info.get("weight", 0), field_name="component_weight"
                         ),
                         count=NormalizedField.from_original(
-                            info.get("count"),
-                            field_name="component_count"
-                        ) if "count" in info else None,
+                            info.get("count"), field_name="component_count"
+                        )
+                        if "count" in info
+                        else None,
                         drop_lowest=NormalizedField.from_original(
-                            info.get("drop_lowest"),
-                            field_name="drop_lowest"
-                        ) if "drop_lowest" in info else None,
+                            info.get("drop_lowest"), field_name="drop_lowest"
+                        )
+                        if "drop_lowest" in info
+                        else None,
                         description=NormalizedField.from_original(
-                            info.get("description"),
-                            field_name="component_description"
-                        ) if "description" in info else None
+                            info.get("description"), field_name="component_description"
+                        )
+                        if "description" in info
+                        else None,
                     )
                     components.append(component)
-                elif isinstance(info, (int, float)):
+                elif isinstance(info, int | float):
                     # Simple weight value
                     component = EvaluationComponent(
                         name=NormalizedField.from_original(name, field_name="component_name"),
-                        weight=NormalizedField.from_original(info, field_name="component_weight")
+                        weight=NormalizedField.from_original(info, field_name="component_weight"),
                     )
                     components.append(component)
 
@@ -294,24 +268,23 @@ class CourseRulesEngine:
                     policy = CoursePolicy(
                         name=NormalizedField.from_original(name, field_name="policy_name"),
                         content=NormalizedField.from_original(
-                            content.get("content", ""),
-                            field_name="policy_content"
+                            content.get("content", ""), field_name="policy_content"
                         ),
                         required=NormalizedField.from_original(
-                            content.get("required", False),
-                            field_name="policy_required"
+                            content.get("required", False), field_name="policy_required"
                         ),
                         source=NormalizedField.from_original(
-                            content.get("source"),
-                            field_name="policy_source"
-                        ) if "source" in content else None
+                            content.get("source"), field_name="policy_source"
+                        )
+                        if "source" in content
+                        else None,
                     )
                 else:
                     # Simple string content
                     policy = CoursePolicy(
                         name=NormalizedField.from_original(name, field_name="policy_name"),
                         content=NormalizedField.from_original(content, field_name="policy_content"),
-                        required=NormalizedField.from_default(False, field_name="policy_required")
+                        required=NormalizedField.from_default(False, field_name="policy_required"),
                     )
                 policies.append(policy)
 
@@ -327,22 +300,21 @@ class CourseRulesEngine:
         date_sources = [
             data.get("important_dates", {}),
             data.get("dates", {}),
-            data.get("calendar", {})
+            data.get("calendar", {}),
         ]
 
         for source in date_sources:
             if isinstance(source, dict):
                 for key, value in source.items():
                     if key not in dates:
-                        dates[key] = NormalizedField.from_original(
-                            value,
-                            field_name=f"date_{key}"
-                        )
+                        dates[key] = NormalizedField.from_original(value, field_name=f"date_{key}")
 
                         # Apply date rules
                         if self.date_rules and isinstance(value, str):
                             # Determine assignment type from key
-                            _ = self._infer_assignment_type(key)  # Reserved for future date adjustment
+                            _ = self._infer_assignment_type(
+                                key
+                            )  # Reserved for future date adjustment
                             # Would apply date adjustment here
                             self.applied_rules.append(f"date_rule_{key}")
 
@@ -380,7 +352,8 @@ class CourseRulesEngine:
         # Check evaluation weights
         if course.evaluation_components:
             total_weight = sum(
-                comp.weight.value for comp in course.evaluation_components
+                comp.weight.value
+                for comp in course.evaluation_components
                 if comp.weight and comp.weight.value
             )
             if abs(total_weight - 100) > 0.1:

@@ -10,22 +10,49 @@ import json
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 
 @dataclass
 class PhaseConfig:
-    pre_launch: Tuple[int, int] = (-30, -8)
-    launch_week: Tuple[int, int] = (-7, 0)
-    week_one: Tuple[int, int] = (1, 7)
-    in_term: Tuple[int, int] = (8, 120)
+    pre_launch: tuple[int, int] = (-30, -8)
+    launch_week: tuple[int, int] = (-7, 0)
+    week_one: tuple[int, int] = (1, 7)
+    in_term: tuple[int, int] = (8, 120)
 
 
 DEFAULT_WEIGHTS = {
-    "pre_launch": {"assessment": 1.0, "communication": 1.0, "content": 1.2, "materials": 1.3, "technical": 1.5, "setup": 1.7},
-    "launch_week": {"assessment": 1.5, "communication": 1.4, "content": 1.2, "materials": 1.0, "technical": 1.0, "setup": 1.0},
-    "week_one": {"assessment": 1.7, "communication": 1.5, "content": 1.2, "materials": 1.0, "technical": 1.0, "setup": 0.8},
-    "in_term": {"assessment": 3.0, "communication": 2.5, "content": 2.0, "materials": 1.5, "technical": 1.0, "setup": 0.5},
+    "pre_launch": {
+        "assessment": 1.0,
+        "communication": 1.0,
+        "content": 1.2,
+        "materials": 1.3,
+        "technical": 1.5,
+        "setup": 1.7,
+    },
+    "launch_week": {
+        "assessment": 1.5,
+        "communication": 1.4,
+        "content": 1.2,
+        "materials": 1.0,
+        "technical": 1.0,
+        "setup": 1.0,
+    },
+    "week_one": {
+        "assessment": 1.7,
+        "communication": 1.5,
+        "content": 1.2,
+        "materials": 1.0,
+        "technical": 1.0,
+        "setup": 0.8,
+    },
+    "in_term": {
+        "assessment": 3.0,
+        "communication": 2.5,
+        "content": 2.0,
+        "materials": 1.5,
+        "technical": 1.0,
+        "setup": 0.5,
+    },
 }
 
 
@@ -33,7 +60,9 @@ def _days_since(start: date, today: date) -> int:
     return (today - start).days
 
 
-def detect_phase(semester_start: date, today: Optional[date] = None, phases: Optional[PhaseConfig] = None) -> str:
+def detect_phase(
+    semester_start: date, today: date | None = None, phases: PhaseConfig | None = None
+) -> str:
     """Return phase key for given date relative to semester_start."""
     phases = phases or PhaseConfig()
     t = today or date.today()
@@ -47,7 +76,7 @@ def detect_phase(semester_start: date, today: Optional[date] = None, phases: Opt
     return "in_term"
 
 
-def load_semester_start(calendar_path: Path) -> Optional[date]:
+def load_semester_start(calendar_path: Path) -> date | None:
     """Load semester_start date from a JSON calendar file if available."""
     if not calendar_path.exists():
         return None
@@ -65,9 +94,8 @@ def load_semester_start(calendar_path: Path) -> Optional[date]:
             return None
 
 
-def phase_weights(phase_key: str, overrides: Optional[Dict[str, float]] = None) -> Dict[str, float]:
+def phase_weights(phase_key: str, overrides: dict[str, float] | None = None) -> dict[str, float]:
     weights = dict(DEFAULT_WEIGHTS.get(phase_key, DEFAULT_WEIGHTS["in_term"]))
     if overrides:
         weights.update(overrides)
     return weights
-

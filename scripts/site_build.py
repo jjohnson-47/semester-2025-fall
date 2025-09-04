@@ -59,7 +59,7 @@ def copy_if_exists(src: Path, dst: Path) -> None:
         shutil.copy2(src, dst)
 
 
-def convert_to_embed_version(html_content: str, course_code: str) -> str:
+def convert_to_embed_version(html_content: str, _course_code: str) -> str:
     """Convert full syllabus HTML to embed-friendly version."""
     # CSS paths are already absolute, no conversion needed
 
@@ -67,8 +67,8 @@ def convert_to_embed_version(html_content: str, course_code: str) -> str:
     iframe_styles = """
     <style>
         /* Iframe embedding optimizations */
-        body { 
-            margin: 0; 
+        body {
+            margin: 0;
             padding: 1rem;
             font-size: 0.95rem;
             line-height: 1.4;
@@ -142,12 +142,12 @@ def has_custom_due_dates(course_code: str) -> bool:
 
 def build_syllabus_pages(
     course_code: str,
-    sb: SyllabusBuilder,
-    schedule_builder: ScheduleBuilder,
+    _sb: SyllabusBuilder,  # noqa: ARG001
+    _schedule_builder: ScheduleBuilder,  # noqa: ARG001
     env: str,  # noqa: ARG001
     term: str,
     out_dir: Path,
-    jinja_templates: Path,
+    _jinja_templates: Path,  # noqa: ARG001
 ) -> dict[str, str]:
     """Copy and adapt high-quality syllabus pages from build/ directory.
 
@@ -191,12 +191,12 @@ def build_syllabus_pages(
 
 def build_schedule_pages(
     course_code: str,
-    sb: SyllabusBuilder,
-    schedule_builder: ScheduleBuilder,
+    _sb: SyllabusBuilder,  # noqa: ARG001
+    _schedule_builder: ScheduleBuilder,  # noqa: ARG001
     env: str,  # noqa: ARG001
     term: str,
     out_dir: Path,
-    jinja_templates: Path,
+    _jinja_templates: Path,  # noqa: ARG001
 ) -> dict[str, str]:
     """Copy and adapt high-quality schedule pages from build/ directory.
 

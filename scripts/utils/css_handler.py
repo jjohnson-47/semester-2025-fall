@@ -15,11 +15,9 @@ logger = logging.getLogger(__name__)
 class CSSHandler:
     """Manages CSS assets for course builds."""
 
-    def __init__(self,
-                 assets_dir: Path = Path("assets/css"),
-                 build_dir: Path = Path("build")):
+    def __init__(self, assets_dir: Path = Path("assets/css"), build_dir: Path = Path("build")):
         """Initialize CSS handler.
-        
+
         Args:
             assets_dir: Source directory for CSS assets
             build_dir: Build output directory
@@ -47,7 +45,7 @@ class CSSHandler:
 
     def copy_course_styles(self, course_codes: list[str] | None = None) -> None:
         """Copy course-specific CSS files to build.
-        
+
         Args:
             course_codes: List of course codes to copy CSS for.
                          If None, copies all found course CSS files.
@@ -73,7 +71,7 @@ class CSSHandler:
 
     def copy_all_assets(self, course_codes: list[str] | None = None) -> None:
         """Copy all CSS assets to build directory.
-        
+
         Args:
             course_codes: Optional list of specific courses to copy CSS for
         """
@@ -83,12 +81,12 @@ class CSSHandler:
 
     def get_css_paths_for_template(self, course_code: str, relative_to_root: bool = True) -> dict:
         """Get CSS file paths for template rendering.
-        
+
         Args:
             course_code: Course code (e.g., MATH221)
             relative_to_root: If True, paths are relative to site root
                             If False, paths are relative to current file
-        
+
         Returns:
             Dictionary with 'base_css' and 'course_css' paths
         """
@@ -99,17 +97,14 @@ class CSSHandler:
             base_path = "../assets/css/course.css"
             course_path = f"../assets/css/courses/{course_code}.css"
 
-        return {
-            "base_css": base_path,
-            "course_css": course_path
-        }
+        return {"base_css": base_path, "course_css": course_path}
 
     def inject_inline_styles(self, course_code: str) -> str:
         """Load CSS content for inline injection if needed.
-        
+
         Args:
             course_code: Course code
-            
+
         Returns:
             Combined CSS content as string
         """

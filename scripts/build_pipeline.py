@@ -16,9 +16,10 @@ import json
 import os
 import sys
 import time
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Iterable, List
+from typing import Any
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -32,16 +33,23 @@ class StageResult:
     stage: str
     status: str = "success"  # success | failed | skipped
     duration: float = 0.0
-    errors: List[str] = field(default_factory=list)
-    warnings: List[str] = field(default_factory=list)
-    artifacts: List[str] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    artifacts: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class BuildPipeline:
     """Staged build pipeline wired to V2 services/builders."""
 
-    def __init__(self, courses: Iterable[str], *, build_dir: str = "build", verbose: bool = False, dry_run: bool = False) -> None:
+    def __init__(
+        self,
+        courses: Iterable[str],
+        *,
+        build_dir: str = "build",
+        verbose: bool = False,
+        dry_run: bool = False,
+    ) -> None:
         self.courses = list(courses)
         self.verbose = verbose
         self.dry_run = dry_run
@@ -188,8 +196,12 @@ class BuildPipeline:
                 "v2_enabled": os.getenv("BUILD_MODE", "v2").lower() == "v2",
                 "paths": {
                     "normalized": str(self.dirs["normalized"] / course / "schedule.v1_1_0.json"),
-                    "projection": str(self.dirs["projection"] / course / "schedule_projection.json"),
-                    "v2_schedule_html": str(self.dirs["v2"] / "schedules" / f"{course}_schedule.html"),
+                    "projection": str(
+                        self.dirs["projection"] / course / "schedule_projection.json"
+                    ),
+                    "v2_schedule_html": str(
+                        self.dirs["v2"] / "schedules" / f"{course}_schedule.html"
+                    ),
                     "v2_syllabus_html": str(self.dirs["v2"] / "syllabi" / f"{course}.html"),
                 },
             }
@@ -287,7 +299,7 @@ class BuildPipeline:
         return res
 
     # ---- runner ----
-    def run(self, force: bool = False) -> bool:
+    def run(self, _force: bool = False) -> bool:
         # `force` kept for backward compatibility; currently unused.
         self._log("pipeline", f"courses={self.courses}")
         if self.validate().status == "failed":
@@ -311,10 +323,14 @@ def main() -> None:  # pragma: no cover - CLI convenience
     parser.add_argument("--build-dir", default="build")
     parser.add_argument("--verbose", "-v", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--stage", choices=["validate", "normalize", "project", "generate", "package", "report"]) 
+    parser.add_argument(
+        "--stage", choices=["validate", "normalize", "project", "generate", "package", "report"]
+    )
     args = parser.parse_args()
 
-    pipeline = BuildPipeline(args.courses, build_dir=args.build_dir, verbose=args.verbose, dry_run=args.dry_run)
+    pipeline = BuildPipeline(
+        args.courses, build_dir=args.build_dir, verbose=args.verbose, dry_run=args.dry_run
+    )
 
     if args.stage:
         # Invoke a single stage

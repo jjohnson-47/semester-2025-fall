@@ -16,7 +16,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from scripts.rules.models import AssignmentType, NormalizedCourse
 from scripts.utils.semester_calendar import SemesterCalendar
@@ -30,10 +30,10 @@ class DateRules:
     logging while preserving the prior helper API.
     """
 
-    calendar: Optional[SemesterCalendar] = None
+    calendar: SemesterCalendar | None = None
     name: str = "DateRules"
     version: str = "1.1.0"
-    shift_log: List["DateShift"] = field(default_factory=list)
+    shift_log: list[DateShift] = field(default_factory=list)
 
     def __post_init__(self):
         if self.calendar is None:
@@ -61,22 +61,31 @@ class DateRules:
         reason: str
         rule: str
 
-    def _type_preferences(self) -> Dict[AssignmentType, Dict[str, Any]]:
+    def _type_preferences(self) -> dict[AssignmentType, dict[str, Any]]:
         """Default weekday preferences and shift directions by type.
 
         Weekday index: Monday=0 .. Sunday=6
         """
         return {
-            AssignmentType.HOMEWORK: {"preferred_day": 4, "shift": self.ShiftDirection.EARLIER},  # Fri
-            AssignmentType.QUIZ: {"preferred_day": 4, "shift": self.ShiftDirection.EARLIER},      # Fri
-            AssignmentType.EXAM: {"preferred_day": 3, "shift": self.ShiftDirection.EARLIER},      # Thu
-            AssignmentType.DISCUSSION: {"preferred_day": 2, "shift": self.ShiftDirection.EARLIER},# Wed
-            AssignmentType.PROJECT: {"preferred_day": 4, "shift": self.ShiftDirection.EARLIER},   # Fri
+            AssignmentType.HOMEWORK: {
+                "preferred_day": 4,
+                "shift": self.ShiftDirection.EARLIER,
+            },  # Fri
+            AssignmentType.QUIZ: {"preferred_day": 4, "shift": self.ShiftDirection.EARLIER},  # Fri
+            AssignmentType.EXAM: {"preferred_day": 3, "shift": self.ShiftDirection.EARLIER},  # Thu
+            AssignmentType.DISCUSSION: {
+                "preferred_day": 2,
+                "shift": self.ShiftDirection.EARLIER,
+            },  # Wed
+            AssignmentType.PROJECT: {
+                "preferred_day": 4,
+                "shift": self.ShiftDirection.EARLIER,
+            },  # Fri
         }
 
-    def _holidays_as_dates(self) -> List[datetime]:
+    def _holidays_as_dates(self) -> list[datetime]:
         """Flatten holidays from SemesterCalendar into a list of datetimes."""
-        holidays: List[datetime] = []
+        holidays: list[datetime] = []
         try:
             for h in self.calendar.get_holidays():  # type: ignore[union-attr]
                 if "date" in h:
@@ -94,7 +103,10 @@ class DateRules:
         """Return True if the given date falls on a holiday."""
         d0 = date.replace(hour=0, minute=0, second=0, microsecond=0)
         return any(d0.date() == h.date() for h in self._holidays_as_dates())
-    def apply_rules(self, label: str, week_start_iso: str, holidays: list[str], *, is_assessment: bool) -> str:
+
+    def apply_rules(
+        self, label: str, week_start_iso: str, holidays: list[str], *, is_assessment: bool
+    ) -> str:
         """Convenience wrapper to choose weekday, apply shifts, and format a due label.
 
         Returns a string like "(due Wed 09/03)".
@@ -102,7 +114,10 @@ class DateRules:
         wd = self.choose_due_weekday(label, is_assessment=is_assessment)
         wd, add = self.apply_holiday_shift(wd, holidays, label, is_assessment)
         return self.format_due(week_start_iso, wd, add)
-    def apply_date_rules(self, date: datetime, assignment_type: AssignmentType = AssignmentType.HOMEWORK) -> datetime:
+
+    def apply_date_rules(
+        self, date: datetime, assignment_type: AssignmentType = AssignmentType.HOMEWORK
+    ) -> datetime:
         """Apply date rules to produce a valid due date.
 
         - No weekend due dates
@@ -112,9 +127,7 @@ class DateRules:
         prefs = self._type_preferences().get(
             assignment_type, {"shift": self.ShiftDirection.EARLIER}
         )
-        direction: "DateRules.ShiftDirection" = prefs.get(
-            "shift", self.ShiftDirection.EARLIER
-        )
+        direction: DateRules.ShiftDirection = prefs.get("shift", self.ShiftDirection.EARLIER)
 
         # Weekend handling
         if self.is_weekend(date):
@@ -140,13 +153,15 @@ class DateRules:
         """Check if date falls on weekend (Saturday=5, Sunday=6)."""
         return date.weekday() >= 5
 
-    def shift_from_weekend(self, date: datetime, direction: str | "DateRules.ShiftDirection" = "before") -> datetime:
+    def shift_from_weekend(
+        self, date: datetime, direction: str | DateRules.ShiftDirection = "before"
+    ) -> datetime:
         """Shift date away from weekend.
-        
+
         Args:
             date: Date to shift
             direction: "before"/"after" or ShiftDirection
-            
+
         Returns:
             Shifted date
         """
@@ -161,21 +176,29 @@ class DateRules:
             # Shift to Friday
             if date.weekday() == 5:  # Saturday -> Friday
                 shifted = date - timedelta(days=1)
-                self.shift_log.append(self.DateShift(date, shifted, "Weekend shift", "no_weekend_due_dates"))
+                self.shift_log.append(
+                    self.DateShift(date, shifted, "Weekend shift", "no_weekend_due_dates")
+                )
                 return shifted
             elif date.weekday() == 6:  # Sunday -> Friday
                 shifted = date - timedelta(days=2)
-                self.shift_log.append(self.DateShift(date, shifted, "Weekend shift", "no_weekend_due_dates"))
+                self.shift_log.append(
+                    self.DateShift(date, shifted, "Weekend shift", "no_weekend_due_dates")
+                )
                 return shifted
         else:  # direction == "after"
             # Shift to Monday
             if date.weekday() == 5:  # Saturday -> Monday
                 shifted = date + timedelta(days=2)
-                self.shift_log.append(self.DateShift(date, shifted, "Weekend shift", "no_weekend_due_dates"))
+                self.shift_log.append(
+                    self.DateShift(date, shifted, "Weekend shift", "no_weekend_due_dates")
+                )
                 return shifted
             elif date.weekday() == 6:  # Sunday -> Monday
                 shifted = date + timedelta(days=1)
-                self.shift_log.append(self.DateShift(date, shifted, "Weekend shift", "no_weekend_due_dates"))
+                self.shift_log.append(
+                    self.DateShift(date, shifted, "Weekend shift", "no_weekend_due_dates")
+                )
                 return shifted
 
         return date
@@ -184,7 +207,11 @@ class DateRules:
     def choose_due_weekday(label: str, is_assessment: bool = False) -> int:
         label_lower = label.lower()
         if not is_assessment:
-            if "discussion" in label_lower or label_lower.startswith("bb") or "blackboard" in label_lower:
+            if (
+                "discussion" in label_lower
+                or label_lower.startswith("bb")
+                or "blackboard" in label_lower
+            ):
                 return 2  # Wed
             return 4  # Fri default
         if "quiz" in label_lower:
@@ -194,12 +221,19 @@ class DateRules:
         return 4
 
     @staticmethod
-    def apply_holiday_shift(weekday: int, holidays: list[str], label: str, is_assessment: bool) -> tuple[int, int]:
+    def apply_holiday_shift(
+        weekday: int, holidays: list[str], label: str, is_assessment: bool
+    ) -> tuple[int, int]:
         add_days = 0
         joined = ", ".join(holidays)
         if "Fall Break" in joined and weekday in (3, 4):  # Thu/Fri
             label_lower = label.lower()
-            if is_assessment and ("quiz" in label_lower or "exam" in label_lower or "test" in label_lower or "midterm" in label_lower):
+            if is_assessment and (
+                "quiz" in label_lower
+                or "exam" in label_lower
+                or "test" in label_lower
+                or "midterm" in label_lower
+            ):
                 return 2, 0  # shift to Wed
             return 0, 7  # homework to next Monday
         # avoid weekends by default
@@ -217,7 +251,9 @@ class DateRules:
         return f"(due {day_label} {due_dt.strftime('%m/%d')})"
 
     # ---- Extended helpers for builders/tests ----
-    def shift_for_holiday(self, date: datetime, direction: str | "DateRules.ShiftDirection" = "before") -> datetime:
+    def shift_for_holiday(
+        self, date: datetime, direction: str | DateRules.ShiftDirection = "before"
+    ) -> datetime:
         """Shift dates that fall on holidays, skipping weekends.
 
         Uses the given direction as the primary vector; falls back to the
@@ -250,7 +286,9 @@ class DateRules:
                 attempts += 1
 
         if shifted != original:
-            self.shift_log.append(self.DateShift(original, shifted, "Holiday accommodation", "holiday_shift_policy"))
+            self.shift_log.append(
+                self.DateShift(original, shifted, "Holiday accommodation", "holiday_shift_policy")
+            )
 
         return shifted
 
@@ -264,9 +302,9 @@ class DateRules:
         target = week_start + timedelta(days=preferred_day)
         return self.apply_date_rules(target, assignment_type)
 
-    def validate_schedule(self, dates: List[datetime]) -> List[str]:
+    def validate_schedule(self, dates: list[datetime]) -> list[str]:
         """Validate a list of dates, returning human-readable error strings."""
-        errors: List[str] = []
+        errors: list[str] = []
         for d in dates:
             if self.is_weekend(d):
                 errors.append(f"Date {d.strftime('%Y-%m-%d')} falls on weekend")
@@ -274,7 +312,7 @@ class DateRules:
                 errors.append(f"Date {d.strftime('%Y-%m-%d')} falls on holiday")
         return errors
 
-    def get_shift_report(self) -> Dict[str, Any]:
+    def get_shift_report(self) -> dict[str, Any]:
         """Summarize shift provenance into a simple report dict."""
         return {
             "total_shifts": len(self.shift_log),

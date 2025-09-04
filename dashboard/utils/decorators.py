@@ -12,7 +12,7 @@ from flask import current_app, jsonify, request
 F = TypeVar("F", bound=Callable[..., Any])
 
 
-def validate_json(f: F) -> F:
+def validate_json[F: Callable[..., Any]](f: F) -> F:
     """
     Decorator to validate JSON request body.
     Returns 400 if request doesn't contain valid JSON.
@@ -34,7 +34,7 @@ def validate_json(f: F) -> F:
     return cast(F, decorated_function)
 
 
-def require_api_key(f: F) -> F:
+def require_api_key[F: Callable[..., Any]](f: F) -> F:
     """
     Decorator to require API key for access.
     Checks for X-API-Key header.

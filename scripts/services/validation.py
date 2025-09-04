@@ -81,6 +81,7 @@ class ValidationGateway:
         schedule_file = course_dir / "schedule.json"
         if schedule_file.exists():
             import json
+
             data = json.loads(schedule_file.read_text(encoding="utf-8"))
             results.append(self.validate_schedule_v1_1_0(data))
 
@@ -88,6 +89,7 @@ class ValidationGateway:
         syllabus_file = course_dir / "syllabus.json"
         if syllabus_file.exists():
             import json
+
             course_data = json.loads(syllabus_file.read_text(encoding="utf-8"))
 
             # Merge schedule data if available
@@ -103,6 +105,6 @@ class ValidationGateway:
 
         return ValidationResult.merge(results)
 
-    def validate_for_intelligence(self, course_id: str) -> ValidationResult:
+    def validate_for_intelligence(self, _course_id: str) -> ValidationResult:
         # Future: require stable IDs, parseable dates, dependency graph
         return ValidationResult(ok=True, messages=["intelligence preconditions: not enforced yet"])

@@ -16,4 +16,3 @@ def test_schedule_projection_generates_due_strings(monkeypatch) -> None:
     # Check that at least one assignment has a due label
     example = next((a for w in weeks for a in w.get("assignments", []) if "(due " in a), None)
     assert example is not None
-

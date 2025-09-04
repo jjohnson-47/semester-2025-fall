@@ -44,7 +44,9 @@ def validate_course(course: str) -> bool:
 def main() -> None:
     ap = argparse.ArgumentParser(description="Validate schedules against v1.1.0 schema")
     ap.add_argument("--course", help="One course code (e.g., MATH221)")
-    ap.add_argument("--all", action="store_true", help="Validate all courses under content/courses/")
+    ap.add_argument(
+        "--all", action="store_true", help="Validate all courses under content/courses/"
+    )
     args = ap.parse_args()
 
     ok = True
@@ -61,4 +63,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

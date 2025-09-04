@@ -103,7 +103,6 @@ title="{course} Schedule"></iframe>""",
         lti_configs = {}
 
         for course in ["MATH221", "MATH251", "STAT253"]:
-
             # Check for LTI configuration
             if course == "MATH221":
                 lti_configs[course] = {

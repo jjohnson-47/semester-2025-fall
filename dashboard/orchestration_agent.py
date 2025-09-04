@@ -335,11 +335,11 @@ class MasterOrchestrationAgent:
 
         for course in ["MATH221", "MATH251", "STAT253"]:
             package["courses"][course] = {
-                "syllabus_iframe": f"""<iframe src="{package['base_url']}/embed/syllabus/{course}"
+                "syllabus_iframe": f"""<iframe src="{package["base_url"]}/embed/syllabus/{course}"
 width="100%" height="800" frameborder="0"
 style="border: 1px solid #ddd; border-radius: 4px;"
 title="{course} Syllabus"></iframe>""",
-                "schedule_iframe": f"""<iframe src="{package['base_url']}/embed/schedule/{course}"
+                "schedule_iframe": f"""<iframe src="{package["base_url"]}/embed/schedule/{course}"
 width="100%" height="600" frameborder="0"
 style="border: 1px solid #ddd; border-radius: 4px;"
 title="{course} Schedule"></iframe>""",

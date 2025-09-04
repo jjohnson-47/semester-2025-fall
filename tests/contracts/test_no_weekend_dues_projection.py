@@ -21,4 +21,3 @@ def test_projection_no_weekend_dues(monkeypatch) -> None:
             for label in wk.get("assignments", []) + wk.get("assessments", []):
                 assert "(due Sat" not in label
                 assert "(due Sun" not in label
-

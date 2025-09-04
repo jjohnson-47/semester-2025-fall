@@ -38,7 +38,7 @@ class TestGoldenFixtures:
             pytest.skip("Golden fixture not found")
 
         with open(golden_file) as f:
-            golden_data = json.load(f)
+            json.load(f)
 
         # Get actual projection (v2 mode)
         os.environ["BUILD_MODE"] = "v2"
@@ -66,8 +66,9 @@ class TestGoldenFixtures:
                 # Check date formatting in assignments
                 for assignment in week.get("assignments", []):
                     # Should have due date formatting
-                    assert "(due" in assignment or not assignment, \
+                    assert "(due" in assignment or not assignment, (
                         f"Assignment missing due date: {assignment}"
+                    )
 
                 # No weekend due dates
                 for assignment in week.get("assignments", []):
@@ -91,18 +92,10 @@ class TestGoldenFixtures:
         course_data = {
             "course_code": "MATH221",
             "course_name": "Linear Algebra",
-            "instructor": {
-                "name": "Dr. Smith",
-                "email": "smith@carleton.edu"
-            },
+            "instructor": {"name": "Dr. Smith", "email": "smith@carleton.edu"},
             "schedule": [
-                {
-                    "week": 1,
-                    "topic": "Introduction",
-                    "assignments": ["HW1"],
-                    "assessments": []
-                }
-            ]
+                {"week": 1, "topic": "Introduction", "assignments": ["HW1"], "assessments": []}
+            ],
         }
 
         # Normalize it
@@ -127,6 +120,7 @@ class TestGoldenFixtures:
         try:
             # Unified service does not expose checksum-based projections; skip
             import pytest as _pytest
+
             _pytest.skip("Checksum-based projections not exposed in unified service")
         except Exception:
             pass
@@ -206,16 +200,12 @@ class TestGoldenFixtures:
         holidays = ["Fall Break Thu-Fri"]
 
         # Thursday exam should shift to Wednesday
-        shifted_day, add_days = rules.apply_holiday_shift(
-            3, holidays, "Midterm", True
-        )
+        shifted_day, add_days = rules.apply_holiday_shift(3, holidays, "Midterm", True)
         assert shifted_day == 2  # Wednesday
         assert add_days == 0
 
         # Friday homework should shift to next Monday
-        shifted_day, add_days = rules.apply_holiday_shift(
-            4, holidays, "Homework", False
-        )
+        shifted_day, add_days = rules.apply_holiday_shift(4, holidays, "Homework", False)
         assert shifted_day == 0  # Monday
         assert add_days == 7  # Next week
 

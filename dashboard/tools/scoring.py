@@ -6,11 +6,11 @@ and per-factor contributions. Stores no state; callers persist via repo layer.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+import contextlib
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from math import exp
-from typing import Any, Dict, Tuple
-
+from typing import Any
 
 # ------------------------------
 # Factor model
@@ -29,7 +29,7 @@ class Factors:
     freshness_decay: float = 0.0
     momentum_bonus: float = 0.0
 
-    def to_dict(self) -> Dict[str, float]:
+    def to_dict(self) -> dict[str, float]:
         return {
             "due_urgency": self.due_urgency,
             "critical_path": self.critical_path,
@@ -64,7 +64,9 @@ def freshness_decay(last_touched: datetime, now: datetime) -> float:
 # ------------------------------
 
 
-def score_task(task: Dict[str, Any], ctx: Dict[str, Any], weights: Dict[str, float]) -> Tuple[float, Dict[str, float]]:
+def score_task(
+    task: dict[str, Any], ctx: dict[str, Any], weights: dict[str, float]
+) -> tuple[float, dict[str, float]]:
     """Compute score and per-factor contributions for a task.
 
     Args:
@@ -75,7 +77,7 @@ def score_task(task: Dict[str, Any], ctx: Dict[str, Any], weights: Dict[str, flo
     Returns:
         total score, contribution map {factor_name: contribution}
     """
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     factors = Factors()
 
     # Raw factor values (bounded)
@@ -94,7 +96,7 @@ def score_task(task: Dict[str, Any], ctx: Dict[str, Any], weights: Dict[str, flo
     factors.anchor_proximity = 10.0 if task.get("anchor") else 0.0
     factors.chain_head_boost = 10.0 if task.get("is_chain_head") else 0.0
 
-    phase_weights = (ctx.get("phase_weights") or {})
+    phase_weights = ctx.get("phase_weights") or {}
     category = (task.get("category") or "").lower()
     if category in phase_weights:
         # Center around ~0 by subtracting 1.0
@@ -102,10 +104,8 @@ def score_task(task: Dict[str, Any], ctx: Dict[str, Any], weights: Dict[str, flo
 
     last_touched_str = task.get("last_touched") or task.get("updated_at")
     if last_touched_str:
-        try:
+        with contextlib.suppress(Exception):
             factors.freshness_decay = freshness_decay(datetime.fromisoformat(last_touched_str), now)
-        except Exception:
-            pass
 
     # Momentum based on recent completions in context (0..3)
     try:
@@ -115,7 +115,8 @@ def score_task(task: Dict[str, Any], ctx: Dict[str, Any], weights: Dict[str, flo
         pass
 
     # Contributions and total
-    contrib = {name: factors.to_dict()[name] * float(weights.get(name, 0.0)) for name in factors.to_dict()}
+    contrib = {
+        name: factors.to_dict()[name] * float(weights.get(name, 0.0)) for name in factors.to_dict()
+    }
     total = float(sum(contrib.values()))
     return total, contrib
-

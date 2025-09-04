@@ -5,26 +5,25 @@ Handles CRUD operations for tasks using the SQLite repository layer.
 Includes status mapping for legacy values.
 """
 
-from flask import current_app, jsonify, request
+import contextlib
 import json
 from pathlib import Path
+
+from flask import current_app, jsonify, request
 from flask.typing import ResponseReturnValue
 
 from dashboard.api import api_bp
-from dashboard.db import Database, DatabaseConfig
 from dashboard.config import Config
+from dashboard.db import Database, DatabaseConfig
 from dashboard.utils.decorators import validate_json
-
 
 # ------------------------------
 # Helpers: DB and status mapping
 # ------------------------------
 
 _db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
-try:  # Initialize tables if needed
+with contextlib.suppress(Exception):  # Initialize tables if needed
     _db.initialize()
-except Exception:
-    pass
 
 
 CANONICAL_STATUSES = {"todo", "doing", "review", "done", "blocked"}
@@ -72,13 +71,15 @@ def get_tasks() -> ResponseReturnValue:
     total = len(tasks)
     start = max(0, (page - 1) * per_page)
     end = start + per_page
-    return jsonify({
-        "tasks": tasks[start:end],
-        "total": total,
-        "page": page,
-        "per_page": per_page,
-        "total_pages": (total + per_page - 1) // per_page,
-    })
+    return jsonify(
+        {
+            "tasks": tasks[start:end],
+            "total": total,
+            "page": page,
+            "per_page": per_page,
+            "total_pages": (total + per_page - 1) // per_page,
+        }
+    )
 
 
 @api_bp.route("/tasks/<task_id>", methods=["GET"])
@@ -150,7 +151,11 @@ def update_task(task_id: str) -> ResponseReturnValue:
             if ms:
                 data["status"] = ms
         # Filter to allowed fields
-        allowed = {k: data[k] for k in ["status","title","due_at","est_minutes","weight","category","notes"] if k in data}
+        allowed = {
+            k: data[k]
+            for k in ["status", "title", "due_at", "est_minutes", "weight", "category", "notes"]
+            if k in data
+        }
         if not allowed:
             # Nothing to update
             current = _db.get_task(task_id)

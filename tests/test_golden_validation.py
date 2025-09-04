@@ -4,8 +4,8 @@ These tests ensure that the refactored system produces consistent,
 correct output that matches expected behavior.
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 import pytest
@@ -58,9 +58,13 @@ class TestGoldenValidation:
         dr = DateRules(calendar=None)  # calendar not needed for this test
         # Saturday/Sunday avoidance via fall-through in helpers
         # Use a week start and a placeholder label; ensure due never lands on weekend
-        due = dr.apply_rules("HW 1", "2025-09-06", holidays=[], is_assessment=False)  # Week start Sat
+        due = dr.apply_rules(
+            "HW 1", "2025-09-06", holidays=[], is_assessment=False
+        )  # Week start Sat
         assert "(due Sat" not in due and "(due Sun" not in due
-        due2 = dr.apply_rules("Exam #1", "2025-09-07", holidays=[], is_assessment=True)  # Week start Sun
+        due2 = dr.apply_rules(
+            "Exam #1", "2025-09-07", holidays=[], is_assessment=True
+        )  # Week start Sun
         assert "(due Sat" not in due2 and "(due Sun" not in due2
         # Different week starts still avoid weekends
         dr2 = DateRules(calendar=None)
@@ -78,6 +82,7 @@ class TestGoldenValidation:
     def test_provenance_tracking(self):
         """Provenance tracking not covered in unified service yet."""
         import pytest
+
         pytest.skip("Provenance tracking is not exposed via unified CourseService")
         assert course.instructor.name.provenance is not None
         assert course.instructor.name.provenance.confidence >= 0.0

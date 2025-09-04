@@ -23,4 +23,3 @@ class ChangeDetector:
     def detect_changes(self, course_id: str) -> list[Change]:
         _ = course_id
         return []
-

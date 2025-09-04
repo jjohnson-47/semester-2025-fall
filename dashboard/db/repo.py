@@ -14,12 +14,12 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from contextlib import contextmanager
+from collections.abc import Generator, Iterable
+from contextlib import contextmanager, suppress
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Generator, Iterable, Optional
-
+from typing import Any
 
 # ------------------------------
 # Connection utilities
@@ -51,7 +51,7 @@ class Database:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
 
     @contextmanager
-    def connect(self) -> Generator[sqlite3.Connection, None, None]:
+    def connect(self) -> Generator[sqlite3.Connection]:
         conn = sqlite3.connect(self.db_path)
         try:
             conn.row_factory = sqlite3.Row
@@ -144,10 +144,8 @@ class Database:
                     conn.execute("alter table tasks add column parent_id text")
             except sqlite3.DatabaseError:
                 pass
-            try:
+            with suppress(sqlite3.DatabaseError):
                 conn.execute("alter table tasks add column checklist text")
-            except sqlite3.DatabaseError:
-                pass
 
     # ------------------------------
     # Import / Export
@@ -212,7 +210,7 @@ class Database:
                     inserted += 1
 
                 # deps
-                for dep_id in (task.get("depends_on") or []):
+                for dep_id in task.get("depends_on") or []:
                     try:
                         conn.execute(
                             "insert or ignore into deps(task_id, blocks_id) values(?, ?)",
@@ -283,12 +281,14 @@ class Database:
     # Core operations
     # ------------------------------
 
-    def get_task(self, task_id: str) -> Optional[dict[str, Any]]:
+    def get_task(self, task_id: str) -> dict[str, Any] | None:
         with self.connect() as conn:
             row = conn.execute("select * from tasks where id=?", (task_id,)).fetchone()
         return dict(row) if row else None
 
-    def list_tasks(self, *, status: Optional[str] = None, course: Optional[str] = None) -> list[dict[str, Any]]:
+    def list_tasks(
+        self, *, status: str | None = None, course: str | None = None
+    ) -> list[dict[str, Any]]:
         query = "select * from tasks"
         params: list[Any] = []
         clauses: list[str] = []
@@ -391,7 +391,9 @@ class Database:
     def add_deps(self, task_id: str, depends_on: Iterable[str]) -> None:
         with self.connect() as conn:
             for dep_id in depends_on:
-                conn.execute("insert or ignore into deps(task_id, blocks_id) values(?, ?)", (task_id, dep_id))
+                conn.execute(
+                    "insert or ignore into deps(task_id, blocks_id) values(?, ?)", (task_id, dep_id)
+                )
 
     def remove_from_now_queue(self, task_id: str) -> None:
         with self.connect() as conn:
@@ -399,7 +401,7 @@ class Database:
             kept = [r["task_id"] for r in rows if r["task_id"] != task_id]
         self.set_now_queue(kept)
 
-    def add_event(self, task_id: str, field: str, from_val: Optional[str], to_val: Optional[str]) -> None:
+    def add_event(self, task_id: str, field: str, from_val: str | None, to_val: str | None) -> None:
         with self.connect() as conn:
             conn.execute(
                 "insert into events(at, task_id, field, from_val, to_val) values(?,?,?,?,?)",
@@ -413,7 +415,7 @@ class Database:
                 (task_id, float(score), json.dumps(factors), _utcnow_iso()),
             )
 
-    def get_score(self, task_id: str) -> Optional[dict[str, Any]]:
+    def get_score(self, task_id: str) -> dict[str, Any] | None:
         with self.connect() as conn:
             row = conn.execute("select * from scores where task_id=?", (task_id,)).fetchone()
         return dict(row) if row else None
