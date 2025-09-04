@@ -1,0 +1,51 @@
+# Codex ignore file - prevent context overflow
+# Large generated files
+build/
+dist/
+*.min.js
+*.min.css
+bundle.js
+*.bundle.js
+
+# Dependencies
+node_modules/
+venv/
+.venv/
+vendor/
+
+# Large data files
+*.sqlite
+*.db
+*.log
+*.csv
+*.json
+*.sql
+
+# Media files
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.mp4
+*.pdf
+*.zip
+*.tar.gz
+
+# Documentation that's too large
+docs/
+documentation/
+API_DOCUMENTATION.md
+
+# Test artifacts
+coverage/
+.pytest_cache/
+__pycache__/
+
+# IDE
+.idea/
+.vscode/
+
+# Keep only essential config
+!package.json
+!pyproject.toml
+!requirements.txt

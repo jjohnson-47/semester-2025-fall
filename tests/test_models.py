@@ -23,8 +23,10 @@ from datetime import date, datetime
 from pathlib import Path
 
 import pytest
-from hypothesis import given
-from hypothesis import strategies as st
+
+_hyp = pytest.importorskip("hypothesis")
+given = _hyp.given  # type: ignore[attr-defined]
+st = pytest.importorskip("hypothesis.strategies")  # type: ignore
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 

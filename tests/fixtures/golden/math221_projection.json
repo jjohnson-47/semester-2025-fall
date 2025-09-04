@@ -1,0 +1,94 @@
+{
+  "course_id": "MATH221",
+  "projection_type": "schedule",
+  "data": {
+    "course_code": "MATH221",
+    "weeks": [
+      {
+        "week": 1,
+        "topic": "Introduction to Linear Algebra",
+        "date_range": "2025-09-08 - 2025-09-12",
+        "holidays": [],
+        "assignments": [
+          "HW 1: Vector Basics (due Fri 09/12)"
+        ],
+        "assessments": []
+      },
+      {
+        "week": 2,
+        "topic": "Matrices and Matrix Operations",
+        "date_range": "2025-09-15 - 2025-09-19",
+        "holidays": [],
+        "assignments": [
+          "HW 2: Matrix Multiplication (due Fri 09/19)",
+          "BB Discussion 1 (due Wed 09/17)"
+        ],
+        "assessments": []
+      },
+      {
+        "week": 3,
+        "topic": "Systems of Linear Equations",
+        "date_range": "2025-09-22 - 2025-09-26",
+        "holidays": [],
+        "assignments": [
+          "HW 3: Gaussian Elimination (due Fri 09/26)"
+        ],
+        "assessments": [
+          "Quiz 1: Vectors and Matrices (due Fri 09/26)"
+        ]
+      },
+      {
+        "week": 4,
+        "topic": "Vector Spaces",
+        "date_range": "2025-09-29 - 2025-10-03",
+        "holidays": [],
+        "assignments": [
+          "HW 4: Vector Spaces (due Fri 10/03)"
+        ],
+        "assessments": []
+      },
+      {
+        "week": 5,
+        "topic": "Linear Independence and Basis",
+        "date_range": "2025-10-06 - 2025-10-10",
+        "holidays": [],
+        "assignments": [
+          "HW 5: Basis and Dimension (due Fri 10/10)"
+        ],
+        "assessments": [
+          "Midterm 1 (due Thu 10/09)"
+        ]
+      },
+      {
+        "week": 6,
+        "topic": "Linear Transformations",
+        "date_range": "2025-10-13 - 2025-10-17",
+        "holidays": ["Fall Break Thu-Fri"],
+        "assignments": [
+          "HW 6: Linear Maps (due Mon 10/20)"
+        ],
+        "assessments": [
+          "Quiz 2: Vector Spaces (due Wed 10/15)"
+        ]
+      }
+    ],
+    "important_dates": {
+      "midterm1": "2025-10-09",
+      "midterm2": "2025-11-13",
+      "final": "2025-12-15",
+      "drop_deadline": "2025-10-20"
+    }
+  },
+  "metadata": {
+    "total_weeks": 14,
+    "has_dates": true,
+    "confidence": 0.95,
+    "rules_applied": [
+      "no_weekend_due_dates",
+      "fall_break_shift",
+      "blackboard_wednesday"
+    ]
+  },
+  "generated_at": "2025-08-25T12:00:00Z",
+  "checksum": "abc123def456"
+}

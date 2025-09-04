@@ -16,7 +16,6 @@ import argparse
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
 
 
 @dataclass
@@ -54,7 +53,7 @@ def parse_coverage(path: Path) -> Totals:
     return t
 
 
-def combine(inputs: List[Path]) -> Totals:
+def combine(inputs: list[Path]) -> Totals:
     total = Totals()
     for p in inputs:
         t = parse_coverage(p)

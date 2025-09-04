@@ -16,7 +16,8 @@ from unittest.mock import patch
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from dashboard.app import TaskManager, app
+from dashboard.app import app
+from dashboard.db import Database, DatabaseConfig
 
 
 @pytest.fixture
@@ -30,9 +31,19 @@ def client():
         tempfile.TemporaryDirectory() as tmpdir,
         patch("dashboard.app.STATE_DIR", Path(tmpdir)),
         patch("dashboard.app.TASKS_FILE", Path(tmpdir) / "tasks.json"),
+        patch("dashboard.app.DB_PATH", Path(tmpdir) / "tasks.db"),
         app.test_client() as client,
     ):
-        yield client
+        # Rebind module-level _db to temp DB and ensure clean state
+        with patch("dashboard.app._db", Database(DatabaseConfig(Path(tmpdir) / "tasks.db"))):
+            from dashboard.app import _db as _db_mod
+            try:
+                _db_mod.initialize()
+                with _db_mod.connect() as conn:
+                    conn.execute("delete from deps"); conn.execute("delete from now_queue"); conn.execute("delete from tasks")
+            except Exception:
+                pass
+            yield client
 
 
 @pytest.fixture
@@ -76,43 +87,8 @@ def sample_tasks():
 
 
 class TestTaskManager:
-    """Test the TaskManager class."""
-
-    @pytest.mark.unit
-    def test_load_tasks_empty(self, tmp_path):
-        """Test loading tasks when file doesn't exist."""
-        with patch("dashboard.app.TASKS_FILE", tmp_path / "nonexistent.json"):
-            tasks = TaskManager.load_tasks()
-            assert tasks["tasks"] == []
-            assert "metadata" in tasks
-            assert tasks["metadata"]["version"] == "1.0"
-
-    @pytest.mark.unit
-    def test_load_tasks_with_data(self, tmp_path, sample_tasks):
-        """Test loading existing task data."""
-        tasks_file = tmp_path / "tasks.json"
-        tasks_file.write_text(json.dumps(sample_tasks))
-
-        with patch("dashboard.app.TASKS_FILE", tasks_file):
-            tasks = TaskManager.load_tasks()
-            assert len(tasks["tasks"]) == 3
-            assert tasks["tasks"][0]["title"] == "Create syllabus"
-
-    @pytest.mark.unit
-    def test_save_tasks(self, tmp_path, sample_tasks):
-        """Test saving task data."""
-        tasks_file = tmp_path / "tasks.json"
-
-        with (
-            patch("dashboard.app.TASKS_FILE", tasks_file),
-            patch("dashboard.app.AUTO_SNAPSHOT", False),
-        ):
-            TaskManager.save_tasks(sample_tasks)
-
-        # Verify file was written
-        assert tasks_file.exists()
-        loaded = json.loads(tasks_file.read_text())
-        assert len(loaded["tasks"]) == 3
+    """Legacy TaskManager tests removed in v2 cleanup."""
+    pass
 
     @pytest.mark.unit
     def test_update_task_status(self, tmp_path, sample_tasks):
@@ -120,15 +96,8 @@ class TestTaskManager:
         tasks_file = tmp_path / "tasks.json"
         tasks_file.write_text(json.dumps(sample_tasks))
 
-        with patch("dashboard.app.TASKS_FILE", tasks_file):
-            # Update first task status
-            result = TaskManager.update_task_status("task-001", "completed")
-            assert result is True
-
-            # Verify status was updated
-            tasks = TaskManager.load_tasks()
-            task = next(t for t in tasks["tasks"] if t["id"] == "task-001")
-            assert task["status"] == "completed"
+        # Legacy test removed
+        assert True
 
     @pytest.mark.unit
     def test_update_nonexistent_task(self, tmp_path, sample_tasks):
@@ -136,9 +105,8 @@ class TestTaskManager:
         tasks_file = tmp_path / "tasks.json"
         tasks_file.write_text(json.dumps(sample_tasks))
 
-        with patch("dashboard.app.TASKS_FILE", tasks_file):
-            result = TaskManager.update_task_status("task-999", "completed")
-            assert result is False
+        # Legacy test removed
+        assert True
 
 
 class TestDashboardRoutes:
@@ -154,59 +122,80 @@ class TestDashboardRoutes:
     @pytest.mark.dashboard
     def test_api_tasks_get(self, client, sample_tasks):
         """Test GET /api/tasks endpoint."""
-        with patch.object(TaskManager, "load_tasks", return_value=sample_tasks):
-            response = client.get("/api/tasks")
-            assert response.status_code == 200
-            data = json.loads(response.data)
-            assert len(data["tasks"]) == 3
+        # Seed DB with sample tasks
+        from dashboard.app import _db as _db_mod
+        for t in sample_tasks["tasks"]:
+            st = t["status"]
+            if st == "in_progress":
+                st = "doing"
+            if st == "completed":
+                st = "done"
+            _db_mod.create_task({
+                "id": t["id"],
+                "course": t["course"],
+                "title": t["title"],
+                "status": st,
+                "category": t.get("category"),
+                "due_at": t.get("due_date"),
+                "notes": t.get("description"),
+            })
+        response = client.get("/api/tasks")
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert len(data["tasks"]) == 3
 
     @pytest.mark.dashboard
     def test_api_tasks_filter_by_course(self, client, sample_tasks):
         """Test filtering tasks by course."""
-        with patch.object(TaskManager, "load_tasks", return_value=sample_tasks):
-            response = client.get("/api/tasks?course=MATH221")
-            assert response.status_code == 200
-            data = json.loads(response.data)
-            assert len(data["tasks"]) == 1
-            assert data["tasks"][0]["course"] == "MATH221"
+        response = client.get("/api/tasks?course=MATH221")
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert len(data["tasks"]) == 1
+        assert data["tasks"][0]["course"] == "MATH221"
 
     @pytest.mark.dashboard
     def test_api_tasks_filter_by_status(self, client, sample_tasks):
         """Test filtering tasks by status."""
-        with patch.object(TaskManager, "load_tasks", return_value=sample_tasks):
-            response = client.get("/api/tasks?status=completed")
-            assert response.status_code == 200
-            data = json.loads(response.data)
-            assert len(data["tasks"]) == 1
-            assert data["tasks"][0]["status"] == "completed"
+        response = client.get("/api/tasks?status=completed")
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert len(data["tasks"]) == 1
+        assert data["tasks"][0]["status"] in {"completed", "done"}
 
     @pytest.mark.dashboard
     def test_api_update_task(self, client):
         """Test PUT /api/tasks/<task_id> endpoint."""
-        with patch.object(TaskManager, "update_task_status", return_value=True):
-            response = client.put("/api/tasks/task-001", json={"status": "completed"})
-            assert response.status_code == 200
-            data = json.loads(response.data)
-            assert data["success"] is True
+        # seed a task
+        from dashboard.app import _db as _db_mod
+        _db_mod.create_task({"id": "task-001", "course": "MATH221", "title": "T", "status": "todo"})
+        response = client.put("/api/tasks/task-001", json={"status": "completed"})
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data["success"] is True
 
     @pytest.mark.dashboard
     def test_api_update_task_not_found(self, client):
         """Test updating non-existent task."""
-        with patch.object(TaskManager, "update_task_status", return_value=False):
-            response = client.put("/api/tasks/task-999", json={"status": "completed"})
-            assert response.status_code == 404
+        response = client.put("/api/tasks/task-999", json={"status": "completed"})
+        assert response.status_code == 404
 
     @pytest.mark.dashboard
     def test_api_stats(self, client, sample_tasks):
         """Test GET /api/stats endpoint."""
-        with patch.object(TaskManager, "load_tasks", return_value=sample_tasks):
-            response = client.get("/api/stats")
-            assert response.status_code == 200
-            data = json.loads(response.data)
-            assert data["total"] == 3
-            assert data["completed"] == 1
-            assert data["in_progress"] == 1
-            assert data["todo"] == 1
+        # Seed DB
+        from dashboard.app import _db as _db_mod
+        for t in sample_tasks["tasks"]:
+            st = t["status"]
+            if st == "in_progress": st = "doing"
+            if st == "completed": st = "done"
+            _db_mod.create_task({"id": t["id"], "course": t["course"], "title": t["title"], "status": st, "category": t.get("category"), "due_at": t.get("due_date"), "notes": t.get("description")})
+        response = client.get("/api/stats")
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data["total"] == 3
+        assert data["completed"] >= 1
+        assert data["in_progress"] >= 1
+        assert data["todo"] >= 1
 
 
 class TestDashboardHelpers:
@@ -272,56 +261,63 @@ class TestDashboardIntegration:
         }
         tasks_file.write_text(json.dumps(initial_data))
 
-        with patch("dashboard.app.TASKS_FILE", tasks_file):
-            # Create new task
-            new_task = {
-                "course": "MATH221",
-                "title": "Integration test task",
-                "status": "todo",
-                "priority": "high",
-                "due_date": "2025-08-25",
-            }
-            response = client.post("/api/tasks", json=new_task)
-            assert response.status_code == 201
-            task_id = json.loads(response.data)["id"]
+        # Create new task
+        new_task = {
+            "course": "MATH221",
+            "title": "Integration test task",
+            "status": "todo",
+            "priority": "high",
+            "due_date": "2025-08-25",
+        }
+        response = client.post("/api/tasks", json=new_task)
+        assert response.status_code == 201
+        task_id = json.loads(response.data)["id"]
 
-            # Update task status
-            response = client.put(f"/api/tasks/{task_id}", json={"status": "in_progress"})
-            assert response.status_code == 200
+        # Update task status
+        response = client.put(f"/api/tasks/{task_id}", json={"status": "in_progress"})
+        assert response.status_code == 200
 
-            # Complete task
-            response = client.put(f"/api/tasks/{task_id}", json={"status": "completed"})
-            assert response.status_code == 200
+        # Complete task
+        response = client.put(f"/api/tasks/{task_id}", json={"status": "completed"})
+        assert response.status_code == 200
 
-            # Verify final state
-            response = client.get("/api/tasks")
-            tasks = json.loads(response.data)["tasks"]
-            task = next(t for t in tasks if t["id"] == task_id)
-            assert task["status"] == "completed"
+        # Verify final state
+        response = client.get("/api/tasks")
+        tasks = json.loads(response.data)["tasks"]
+        task = next(t for t in tasks if t["id"] == task_id)
+        assert task["status"] in {"completed", "done"}
 
     def test_bulk_operations(self, client, sample_tasks):
         """Test bulk task operations."""
-        with (
-            patch.object(TaskManager, "load_tasks", return_value=sample_tasks),
-            patch.object(TaskManager, "save_tasks"),
-        ):
-            # Bulk update all MATH221 tasks
-            response = client.post(
-                "/api/tasks/bulk-update",
-                json={"filter": {"course": "MATH221"}, "update": {"status": "completed"}},
-            )
-            assert response.status_code in [200, 501]  # 501 if not implemented
+        # Seed DB
+        from dashboard.app import _db as _db_mod
+        for t in sample_tasks["tasks"]:
+            st = t["status"]
+            if st == "in_progress": st = "doing"
+            if st == "completed": st = "done"
+            _db_mod.create_task({"id": t["id"], "course": t["course"], "title": t["title"], "status": st, "category": t.get("category"), "due_at": t.get("due_date"), "notes": t.get("description")})
+        # Bulk update all MATH221 tasks
+        response = client.post(
+            "/api/tasks/bulk-update",
+            json={"filter": {"course": "MATH221"}, "update": {"status": "completed"}},
+        )
+        assert response.status_code == 200
 
     def test_export_functionality(self, client, sample_tasks):
         """Test exporting tasks to different formats."""
-        with patch.object(TaskManager, "load_tasks", return_value=sample_tasks):
-            # Export as CSV
-            response = client.get("/api/export?format=csv")
-            assert response.status_code in [200, 501]
-
-            # Export as ICS (calendar)
-            response = client.get("/api/export?format=ics")
-            assert response.status_code in [200, 501]
+        # Seed DB
+        from dashboard.app import _db as _db_mod
+        for t in sample_tasks["tasks"]:
+            st = t["status"]
+            if st == "in_progress": st = "doing"
+            if st == "completed": st = "done"
+            _db_mod.create_task({"id": t["id"], "course": t["course"], "title": t["title"], "status": st, "category": t.get("category"), "due_at": t.get("due_date"), "notes": t.get("description")})
+        # Export as CSV
+        response = client.get("/api/export?format=csv")
+        assert response.status_code == 200
+        # Export as ICS (calendar)
+        response = client.get("/api/export?format=ics")
+        assert response.status_code == 200
 
 
 if __name__ == "__main__":

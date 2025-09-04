@@ -13,15 +13,14 @@ from __future__ import annotations
 
 import re
 import sys
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, List, Tuple
-
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def find_md_files() -> List[Path]:
-    files: List[Path] = [ROOT / "README.md"]
+def find_md_files() -> list[Path]:
+    files: list[Path] = [ROOT / "README.md"]
     files += list((ROOT / "docs").rglob("*.md"))
     return [p for p in files if p.exists()]
 
@@ -38,8 +37,8 @@ def is_relative_link(target: str) -> bool:
     return True
 
 
-def check_links(files: List[Path]) -> List[Tuple[Path, str]]:
-    broken: List[Tuple[Path, str]] = []
+def check_links(files: list[Path]) -> list[tuple[Path, str]]:
+    broken: list[tuple[Path, str]] = []
     for f in files:
         md = f.read_text(encoding="utf-8", errors="ignore")
         for link in extract_links(md):
@@ -55,12 +54,12 @@ def check_links(files: List[Path]) -> List[Tuple[Path, str]]:
     return broken
 
 
-def check_adr_contiguous() -> List[str]:
-    problems: List[str] = []
+def check_adr_contiguous() -> list[str]:
+    problems: list[str] = []
     adr_dir = ROOT / "docs" / "adr"
     if not adr_dir.exists():
         return problems
-    nums: List[int] = []
+    nums: list[int] = []
     for p in adr_dir.glob("*.md"):
         stem = p.stem
         # e.g., 0001-something
@@ -78,7 +77,7 @@ def check_adr_contiguous() -> List[str]:
     return problems
 
 
-def check_required_docs() -> List[str]:
+def check_required_docs() -> list[str]:
     required = [
         ROOT / "docs" / "REPOSITORY_ARCHITECTURE_OVERVIEW.md",
         ROOT / "docs" / "architecture-diagram.mmd",

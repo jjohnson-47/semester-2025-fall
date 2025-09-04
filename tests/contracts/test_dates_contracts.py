@@ -8,12 +8,12 @@ future rule implementations can bind to these contracts.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import yaml  # type: ignore[import-untyped]
 
 
-def _load_contracts(path: Path) -> Dict[str, Any]:
+def _load_contracts(path: Path) -> dict[str, Any]:
     data = yaml.safe_load(path.read_text())
     assert isinstance(data, dict)
     assert "contracts" in data
