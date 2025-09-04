@@ -18,8 +18,10 @@ from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+from scripts.services.projection_adapter import get_schedule_projection_weeks, is_v2_enabled
 from scripts.utils.jinja_env import create_jinja_env
 from scripts.utils.semester_calendar import SemesterCalendar
+from scripts.utils.style_system import DeploymentContext, StyleConfiguration, StyleSystem
 
 
 def _parse_date(date_str: str) -> datetime:
@@ -45,6 +47,11 @@ class ScheduleBuilder:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.calendar = calendar or SemesterCalendar()
         self.content_root = Path(".") if content_root is None else Path(content_root)
+
+        # Initialize style system with LOCAL context for standalone HTML files
+        self.style_system = StyleSystem(
+            StyleConfiguration(deployment_context=DeploymentContext.LOCAL)
+        )
 
     def _load_course_schedule(self, course_code: str) -> dict[str, Any] | None:
         """Load a course's schedule JSON if available.
@@ -149,7 +156,7 @@ class ScheduleBuilder:
         return {}
 
     def _format_custom_due_date(self, date_str: str) -> str:
-        """Format a custom due date string.
+        """Format a custom due date string with weekend adjustment.
 
         Args:
             date_str: ISO format date (YYYY-MM-DD)
@@ -158,6 +165,14 @@ class ScheduleBuilder:
             Formatted string like '(due Mon 09/02)'
         """
         due_date = datetime.strptime(date_str, "%Y-%m-%d")
+
+        # Apply weekend adjustment rules
+        weekday = due_date.weekday()
+        if weekday == 5:  # Saturday -> Friday
+            due_date = due_date - timedelta(days=1)
+        elif weekday == 6:  # Sunday -> Monday
+            due_date = due_date + timedelta(days=1)
+
         day_names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
         day_label = day_names[due_date.weekday()]
         return f"(due {day_label} {due_date.strftime('%m/%d')})"
@@ -201,7 +216,86 @@ class ScheduleBuilder:
         html_weeks: list[dict[str, Any]] = []
         instruction_weeks = [w for w in weeks if not w.get("is_finals")]
 
-        if course_schedule and "weeks" in course_schedule:
+        if is_v2_enabled():
+            # Use v2 schedule projection weeks with due date enhancement
+            projection_weeks = get_schedule_projection_weeks(course_code)
+            if projection_weeks:
+                for idx, pw in enumerate(projection_weeks, 1):
+                    # Get corresponding calendar week for date calculation
+                    if idx <= len(instruction_weeks):
+                        cal_week = instruction_weeks[idx - 1]
+                    else:
+                        cal_week = None
+
+                    date_range = pw.get("date_range", "")
+                    if not date_range and cal_week:
+                        date_range = self._format_dates_range(cal_week["start"], cal_week["end"])
+
+                    holidays = pw.get("holidays", [])
+                    if not holidays and cal_week:
+                        holidays = cal_week.get("holidays", [])
+                    holidays_str = f" ({', '.join(holidays)})" if holidays else ""
+
+                    # Process assignments with due dates
+                    assignments_with_dates = []
+                    html_assignments = []
+                    for item in pw.get("assignments", []):
+                        if item in custom_due_dates:
+                            due = self._format_custom_due_date(custom_due_dates[item])
+                            assignments_with_dates.append(f"{item} {due}")
+                            html_assignments.append(f"{item} {due}")
+                        elif cal_week:
+                            # Use automatic date calculation
+                            wd = self._choose_due_weekday(item, is_assessment=False)
+                            wd, add = self._apply_holiday_shift(wd, holidays, item, False)
+                            due = self._format_due(cal_week["start"], wd, add)
+                            assignments_with_dates.append(f"{item} {due}")
+                            html_assignments.append(f"{item} {due}")
+                        else:
+                            assignments_with_dates.append(item)
+                            html_assignments.append(item)
+
+                    # Process assessments with due dates
+                    assessments_with_dates = []
+                    html_assessments = []
+                    for item in pw.get("assessments", []):
+                        if item in custom_due_dates:
+                            due = self._format_custom_due_date(custom_due_dates[item])
+                            assessments_with_dates.append(f"{item} {due}")
+                            html_assessments.append(f"{item} {due}")
+                        elif cal_week:
+                            # Use automatic date calculation
+                            wd = self._choose_due_weekday(item, is_assessment=True)
+                            wd, add = self._apply_holiday_shift(wd, holidays, item, True)
+                            due = self._format_due(cal_week["start"], wd, add)
+                            assessments_with_dates.append(f"{item} {due}")
+                            html_assessments.append(f"{item} {due}")
+                        else:
+                            assessments_with_dates.append(item)
+                            html_assessments.append(item)
+
+                    rows.append(
+                        f"| {idx} | {date_range}{holidays_str} | {pw.get('topic','')} | {', '.join(assignments_with_dates)} | {', '.join(assessments_with_dates)} |"
+                    )
+                    html_weeks.append(
+                        {
+                            "label": idx,
+                            "date_range": date_range,
+                            "holidays": holidays,
+                            "topic": pw.get("topic", ""),
+                            "subtopics": [],
+                            "readings": pw.get("readings", []),
+                            "assignments": html_assignments,
+                            "assessments": html_assessments,
+                            "has_exam": any("exam" in a.lower() or "midterm" in a.lower() for a in pw.get("assessments", [])),
+                            "is_finals": False,
+                        }
+                    )
+            else:
+                # Fallback to legacy path below
+                pass
+        elif not is_v2_enabled() and course_schedule and "weeks" in course_schedule:
+            # Legacy path - only run if v2 is not enabled
             planned_weeks: list[dict[str, Any]] = course_schedule["weeks"]
             count = min(len(planned_weeks), len(instruction_weeks))
             for idx in range(count):
@@ -217,13 +311,15 @@ class ScheduleBuilder:
                     # Check for custom override date first
                     if item in custom_due_dates:
                         due = self._format_custom_due_date(custom_due_dates[item])
+                        assignments.append(f"{item} {due}")
+                        html_assignments.append(f"{item} {due}")
                     else:
                         # Use automatic date calculation
                         wd = self._choose_due_weekday(item, is_assessment=False)
                         wd, add = self._apply_holiday_shift(wd, cw.get("holidays", []), item, False)
                         due = self._format_due(cw["start"], wd, add)
-                    assignments.append(f"{item} {due}")
-                    html_assignments.append(f"{item} {due}")
+                        assignments.append(f"{item} {due}")
+                        html_assignments.append(f"{item} {due}")
                 # Assessments with due dates where applicable
                 assessments: list[str] = []
                 html_assessments: list[str] = []
@@ -342,6 +438,9 @@ class ScheduleBuilder:
             except Exception:
                 instructor = {"name": "Instructor", "office_hours": "By appointment"}
 
+            # Add style context for template rendering
+            style_context = self.style_system.get_template_style_context(course_code)
+
             html_context = {
                 "course": {
                     "code": course_code,
@@ -354,6 +453,8 @@ class ScheduleBuilder:
                 "dates": dates,
                 "weeks": html_weeks,
                 "instructor": instructor,
+                "course_code": course_code,  # For style template
+                **style_context  # Include all style context
             }
             html_out = tpl.render(**html_context)
             html_file = self.output_dir / f"{course_code}_schedule.html"

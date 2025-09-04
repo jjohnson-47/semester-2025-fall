@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://courses.jeffsthings.com/schemas/v1.1.0/course.schema.json",
+  "title": "Course Data (v1.1.0)",
+  "description": "Enhanced course schema with stable IDs and metadata tracking",
+  "type": "object",
+  "properties": {
+    "_meta": {
+      "type": "object",
+      "description": "Metadata header for versioning and tracking",
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "pattern": "^1\\.1\\.0$",
+          "description": "Schema version"
+        },
+        "stable_id": {
+          "type": "string",
+          "description": "Stable identifier for this course instance"
+        },
+        "term": {"type": "string"},
+        "timezone": {"type": "string", "default": "America/Chicago"},
+        "lastModified": {"type": "string", "format": "date-time"},
+        "generator": {"type": "string"},
+        "checksum": {"type": "string"},
+        "provenance": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "rule": {"type": "string"},
+              "timestamp": {"type": "string", "format": "date-time"}
+            }
+          }
+        }
+      },
+      "required": ["schemaVersion"]
+    },
+    "course_meta": {
+      "type": "object",
+      "properties": {
+        "code": {"type": "string", "pattern": "^[A-Z]{3,4}\\d{3}$"},
+        "name": {"type": "string"},
+        "credits": {"type": "number", "minimum": 0, "maximum": 12},
+        "format": {"type": "string"},
+        "instructor": {
+          "type": "object",
+          "properties": {
+            "name": {"type": "string"},
+            "email": {"type": "string", "format": "email"},
+            "office": {"type": "string"},
+            "office_hours": {"type": "string"}
+          }
+        }
+      }
+    },
+    "schedule": {
+      "$ref": "schedule.schema.json"
+    },
+    "evaluation": {
+      "type": "object",
+      "patternProperties": {
+        "^.*$": {
+          "oneOf": [
+            {"type": "number", "minimum": 0, "maximum": 100},
+            {
+              "type": "object",
+              "properties": {
+                "weight": {"type": "number", "minimum": 0, "maximum": 100},
+                "count": {"type": "integer", "minimum": 0},
+                "description": {"type": "string"}
+              }
+            }
+          ]
+        }
+      }
+    },
+    "policies": {
+      "type": "object",
+      "additionalProperties": {"type": "string"}
+    },
+    "important_dates": {
+      "type": "object",
+      "additionalProperties": {"type": "string"}
+    }
+  },
+  "additionalProperties": true
+}
+
