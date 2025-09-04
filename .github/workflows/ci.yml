@@ -30,6 +30,13 @@ jobs:
         run: uv run ruff format --check .
       - name: Ruff lint
         run: uv run ruff check .
+      - name: Guard deprecated imports
+        run: |
+          set +e
+          (! uv run python -W error::DeprecationWarning -c "import scripts.build_pipeline_impl")
+          (! uv run python -W error::DeprecationWarning -c "import scripts.rules.dates_full")
+          (! uv run python -W error::DeprecationWarning -c "import scripts.schema.migrator")
+          (! uv run python -W error::DeprecationWarning -c "import scripts.utils.schema.versions.v1_1_0 as m; m.create_stable_id('X','Y',2025)")
 
   type-check:
     name: Type Check (mypy --strict)

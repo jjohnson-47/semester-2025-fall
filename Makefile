@@ -36,6 +36,46 @@ docs: ## Download all project documentation
 	@bash scripts/fetch-all-docs.sh
 	@echo "$(GREEN)✓ Documentation downloaded$(NC)"
 
+# Unified developer UX targets
+.PHONY: fmt lint typecheck test cov cov-xml build audit
+
+fmt:
+	$(UV) run ruff format .
+	$(UV) run ruff --fix .
+
+lint:
+	$(UV) run ruff .
+
+typecheck:
+	$(UV) run mypy scripts/rules scripts/build_pipeline.py dashboard/api --ignore-missing-imports
+
+# Partitioned tests: set UNIT=1, INTEGRATION=1, SMOKE=1
+test:
+	@if [ "$(UNIT)" = "1" ]; then \
+		$(UV) run pytest -q -m "unit" --cov=dashboard --cov=scripts --cov-branch --cov-append ; \
+	fi
+	@if [ "$(INTEGRATION)" = "1" ]; then \
+		$(UV) run pytest -q -m "integration" --cov=dashboard --cov=scripts --cov-branch --cov-append ; \
+	fi
+	@if [ "$(SMOKE)" = "1" ]; then \
+		$(UV) run pytest -q -m "smoke" --cov=dashboard --cov=scripts --cov-branch --cov-append ; \
+	fi
+	@if [ "$(UNIT)" != "1" ] && [ "$(INTEGRATION)" != "1" ] && [ "$(SMOKE)" != "1" ]; then \
+		$(UV) run pytest -q --cov=dashboard --cov=scripts --cov-branch ; \
+	fi
+
+cov:
+	$(UV) run coverage report -m
+
+cov-xml:
+	$(UV) run coverage xml -o coverage.xml
+
+build:
+	$(UV) run python scripts/build_pipeline.py --courses $(COURSES)
+
+audit:
+	@echo "(advisory) dependency audit" && true
+
 docs-flask: ## Download Flask documentation only
 	@echo "$(BLUE)Downloading Flask documentation...$(NC)"
 	@bash scripts/get-flask-docs-quick.sh

@@ -65,6 +65,7 @@ dev-dependencies = [
 target-version = "py313"
 line-length = 100
 fix = true
+src = ["dashboard", "scripts"]
 exclude = [
     ".git",
     "__pycache__",
@@ -77,17 +78,8 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-select = [
-    "E",    # pycodestyle errors
-    "W",    # pycodestyle warnings
-    "F",    # pyflakes
-    "I",    # isort
-    "B",    # flake8-bugbear
-    "C4",   # flake8-comprehensions
-    "UP",   # pyupgrade
-    "ARG",  # flake8-unused-arguments
-    "SIM",  # flake8-simplify
-]
+select = ["E","F","I","UP","B","SIM","ARG","RUF"]
+ignore = ["D"]
 ignore = [
     "E501",  # line too long (handled by formatter)
     "B008",  # do not perform function calls in argument defaults
