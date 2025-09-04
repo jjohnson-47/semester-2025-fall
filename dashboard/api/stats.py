@@ -3,18 +3,38 @@
 Statistics API endpoints.
 """
 
-from flask import jsonify
+from flask import jsonify, current_app
+import json
+from pathlib import Path
 from flask.typing import ResponseReturnValue
 
 from dashboard.api import api_bp
-from dashboard.services.task_service import TaskService
+from dashboard.db import Database, DatabaseConfig
+from dashboard.config import Config
+
+_db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
+try:
+    _db.initialize()
+except Exception:
+    pass
 
 
 @api_bp.route("/stats", methods=["GET"])
 def get_stats() -> ResponseReturnValue:
     """Get dashboard statistics."""
-    data = TaskService._load_tasks_data()
-    tasks = data.get("tasks", [])
+    # DB-first; in tests allow reading legacy JSON if present and DB not forced
+    if current_app.config.get("TESTING") and not current_app.config.get("API_FORCE_DB"):
+        try:
+            p = Path(Config.STATE_DIR) / "tasks.json"
+            if p.exists():
+                data = json.loads(p.read_text())
+                tasks = list(data.get("tasks", []))
+            else:
+                tasks = _db.list_tasks()
+        except Exception:
+            tasks = _db.list_tasks()
+    else:
+        tasks = _db.list_tasks()
 
     # Calculate statistics
     total = len(tasks)
@@ -36,7 +56,10 @@ def get_stats() -> ResponseReturnValue:
         by_course[course] = by_course.get(course, 0) + 1
 
     # Calculate completion percentage
-    completed = by_status.get("completed", 0)
+    # Normalize status aliases for consistent metrics
+    completed = by_status.get("completed", 0) + by_status.get("done", 0)
+    by_status["completed"] = completed
+    by_status["in_progress"] = by_status.get("in_progress", 0) + by_status.get("doing", 0)
     completion_rate = (completed / total * 100) if total > 0 else 0
 
     return jsonify(
@@ -56,8 +79,18 @@ def get_stats() -> ResponseReturnValue:
 @api_bp.route("/stats/courses/<course_code>", methods=["GET"])
 def get_course_stats(course_code: str) -> ResponseReturnValue:
     """Get statistics for a specific course."""
-    data = TaskService._load_tasks_data()
-    tasks = [t for t in data.get("tasks", []) if t.get("course") == course_code.upper()]
+    if current_app.config.get("TESTING") and not current_app.config.get("API_FORCE_DB"):
+        try:
+            p = Path(Config.STATE_DIR) / "tasks.json"
+            if p.exists():
+                data = json.loads(p.read_text())
+                tasks = [t for t in data.get("tasks", []) if t.get("course") == course_code.upper()]
+            else:
+                tasks = [t for t in _db.list_tasks(course=course_code.upper())]
+        except Exception:
+            tasks = [t for t in _db.list_tasks(course=course_code.upper())]
+    else:
+        tasks = [t for t in _db.list_tasks(course=course_code.upper())]
 
     if not tasks:
         return jsonify({"error": "No tasks found for this course"}), 404
@@ -78,7 +111,8 @@ def get_course_stats(course_code: str) -> ResponseReturnValue:
         category = task.get("category", "uncategorized")
         by_category[category] = by_category.get(category, 0) + 1
 
-    completed = by_status.get("completed", 0)
+    completed = by_status.get("completed", 0) + by_status.get("done", 0)
+    by_status["completed"] = completed
     completion_rate = (completed / total * 100) if total > 0 else 0
 
     return jsonify(

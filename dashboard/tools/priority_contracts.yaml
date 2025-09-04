@@ -110,7 +110,7 @@ anchors:
 # ═══════════════════════════════════════════════════════════════════════════
 now_queue:
   # Total tasks to show in Now Queue
-  max_items: 7
+  max_items: 3
 
   # Maximum tasks per course (prevents one course from dominating)
   per_course_limit: 3
@@ -228,3 +228,71 @@ debug:
 
   # Highlight critical path in visualizations
   highlight_critical: true
+
+# ============================================================================
+# COMPATIBILITY SECTIONS (used by loader: dashboard/tools/contracts.py)
+# ============================================================================
+
+# Factor weights expected by loader
+factors:
+  due_urgency:
+    weight: 1.0  # from coefficients.alpha_due
+  critical_path:
+    weight: 2.5  # from coefficients.beta_critical
+  unblock_impact:
+    weight: 3.0  # from coefficients.gamma_impact
+  anchor_proximity:
+    weight: 1.5  # from coefficients.delta_proximity
+  chain_head_boost:
+    weight: 10.0 # from coefficients.epsilon_head
+  phase_category:
+    weight: 0.5  # from coefficients.zeta_phase
+  cost_of_delay:
+    weight: 2.0  # default
+  freshness_decay:
+    weight: 1.0  # default
+  momentum_bonus:
+    weight: 0.8  # default
+
+# Queue constraints expected by loader
+constraints:
+  now_queue:
+    k: 3
+    max_heavy: 1
+    min_courses: 2
+    exclude_status: ["done", "blocked"]
+    fit_minutes: 90
+    require_chain_heads: true
+    heavy_threshold: 60
+    wip_cap: 3
+
+# Phase category weights expected by loader
+phase:
+  pre_launch:
+    setup: 5.0
+    technical: 4.0
+    materials: 3.0
+    content: 2.0
+    assessment: 1.0
+    communication: 0.5
+  launch_week:
+    technical: 5.0
+    assessment: 4.0
+    communication: 3.0
+    setup: 2.0
+    content: 1.5
+    materials: 1.0
+  week_one:
+    communication: 5.0
+    technical: 3.0
+    assessment: 2.0
+    content: 1.5
+    setup: 0.5
+    materials: 0.5
+  in_term:
+    assessment: 3.0
+    communication: 2.5
+    content: 2.0
+    materials: 1.5
+    technical: 1.0
+    setup: 0.5

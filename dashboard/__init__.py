@@ -120,11 +120,13 @@ def register_commands(app: Flask) -> None:
 
     @app.cli.command()
     def seed_data() -> None:
-        """Seed sample data."""
-        from dashboard.services.task_service import TaskService
-
-        TaskService.seed_sample_data()
-        click.echo("Sample data seeded!")
+        """Seed sample data (DB-backed)."""
+        from dashboard.db import Database, DatabaseConfig
+        from pathlib import Path as _P
+        db = Database(DatabaseConfig(_P("dashboard/state/tasks.db")))
+        db.initialize()
+        db.create_task({"course":"MATH221","title":"Prepare syllabus","status":"todo","category":"setup"})
+        click.echo("Sample data seeded (DB)")
 
 
 def register_template_filters(app: Flask) -> None:
@@ -179,8 +181,7 @@ def register_template_filters(app: Flask) -> None:
         if not dt:
             return ""
 
-        from datetime import UTC
-        
+
         now = datetime.now(UTC)
         if dt.tzinfo is None:
             from pytz import UTC as pytz_UTC  # type: ignore[import-untyped]

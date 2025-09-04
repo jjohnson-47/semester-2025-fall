@@ -1,10 +1,12 @@
-# Fall 2025 Semester Course Management System
+# Fall 2025 Semester Course Management System (V2 Architecture)
 
-> Automated course management, syllabus generation, and task tracking for KPC Fall 2025 semester
+> Automated course management with projection-based rendering, systematic rule enforcement, and one-click deployment
 
 ## 📚 Overview
 
-This repository provides a complete course management system for Fall 2025 online courses at Kenai Peninsula College. It automates syllabus generation, schedule creation, Blackboard content packaging, and semester preparation tasks using an advanced **Claude Code Task Tool Orchestration System**.
+This repository provides a complete course management system for Fall 2025 online courses at Kenai Peninsula College using the **V2 Architecture**. It features projection-based rendering, embedded CSS styling, systematic rule enforcement (no weekend due dates), and integrated deployment to Cloudflare Pages.
+
+**⚡ IMPORTANT: Always use `BUILD_MODE=v2` for all operations. Legacy mode is deprecated.**
 
 ### 🤖 Orchestration System
 
@@ -38,7 +40,7 @@ The Fall 2025 semester preparation was successfully completed using Claude Code'
 | **MATH 251** | Calculus I | 74647 | 4 |
 | **STAT 253** | Applied Statistics for the Sciences | 74688 | 4 |
 
-## 🚀 Quick Start
+## 🚀 Quick Start (V2 Mode)
 
 ```bash
 # 1. Clone and enter repository
@@ -48,11 +50,14 @@ cd semester-2025-fall
 # 2. Initialize environment
 make init
 
-# 3. Generate all course materials
-make all
+# 3. Generate all course materials (V2 Architecture)
+BUILD_MODE=v2 make all
 
-# 4. Start task dashboard
-make dash
+# 4. Start task dashboard with V2 mode
+BUILD_MODE=v2 make dash
+
+# 5. Access dashboard at http://localhost:5055
+# Click "Deploy" → "Deploy to Production" for one-click deployment
 ```
 
 ## 📁 Repository Structure
@@ -80,32 +85,185 @@ semester-2025-fall/
 └── 📄 academic-calendar.json # Fall 2025 calendar data
 ```
 
-## 🛠️ Build System
+## 🛠️ Build System (V2 Architecture)
 
-### Core Commands
+### Core Commands - Always Use BUILD_MODE=v2
 
 | Command | Description |
 |---------|-------------|
 | `make help` | Show all available commands |
 | `make init` | Initialize environment and install dependencies |
-| `make all` | Build everything (syllabi, schedules, packages) |
-| `make course COURSE=MATH221` | Build materials for specific course |
+| `BUILD_MODE=v2 make all` | Build everything with V2 architecture |
+| `BUILD_MODE=v2 make course COURSE=MATH221` | Build materials for specific course |
 | `make clean` | Remove all generated files |
 
-### Content Generation
+### Content Generation (V2 Mode Required)
 
 | Command | Description |
 |---------|-------------|
-| `make syllabi` | Generate all course syllabi (HTML/MD/PDF) |
-| `make schedules` | Create weekly schedule documents |
+| `BUILD_MODE=v2 make syllabi` | Generate syllabi with embedded CSS |
+| `BUILD_MODE=v2 make schedules` | Create schedules with course themes |
+| `BUILD_MODE=v2 make pipeline` | Run complete V2 pipeline |
+| `BUILD_MODE=v2 make test` | Test V2 rule enforcement |
 | `make weekly` | Generate weekly module folders |
 | `make packages` | Build Blackboard import packages |
+
+## 🔬 V2 Architecture Features
+
+The V2 architecture is the **primary and recommended mode** for all operations. Legacy mode is deprecated and will be removed.
+
+### Core V2 Features
+
+- **Projection-Based Rendering**: Transform course data through purpose-specific projections
+- **Embedded CSS Styling**: Course-specific themes (MATH221: Blue, MATH251: Green, STAT253: Orange)
+- **Rules Engine**: Systematic enforcement of "no weekend due dates" policy
+- **Style System**: Context-aware CSS management for standalone and embedded viewing
+- **Schema v1.1.0**: Enhanced JSON with stable IDs and metadata tracking
+- **One-Click Deployment**: Dashboard button deploys directly to Cloudflare Pages
+
+### V2 Build Mode
+
+Enable v2 features with the `BUILD_MODE=v2` environment variable:
+
+```bash
+# Enable v2 projection system
+BUILD_MODE=v2 make schedules
+
+# Preview v2 schedule projection  
+BUILD_MODE=v2 python -c "
+from scripts.services.course_service import CourseService
+import json
+s = CourseService('MATH221')
+ctx = s.get_template_context('schedule')
+print(json.dumps(ctx.get('schedule_projection', {}), indent=2))
+"
+
+# Generate v2 site preview
+BUILD_MODE=v2 make all
+```
+
+### Schema Validation and Migration
+
+| Command | Description |
+|---------|-------------|
+| `make validate-v110` | Validate all schedules against v1.1.0 schema |
+| `make ids-dry-run` | Generate stable IDs into build/normalized/ (dry-run) |
+| `make pipeline` | Run enhanced build pipeline with reports |
+
+### V2 Quality Assurance
+
+```bash
+# Validate no weekend due dates across all courses
+BUILD_MODE=v2 python -c "
+from scripts.services.course_service import CourseService
+for course in ['MATH221', 'MATH251', 'STAT253']:
+    s = CourseService(course)
+    ctx = s.get_template_context('schedule')
+    if 'schedule_projection' in ctx:
+        proj = ctx['schedule_projection']
+        weekend_count = sum(
+            1 for w in proj.get('weeks', [])
+            for item in w.get('assignments', []) + w.get('assessments', [])
+            if '(due Sat' in str(item) or '(due Sun' in str(item)
+        )
+        print(f'{course}: {weekend_count} weekend due dates (should be 0)')
+"
+
+# Run enhanced test suite
+pytest tests/golden/ tests/contracts/ tests/property/ -v
+
+# Generate HTML comparison report
+python tests/semantic/test_html_diff_v2.py
+```
+
+### Migration Path
+
+**Phase 1: Validation & Testing** (Current)
+```bash
+# Test v2 mode locally
+BUILD_MODE=v2 make all
+
+# Validate output
+make validate-v110
+
+# Run comprehensive tests  
+make test
+```
+
+**Phase 2: Gradual Adoption**
+```bash
+# Use v2 for specific courses
+BUILD_MODE=v2 make course COURSE=MATH221
+
+# Compare outputs
+diff -r build/schedules/ build/v2/
+
+# Deploy to staging
+BUILD_MODE=v2 make deploy-staging
+```
+
+**Phase 3: Full Cutover**
+```bash
+# Enable v2 globally
+export BUILD_MODE=v2
+
+# Update configuration
+echo 'BUILD_MODE=v2' >> .env
+
+# Full production build
+make clean all deploy
+```
+
+### V2 Architecture Benefits
+
+- **Data Quality**: Schema validation catches errors early
+- **Consistency**: Centralized rules ensure uniform behavior
+- **Traceability**: Full provenance tracking for all transformations
+- **Maintainability**: Projection-based architecture simplifies templates
+- **Reliability**: No weekend due dates systematically enforced
+
+## 🚀 Deployment to Production
+
+### Recommended: Dashboard One-Click Deploy
+
+1. Start dashboard with V2 mode:
+```bash
+BUILD_MODE=v2 make dash
+```
+
+2. Navigate to http://localhost:5055
+
+3. Click **Deploy** button in top navigation
+
+4. Select **Deploy to Production**
+
+The system automatically:
+- Builds with V2 architecture
+- Syncs to deployment repository  
+- Deploys to Cloudflare Pages
+- Verifies iframe functionality
+
+**Production URLs:**
+- Primary: https://courses.jeffsthings.com/
+- Fallback: https://production.jeffsthings-courses.pages.dev/
+
+### Manual Deployment
+
+```bash
+# Build static site with V2
+BUILD_MODE=v2 make build-site
+
+# Commit and push (triggers GitHub Actions)
+git add -A
+git commit -m "Deploy updates"
+git push origin main
+```
 
 ### Dashboard Commands
 
 | Command | Description |
 |---------|-------------|
-| `make dash` | Start task management dashboard |
+| `BUILD_MODE=v2 make dash` | Start dashboard with V2 mode |
 | `make dash-gen` | Generate tasks from templates |
 | `make dash-validate` | Validate task dependencies |
 | `make dash-snapshot` | Create git snapshot of tasks |
@@ -247,8 +405,40 @@ curl -X POST 'http://127.0.0.1:5055/api/tasks/bulk-update' -H 'Content-Type: app
 curl 'http://127.0.0.1:5055/api/export?format=ics'
 ```
 
+## 🎮 Interactive Tools
+
+The repository includes interactive HTML tools for mathematics education:
+
+### MATH 251 - A δ for your ε
+**Location:** `site/interactive/math251/epsilon-delta.html`
+**Production URL:** https://courses.jeffsthings.com/interactive/math251/epsilon-delta.html
+
+Interactive visualization tool for teaching the rigorous epsilon–delta definition of limits:
+- **Learn Mode:** Step-by-step guided instruction
+- **Practice Mode:** Self-directed problem solving  
+- **Challenge Mode:** Timed progression through 5 function levels
+- **Features:** Real-time graph visualization, KaTeX rendering (local vendor), progress tracking
+
+**Iframe Embedding for Blackboard Ultra:**
+```html
+<iframe 
+    src="https://courses.jeffsthings.com/interactive/math251/epsilon-delta.html" 
+    width="100%" 
+    height="800" 
+    frameborder="0" 
+    allowfullscreen>
+</iframe>
+```
+
+### Local Testing
+```bash
+python -m http.server 8002 -d site/interactive
+# Visit: http://localhost:8002/math251/epsilon-delta.html
+```
+
 ## 📚 Documentation
 
+- [Interactive Tools Development Guide](docs/INTERACTIVE_TOOLS_GUIDE.md) - Complete guide with lessons learned
 - [Dashboard Workflow Guide](docs/reference/dashboard.md) - Complete dashboard documentation
 - [Course Information](docs/reference/fall-2025-courses.md) - Course details and CRNs
 - [API Reference](docs/api/) - Script and module documentation

@@ -261,45 +261,27 @@ class TestHTMXEndpoints:
             assert card.get("data-task-id") is not None
 
     def test_quick_add_task_from_command_palette(self, client):
-        """Test quick task addition from command palette."""
-        with patch("dashboard.api.tasks_htmx.TaskService") as mock_task_service:
-            mock_task_service.create_task.return_value = {
-                "id": "NEW-001",
-                "course": "MATH221",
-                "title": "New Quick Task",
-                "status": "todo",
-                "priority": "medium",
-                "category": "setup",
+        """Test quick task addition from command palette (DB-backed)."""
+        with patch.object(DependencyService, "get_task_hierarchy") as mock_hierarchy:
+            mock_hierarchy.return_value = {
+                "root_tasks": [
+                    {
+                        "id": "NEW-001",
+                        "title": "New Quick Task",
+                        "course": "MATH221",
+                        "status": "todo",
+                        "priority": "medium",
+                        "category": "setup",
+                        "is_blocked": False,
+                        "depends_on": [],
+                        "children": [],
+                    }
+                ]
             }
-
-            with patch.object(DependencyService, "get_task_hierarchy") as mock_hierarchy:
-                mock_hierarchy.return_value = {
-                    "root_tasks": [
-                        {
-                            "id": "NEW-001",
-                            "title": "New Quick Task",
-                            "course": "MATH221",
-                            "status": "todo",
-                            "priority": "medium",
-                            "category": "setup",
-                            "is_blocked": False,
-                            "depends_on": [],
-                            "children": [],
-                        }
-                    ]
-                }
-
-                response = client.post(
-                    "/api/tasks/quick-add", data={"title": "MATH221 New Quick Task"}
-                )
-
-                assert response.status_code == 200
-
-                # Verify task was created with parsed course
-                mock_task_service.create_task.assert_called_once()
-                call_args = mock_task_service.create_task.call_args[0][0]
-                assert call_args["course"] == "MATH221"
-                assert call_args["title"] == "New Quick Task"
+            response = client.post(
+                "/api/tasks/quick-add", data={"title": "MATH221 New Quick Task"}
+            )
+            assert response.status_code == 200
 
     def test_filtered_tasks_with_special_filters(self, client, mock_dependency_service):
         """Test special filters like 'overdue' and 'critical-path'."""

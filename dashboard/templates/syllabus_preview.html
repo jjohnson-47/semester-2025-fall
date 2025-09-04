@@ -336,9 +336,7 @@
                         <button class="btn btn-outline-primary btn-sm" onclick="openScheduleBuilder()">
                             <i class="bi bi-calendar-plus"></i> Schedule Builder
                         </button>
-                        <button class="btn btn-outline-primary btn-sm" onclick="openTaskManager()">
-                            <i class="bi bi-list-task"></i> Task Manager
-                        </button>
+                        
                         <button class="btn btn-outline-primary btn-sm" onclick="openCourseSettings()">
                             <i class="bi bi-gear"></i> Course Settings
                         </button>
@@ -513,9 +511,7 @@
             window.location.href = '/schedule-builder';
         }
 
-        function openTaskManager() {
-            window.location.href = '/';
-        }
+        
 
         function openCourseSettings() {
             const course = document.getElementById('course-selector').value;

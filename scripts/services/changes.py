@@ -8,20 +8,19 @@ Real implementation will hash file contents and maintain history.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List
 
 
 @dataclass
 class Change:
     kind: str
     path: str
-    impact: List[str] | None = None
+    impact: list[str] | None = None
 
 
 class ChangeDetector:
     """Detects changes and their impacts (placeholder)."""
 
-    def detect_changes(self, course_id: str) -> List[Change]:
+    def detect_changes(self, course_id: str) -> list[Change]:
         _ = course_id
         return []
 

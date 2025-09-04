@@ -16,8 +16,10 @@ from typing import Any
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from scripts.build_schedules import ScheduleBuilder
+from scripts.services.projection_adapter import get_schedule_projection_weeks, is_v2_enabled
 from scripts.utils.jinja_env import create_jinja_env
 from scripts.utils.semester_calendar import SemesterCalendar
+from scripts.utils.style_system import DeploymentContext, StyleConfiguration, StyleSystem
 
 # Load environment variables from .env if it exists
 env_file = Path(__file__).parent.parent / ".env"
@@ -44,6 +46,11 @@ class SyllabusBuilder:
 
         self.env = create_jinja_env(str(self.template_dir))
         self.calendar = SemesterCalendar()
+
+        # Initialize style system with LOCAL context for standalone HTML files
+        self.style_system = StyleSystem(
+            StyleConfiguration(deployment_context=DeploymentContext.LOCAL)
+        )
 
     def load_course_data(self, course_code: str) -> dict[str, Any]:
         """Load all JSON data for a course.
@@ -88,16 +95,33 @@ class SyllabusBuilder:
         # Add calendar data with schedule integration
         calendar_data = self.calendar.get_course_calendar(course_code)
 
-        # Enhance calendar weeks with schedule data if available
-        schedule_data = data.get("schedule", {})
-        if schedule_data and "weeks" in schedule_data:
-            for idx, week in enumerate(calendar_data["weeks"][: len(schedule_data["weeks"])]):
-                if idx < len(schedule_data["weeks"]):
-                    schedule_week = schedule_data["weeks"][idx]
-                    week["topic"] = schedule_week.get("topic", "")
-                    week["readings"] = schedule_week.get("readings", [])
-                    week["assignments"] = schedule_week.get("assignments", [])
-                    week["assessments"] = schedule_week.get("assessments", [])
+        # Enhance calendar weeks with schedule data
+        # Use v2 projections if available, otherwise fall back to raw schedule data
+        if is_v2_enabled():
+            # V2 mode: Use projection adapter for enhanced schedule data
+            projection_weeks = get_schedule_projection_weeks(course_code)
+            if projection_weeks:
+                for idx, week in enumerate(calendar_data["weeks"][: len(projection_weeks)]):
+                    if idx < len(projection_weeks):
+                        projection_week = projection_weeks[idx]
+                        week["topic"] = projection_week.get("topic", "")
+                        week["readings"] = projection_week.get("readings", [])
+                        week["assignments"] = projection_week.get("assignments", [])
+                        week["assessments"] = projection_week.get("assessments", [])
+                        # V2 projections include formatted due dates
+                        week["formatted_assignments"] = projection_week.get("assignments", [])
+                        week["formatted_assessments"] = projection_week.get("assessments", [])
+        else:
+            # Legacy mode: Use raw schedule data
+            schedule_data = data.get("schedule", {})
+            if schedule_data and "weeks" in schedule_data:
+                for idx, week in enumerate(calendar_data["weeks"][: len(schedule_data["weeks"])]):
+                    if idx < len(schedule_data["weeks"]):
+                        schedule_week = schedule_data["weeks"][idx]
+                        week["topic"] = schedule_week.get("topic", "")
+                        week["readings"] = schedule_week.get("readings", [])
+                        week["assignments"] = schedule_week.get("assignments", [])
+                        week["assessments"] = schedule_week.get("assessments", [])
 
         data["calendar"] = calendar_data
 
@@ -165,6 +189,10 @@ class SyllabusBuilder:
 
         # Load data
         data = self.load_course_data(course_code)
+
+        # Add style context for template rendering
+        style_context = self.style_system.get_template_style_context(course_code)
+        data.update(style_context)
 
         # Ensure schedule is generated as a separate document
         schedule_builder = ScheduleBuilder(output_dir="build/schedules")

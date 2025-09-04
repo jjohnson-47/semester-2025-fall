@@ -1,0 +1,805 @@
+{
+  "metadata": {
+    "exported": "2025-09-02T23:50:10Z"
+  },
+  "tasks": [
+    {
+      "id": "MATH221-BB-UPDATE-DATES",
+      "course": "MATH221",
+      "title": "Update all Blackboard dates and deadlines",
+      "status": "blocked",
+      "due_date": "2025-08-20T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Update assignment, test, and discussion due dates for Fall 2025",
+      "created_at": "2025-08-24T12:08:15.504856",
+      "updated_at": "2025-08-24T12:08:15.504860",
+      "depends_on": [
+        "MATH221-BB-COPY-CONTENT"
+      ]
+    },
+    {
+      "id": "MATH251-BB-UPDATE-DATES",
+      "course": "MATH251",
+      "title": "Update all Blackboard dates and deadlines",
+      "status": "blocked",
+      "due_date": "2025-08-20T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Update assignment, test, and discussion due dates for Fall 2025",
+      "created_at": "2025-08-24T12:08:15.505155",
+      "updated_at": "2025-08-24T12:08:15.505158",
+      "depends_on": [
+        "MATH251-BB-COPY-CONTENT"
+      ]
+    },
+    {
+      "id": "STAT253-BB-UPDATE-DATES",
+      "course": "STAT253",
+      "title": "Update all Blackboard dates and deadlines",
+      "status": "blocked",
+      "due_date": "2025-08-20T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Update assignment, test, and discussion due dates for Fall 2025",
+      "created_at": "2025-08-24T12:08:15.505413",
+      "updated_at": "2025-08-24T12:08:15.505417",
+      "depends_on": [
+        "STAT253-BB-COPY-CONTENT"
+      ]
+    },
+    {
+      "id": "MATH221-SYLL-UPDATE-CONTENT",
+      "course": "MATH221",
+      "title": "Update course content JSON files",
+      "status": "done",
+      "due_date": "2025-08-13T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Update all course-specific JSON data in content/courses/MATH221/",
+      "created_at": "2025-08-24T12:08:15.515781",
+      "updated_at": "2025-08-24T12:08:15.515793"
+    },
+    {
+      "id": "MATH221-SYLL-UPDATE-DATES",
+      "course": "MATH221",
+      "title": "Update syllabus dates and schedule",
+      "status": "blocked",
+      "due_date": "2025-08-15T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Update all dates in syllabus for Fall 2025 (2025-08-25 - 2025-12-13)",
+      "created_at": "2025-08-24T12:08:15.515874",
+      "updated_at": "2025-08-24T12:08:15.515877",
+      "depends_on": [
+        "MATH221-SYLL-UPDATE-CONTENT"
+      ]
+    },
+    {
+      "id": "MATH221-SYLL-GENERATE",
+      "course": "MATH221",
+      "title": "Generate syllabus from templates",
+      "status": "blocked",
+      "due_date": "2025-08-18T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Run make course COURSE=MATH221 to generate syllabus",
+      "created_at": "2025-08-24T12:08:15.515943",
+      "updated_at": "2025-08-24T12:08:15.515946",
+      "depends_on": [
+        "MATH221-SYLL-UPDATE-DATES"
+      ]
+    },
+    {
+      "id": "MATH221-SYLL-UPLOAD-BB",
+      "course": "MATH221",
+      "title": "Upload syllabus to Blackboard",
+      "status": "blocked",
+      "due_date": "2025-08-22T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Upload generated syllabus to Blackboard course shell",
+      "created_at": "2025-08-24T12:08:15.515996",
+      "updated_at": "2025-08-24T12:08:15.515998",
+      "depends_on": [
+        "MATH221-SYLL-GENERATE",
+        "MATH221-BB-WELCOME"
+      ]
+    },
+    {
+      "id": "MATH221-SYLL-SCHEDULE",
+      "course": "MATH221",
+      "title": "Generate and post course schedule",
+      "status": "blocked",
+      "due_date": "2025-08-22T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Create detailed course schedule with weekly topics",
+      "created_at": "2025-08-24T12:08:15.516047",
+      "updated_at": "2025-08-24T12:08:15.516050",
+      "depends_on": [
+        "MATH221-SYLL-UPDATE-DATES"
+      ]
+    },
+    {
+      "id": "MATH251-SYLL-UPDATE-CONTENT",
+      "course": "MATH251",
+      "title": "Update course content JSON files",
+      "status": "todo",
+      "due_date": "2025-08-13T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Update all course-specific JSON data in content/courses/MATH251/",
+      "created_at": "2025-08-24T12:08:15.516099",
+      "updated_at": "2025-08-24T12:08:15.516102"
+    },
+    {
+      "id": "MATH251-SYLL-UPDATE-DATES",
+      "course": "MATH251",
+      "title": "Update syllabus dates and schedule",
+      "status": "blocked",
+      "due_date": "2025-08-15T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Update all dates in syllabus for Fall 2025 (2025-08-25 - 2025-12-13)",
+      "created_at": "2025-08-24T12:08:15.516148",
+      "updated_at": "2025-08-24T12:08:15.516150",
+      "depends_on": [
+        "MATH251-SYLL-UPDATE-CONTENT"
+      ]
+    },
+    {
+      "id": "MATH251-SYLL-GENERATE",
+      "course": "MATH251",
+      "title": "Generate syllabus from templates",
+      "status": "blocked",
+      "due_date": "2025-08-18T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Run make course COURSE=MATH251 to generate syllabus",
+      "created_at": "2025-08-24T12:08:15.516201",
+      "updated_at": "2025-08-24T12:08:15.516203",
+      "depends_on": [
+        "MATH251-SYLL-UPDATE-DATES"
+      ]
+    },
+    {
+      "id": "MATH251-SYLL-UPLOAD-BB",
+      "course": "MATH251",
+      "title": "Upload syllabus to Blackboard",
+      "status": "blocked",
+      "due_date": "2025-08-22T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Upload generated syllabus to Blackboard course shell",
+      "created_at": "2025-08-24T12:08:15.516244",
+      "updated_at": "2025-08-24T12:08:15.516247",
+      "depends_on": [
+        "MATH251-SYLL-GENERATE",
+        "MATH251-BB-WELCOME"
+      ]
+    },
+    {
+      "id": "MATH251-SYLL-SCHEDULE",
+      "course": "MATH251",
+      "title": "Generate and post course schedule",
+      "status": "blocked",
+      "due_date": "2025-08-22T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Create detailed course schedule with weekly topics",
+      "created_at": "2025-08-24T12:08:15.516288",
+      "updated_at": "2025-08-24T12:08:15.516291",
+      "depends_on": [
+        "MATH251-SYLL-UPDATE-DATES"
+      ]
+    },
+    {
+      "id": "STAT253-SYLL-UPDATE-CONTENT",
+      "course": "STAT253",
+      "title": "Update course content JSON files",
+      "status": "todo",
+      "due_date": "2025-08-13T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Update all course-specific JSON data in content/courses/STAT253/",
+      "created_at": "2025-08-24T12:08:15.516345",
+      "updated_at": "2025-08-24T12:08:15.516347"
+    },
+    {
+      "id": "STAT253-SYLL-UPDATE-DATES",
+      "course": "STAT253",
+      "title": "Update syllabus dates and schedule",
+      "status": "blocked",
+      "due_date": "2025-08-15T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Update all dates in syllabus for Fall 2025 (2025-08-25 - 2025-12-13)",
+      "created_at": "2025-08-24T12:08:15.516391",
+      "updated_at": "2025-08-24T12:08:15.516394",
+      "depends_on": [
+        "STAT253-SYLL-UPDATE-CONTENT"
+      ]
+    },
+    {
+      "id": "STAT253-SYLL-GENERATE",
+      "course": "STAT253",
+      "title": "Generate syllabus from templates",
+      "status": "blocked",
+      "due_date": "2025-08-18T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Run make course COURSE=STAT253 to generate syllabus",
+      "created_at": "2025-08-24T12:08:15.516439",
+      "updated_at": "2025-08-24T12:08:15.516442",
+      "depends_on": [
+        "STAT253-SYLL-UPDATE-DATES"
+      ]
+    },
+    {
+      "id": "STAT253-SYLL-UPLOAD-BB",
+      "course": "STAT253",
+      "title": "Upload syllabus to Blackboard",
+      "status": "blocked",
+      "due_date": "2025-08-22T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Upload generated syllabus to Blackboard course shell",
+      "created_at": "2025-08-24T12:08:15.516481",
+      "updated_at": "2025-08-24T12:08:15.516484",
+      "depends_on": [
+        "STAT253-SYLL-GENERATE",
+        "STAT253-BB-WELCOME"
+      ]
+    },
+    {
+      "id": "STAT253-SYLL-SCHEDULE",
+      "course": "STAT253",
+      "title": "Generate and post course schedule",
+      "status": "blocked",
+      "due_date": "2025-08-22T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Syllabus & Documentation",
+      "anchor": false,
+      "description": "Create detailed course schedule with weekly topics",
+      "created_at": "2025-08-24T12:08:15.516523",
+      "updated_at": "2025-08-24T12:08:15.516526",
+      "depends_on": [
+        "STAT253-SYLL-UPDATE-DATES"
+      ]
+    },
+    {
+      "id": "MATH221-MIDTERM-PREP",
+      "course": "MATH221",
+      "title": "Midterm Exam Preparation",
+      "status": "todo",
+      "due_date": "2025-10-09T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Set up and configure midterm exam (Week 8)",
+      "created_at": "2025-08-24T12:08:15.527007",
+      "updated_at": "2025-08-24T12:08:15.527009"
+    },
+    {
+      "id": "MATH221-FINAL-PREP",
+      "course": "MATH221",
+      "title": "Final Exam Preparation",
+      "status": "todo",
+      "due_date": null,
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Set up and configure final exam",
+      "created_at": "2025-08-24T12:08:15.527091",
+      "updated_at": "2025-08-24T12:08:15.527094"
+    },
+    {
+      "id": "MATH251-MIDTERM-PREP",
+      "course": "MATH251",
+      "title": "Midterm Exam Preparation",
+      "status": "todo",
+      "due_date": "2025-10-09T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Set up and configure midterm exam (Week 8)",
+      "created_at": "2025-08-24T12:08:15.527331",
+      "updated_at": "2025-08-24T12:08:15.527334"
+    },
+    {
+      "id": "MATH251-FINAL-PREP",
+      "course": "MATH251",
+      "title": "Final Exam Preparation",
+      "status": "todo",
+      "due_date": null,
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Set up and configure final exam",
+      "created_at": "2025-08-24T12:08:15.527373",
+      "updated_at": "2025-08-24T12:08:15.527376"
+    },
+    {
+      "id": "STAT253-MIDTERM-PREP",
+      "course": "STAT253",
+      "title": "Midterm Exam Preparation",
+      "status": "todo",
+      "due_date": "2025-10-09T00:00:00",
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Set up and configure midterm exam (Week 8)",
+      "created_at": "2025-08-24T12:08:15.527593",
+      "updated_at": "2025-08-24T12:08:15.527595"
+    },
+    {
+      "id": "STAT253-FINAL-PREP",
+      "course": "STAT253",
+      "title": "Final Exam Preparation",
+      "status": "todo",
+      "due_date": null,
+      "est_minutes": null,
+      "weight": 3.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Set up and configure final exam",
+      "created_at": "2025-08-24T12:08:15.527628",
+      "updated_at": "2025-08-24T12:08:15.527631"
+    },
+    {
+      "id": "MATH221-BB-REQUEST-SHELL",
+      "course": "MATH221",
+      "title": "Request Blackboard Ultra shell creation",
+      "status": "done",
+      "due_date": "2025-08-11T00:00:00",
+      "est_minutes": null,
+      "weight": 2.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Submit IT ticket for Ultra course shell: 2025-FALL-MATH221-901",
+      "created_at": "2025-08-24T12:08:15.504609",
+      "updated_at": "2025-08-24T12:08:15.504627"
+    },
+    {
+      "id": "MATH221-BB-COPY-CONTENT",
+      "course": "MATH221",
+      "title": "Copy content from previous semester",
+      "status": "blocked",
+      "due_date": "2025-08-18T00:00:00",
+      "est_minutes": null,
+      "weight": 2.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Use Ultra Copy Content from 2024-FALL-MATH221-901",
+      "created_at": "2025-08-24T12:08:15.504763",
+      "updated_at": "2025-08-24T12:08:15.504768",
+      "depends_on": [
+        "MATH221-BB-REQUEST-SHELL"
+      ]
+    },
+    {
+      "id": "MATH221-BB-GRADE-CENTER",
+      "course": "MATH221",
+      "title": "Configure Grade Center categories and weights",
+      "status": "blocked",
+      "due_date": "2025-08-21T00:00:00",
+      "est_minutes": null,
+      "weight": 2.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Set up Grade Center with proper categories and weighting",
+      "created_at": "2025-08-24T12:08:15.504917",
+      "updated_at": "2025-08-24T12:08:15.504921",
+      "depends_on": [
+        "MATH221-BB-COPY-CONTENT"
+      ]
+    },
+    {
+      "id": "MATH221-BB-WELCOME",
+      "course": "MATH221",
+      "title": "Create welcome announcement and Start Here",
+      "status": "blocked",
+      "due_date": "2025-08-23T00:00:00",
+      "est_minutes": null,
+      "weight": 2.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Post welcome message and update Start Here page",
+      "created_at": "2025-08-24T12:08:15.504983",
+      "updated_at": "2025-08-24T12:08:15.504987",
+      "depends_on": [
+        "MATH221-BB-UPDATE-DATES"
+      ]
+    },
+    {
+      "id": "MATH251-BB-REQUEST-SHELL",
+      "course": "MATH251",
+      "title": "Request Blackboard Ultra shell creation",
+      "status": "done",
+      "due_date": "2025-08-11T00:00:00",
+      "est_minutes": null,
+      "weight": 2.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Submit IT ticket for Ultra course shell: 2025-FALL-MATH251-901",
+      "created_at": "2025-08-24T12:08:15.505055",
+      "updated_at": "2025-08-24T12:08:15.505058"
+    },
+    {
+      "id": "MATH251-BB-COPY-CONTENT",
+      "course": "MATH251",
+      "title": "Copy content from previous semester",
+      "status": "blocked",
+      "due_date": "2025-08-18T00:00:00",
+      "est_minutes": null,
+      "weight": 2.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Use Ultra Copy Content from 2024-FALL-MATH251-901",
+      "created_at": "2025-08-24T12:08:15.505103",
+      "updated_at": "2025-08-24T12:08:15.505106",
+      "depends_on": [
+        "MATH251-BB-REQUEST-SHELL"
+      ]
+    },
+    {
+      "id": "MATH251-BB-GRADE-CENTER",
+      "course": "MATH251",
+      "title": "Configure Grade Center categories and weights",
+      "status": "blocked",
+      "due_date": "2025-08-21T00:00:00",
+      "est_minutes": null,
+      "weight": 2.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Set up Grade Center with proper categories and weighting",
+      "created_at": "2025-08-24T12:08:15.505199",
+      "updated_at": "2025-08-24T12:08:15.505202",
+      "depends_on": [
+        "MATH251-BB-COPY-CONTENT"
+      ]
+    },
+    {
+      "id": "MATH251-BB-WELCOME",
+      "course": "MATH251",
+      "title": "Create welcome announcement and Start Here",
+      "status": "blocked",
+      "due_date": "2025-08-23T00:00:00",
+      "est_minutes": null,
+      "weight": 2.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Post welcome message and update Start Here page",
+      "created_at": "2025-08-24T12:08:15.505245",
+      "updated_at": "2025-08-24T12:08:15.505248",
+      "depends_on": [
+        "MATH251-BB-UPDATE-DATES"
+      ]
+    },
+    {
+      "id": "STAT253-BB-REQUEST-SHELL",
+      "course": "STAT253",
+      "title": "Request Blackboard Ultra shell creation",
+      "status": "done",
+      "due_date": "2025-08-11T00:00:00",
+      "est_minutes": null,
+      "weight": 2.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Submit IT ticket for Ultra course shell: 2025-FALL-STAT253-901",
+      "created_at": "2025-08-24T12:08:15.505313",
+      "updated_at": "2025-08-24T12:08:15.505316"
+    },
+    {
+      "id": "STAT253-BB-COPY-CONTENT",
+      "course": "STAT253",
+      "title": "Copy content from previous semester",
+      "status": "blocked",
+      "due_date": "2025-08-18T00:00:00",
+      "est_minutes": null,
+      "weight": 2.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Use Ultra Copy Content from 2024-FALL-STAT253-901",
+      "created_at": "2025-08-24T12:08:15.505359",
+      "updated_at": "2025-08-24T12:08:15.505363",
+      "depends_on": [
+        "STAT253-BB-REQUEST-SHELL"
+      ]
+    },
+    {
+      "id": "STAT253-BB-GRADE-CENTER",
+      "course": "STAT253",
+      "title": "Configure Grade Center categories and weights",
+      "status": "blocked",
+      "due_date": "2025-08-21T00:00:00",
+      "est_minutes": null,
+      "weight": 2.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Set up Grade Center with proper categories and weighting",
+      "created_at": "2025-08-24T12:08:15.505456",
+      "updated_at": "2025-08-24T12:08:15.505459",
+      "depends_on": [
+        "STAT253-BB-COPY-CONTENT"
+      ]
+    },
+    {
+      "id": "STAT253-BB-WELCOME",
+      "course": "STAT253",
+      "title": "Create welcome announcement and Start Here",
+      "status": "blocked",
+      "due_date": "2025-08-23T00:00:00",
+      "est_minutes": null,
+      "weight": 2.0,
+      "category": "Blackboard Setup",
+      "anchor": false,
+      "description": "Post welcome message and update Start Here page",
+      "created_at": "2025-08-24T12:08:15.505500",
+      "updated_at": "2025-08-24T12:08:15.505503",
+      "depends_on": [
+        "STAT253-BB-UPDATE-DATES"
+      ]
+    },
+    {
+      "id": "MATH221-WEEK-01-PREP",
+      "course": "MATH221",
+      "title": "Week 1: Introduction & Course Overview",
+      "status": "todo",
+      "due_date": "2025-08-22T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Prepare Week 1 module with syllabus review and introductions",
+      "created_at": "2025-08-24T12:08:15.526762",
+      "updated_at": "2025-08-24T12:08:15.526773"
+    },
+    {
+      "id": "MATH221-WEEK-01-INTRO-DISC",
+      "course": "MATH221",
+      "title": "Week 1: Set up introduction discussion",
+      "status": "blocked",
+      "due_date": "2025-08-23T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Create and configure student introduction discussion board",
+      "created_at": "2025-08-24T12:08:15.526838",
+      "updated_at": "2025-08-24T12:08:15.526842",
+      "depends_on": [
+        "MATH221-WEEK-01-PREP"
+      ]
+    },
+    {
+      "id": "MATH221-WEEK-02-PREP",
+      "course": "MATH221",
+      "title": "Week 2: First Content Module",
+      "status": "todo",
+      "due_date": "2025-08-29T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Prepare Week 2 content and assessments",
+      "created_at": "2025-08-24T12:08:15.526896",
+      "updated_at": "2025-08-24T12:08:15.526899"
+    },
+    {
+      "id": "MATH221-WEEK-03-PREP",
+      "course": "MATH221",
+      "title": "Week 3: Content Module",
+      "status": "todo",
+      "due_date": "2025-09-05T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Prepare Week 3 content and assessments",
+      "created_at": "2025-08-24T12:08:15.526935",
+      "updated_at": "2025-08-24T12:08:15.526938"
+    },
+    {
+      "id": "MATH221-WEEK-04-PREP",
+      "course": "MATH221",
+      "title": "Week 4: Content Module",
+      "status": "todo",
+      "due_date": "2025-09-12T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Prepare Week 4 content and assessments",
+      "created_at": "2025-08-24T12:08:15.526971",
+      "updated_at": "2025-08-24T12:08:15.526974"
+    },
+    {
+      "id": "MATH251-WEEK-01-PREP",
+      "course": "MATH251",
+      "title": "Week 1: Introduction & Course Overview",
+      "status": "todo",
+      "due_date": "2025-08-22T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Prepare Week 1 module with syllabus review and introductions",
+      "created_at": "2025-08-24T12:08:15.527135",
+      "updated_at": "2025-08-24T12:08:15.527138"
+    },
+    {
+      "id": "MATH251-WEEK-01-INTRO-DISC",
+      "course": "MATH251",
+      "title": "Week 1: Set up introduction discussion",
+      "status": "blocked",
+      "due_date": "2025-08-23T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Create and configure student introduction discussion board",
+      "created_at": "2025-08-24T12:08:15.527174",
+      "updated_at": "2025-08-24T12:08:15.527177",
+      "depends_on": [
+        "MATH251-WEEK-01-PREP"
+      ]
+    },
+    {
+      "id": "MATH251-WEEK-02-PREP",
+      "course": "MATH251",
+      "title": "Week 2: First Content Module",
+      "status": "todo",
+      "due_date": "2025-08-29T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Prepare Week 2 content and assessments",
+      "created_at": "2025-08-24T12:08:15.527216",
+      "updated_at": "2025-08-24T12:08:15.527219"
+    },
+    {
+      "id": "MATH251-WEEK-03-PREP",
+      "course": "MATH251",
+      "title": "Week 3: Content Module",
+      "status": "todo",
+      "due_date": "2025-09-05T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Prepare Week 3 content and assessments",
+      "created_at": "2025-08-24T12:08:15.527251",
+      "updated_at": "2025-08-24T12:08:15.527254"
+    },
+    {
+      "id": "MATH251-WEEK-04-PREP",
+      "course": "MATH251",
+      "title": "Week 4: Content Module",
+      "status": "todo",
+      "due_date": "2025-09-12T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Prepare Week 4 content and assessments",
+      "created_at": "2025-08-24T12:08:15.527286",
+      "updated_at": "2025-08-24T12:08:15.527288"
+    },
+    {
+      "id": "STAT253-WEEK-01-PREP",
+      "course": "STAT253",
+      "title": "Week 1: Introduction & Course Overview",
+      "status": "todo",
+      "due_date": "2025-08-22T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Prepare Week 1 module with syllabus review and introductions",
+      "created_at": "2025-08-24T12:08:15.527412",
+      "updated_at": "2025-08-24T12:08:15.527415"
+    },
+    {
+      "id": "STAT253-WEEK-01-INTRO-DISC",
+      "course": "STAT253",
+      "title": "Week 1: Set up introduction discussion",
+      "status": "blocked",
+      "due_date": "2025-08-23T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Create and configure student introduction discussion board",
+      "created_at": "2025-08-24T12:08:15.527450",
+      "updated_at": "2025-08-24T12:08:15.527453",
+      "depends_on": [
+        "STAT253-WEEK-01-PREP"
+      ]
+    },
+    {
+      "id": "STAT253-WEEK-02-PREP",
+      "course": "STAT253",
+      "title": "Week 2: First Content Module",
+      "status": "todo",
+      "due_date": "2025-08-29T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Prepare Week 2 content and assessments",
+      "created_at": "2025-08-24T12:08:15.527490",
+      "updated_at": "2025-08-24T12:08:15.527493"
+    },
+    {
+      "id": "STAT253-WEEK-03-PREP",
+      "course": "STAT253",
+      "title": "Week 3: Content Module",
+      "status": "todo",
+      "due_date": "2025-09-05T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Prepare Week 3 content and assessments",
+      "created_at": "2025-08-24T12:08:15.527524",
+      "updated_at": "2025-08-24T12:08:15.527527"
+    },
+    {
+      "id": "STAT253-WEEK-04-PREP",
+      "course": "STAT253",
+      "title": "Week 4: Content Module",
+      "status": "todo",
+      "due_date": "2025-09-12T00:00:00",
+      "est_minutes": null,
+      "weight": 1.0,
+      "category": "Weekly Content",
+      "anchor": false,
+      "description": "Prepare Week 4 content and assessments",
+      "created_at": "2025-08-24T12:08:15.527558",
+      "updated_at": "2025-08-24T12:08:15.527561"
+    }
+  ]
+}

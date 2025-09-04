@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Course Schedule (v1.1.0)",
+  "type": "object",
+  "properties": {
+    "weeks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "week": {"type": ["integer", "string"]},
+          "topic": {"type": "string"},
+          "readings": {"type": "array", "items": {"type": "string"}},
+          "assignments": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {"type": "string"},
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {"type": "string"},
+                    "title": {"type": "string"}
+                  },
+                  "required": ["id", "title"]
+                }
+              ]
+            }
+          },
+          "assessments": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {"type": "string"},
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {"type": "string"},
+                    "title": {"type": "string"}
+                  },
+                  "required": ["id", "title"]
+                }
+              ]
+            }
+          },
+          "notes": {"type": "string"}
+        },
+        "required": ["topic", "assignments", "assessments"]
+      }
+    },
+    "finals": {
+      "type": "object",
+      "properties": {
+        "topic": {"type": "string"},
+        "assessments": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {"type": "string"},
+              {
+                "type": "object",
+                "properties": {
+                  "id": {"type": "string"},
+                  "title": {"type": "string"}
+                },
+                "required": ["id", "title"]
+              }
+            ]
+          }
+        },
+        "notes": {"type": "string"}
+      }
+    }
+  }
+}
+

@@ -334,11 +334,8 @@ class TestSmokeTests:
     def test_imports(self):
         """Test that all modules can be imported."""
         try:
-            # Test imports by verifying they have expected attributes
-            from dashboard.app import TaskManager, app
-
-            assert hasattr(TaskManager, "load_tasks")
-            assert hasattr(TaskManager, "save_tasks")
+            # Test imports by verifying app exists
+            from dashboard.app import app
             assert hasattr(app, "route")
 
             from dashboard.tools import generate_tasks, validate

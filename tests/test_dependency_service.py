@@ -12,7 +12,6 @@ Tests the complete dependency resolution system including:
 Uses pytest fixtures for realistic test scenarios.
 """
 
-import json
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -25,7 +24,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dashboard.models import Task, TaskStatus
 from dashboard.services.dependency_service import DependencyService
-from dashboard.services.task_service import TaskService
 
 
 class TestDependencyService:
@@ -37,11 +35,18 @@ class TestDependencyService:
         # Create temporary state directory
         state_dir = tmp_path / "state"
         state_dir.mkdir()
-        tasks_file = state_dir / "tasks.json"
+        db_path = state_dir / "tasks.db"
 
-        # Patch the TaskService to use our temp directory
-        with patch.object(TaskService, "_get_tasks_file", return_value=tasks_file):
-            yield tasks_file
+        # Force DB-backed behavior for testing
+        # Patch the Database instance directly in the dependency_service module
+        from dashboard.db import Database, DatabaseConfig
+        test_db = Database(DatabaseConfig(db_path))
+        test_db.initialize()
+        
+        with patch("dashboard.services.dependency_service.Config.API_FORCE_DB", True), \
+             patch("dashboard.services.dependency_service.Config.STATE_DIR", state_dir), \
+             patch("dashboard.services.dependency_service._db", test_db):
+            yield test_db
 
     @pytest.fixture
     def sample_task_data(self) -> dict[str, Any]:
@@ -95,11 +100,11 @@ class TestDependencyService:
     @pytest.fixture
     def populated_service(self, setup_test_environment, sample_task_data):
         """Create a DependencyService with sample data."""
-        tasks_file = setup_test_environment
+        db = setup_test_environment
 
-        # Save sample data to file
-        with open(tasks_file, "w") as f:
-            json.dump(sample_task_data, f)
+        # Insert tasks into database
+        for task in sample_task_data.get("tasks", []):
+            db.create_task(task)
 
         return DependencyService()
 

@@ -475,7 +475,7 @@ def main():
 
     # Generate deployment materials
     logger.info("Generating iframe deployment package...")
-    deployment = agent.create_iframe_deployment_package()
+    _deployment = agent.create_iframe_deployment_package()
     logger.info(f"✓ Deployment package created: {agent.state_dir}/iframe_deployment.json")
 
     # Generate checklist

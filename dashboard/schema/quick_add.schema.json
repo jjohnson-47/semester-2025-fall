@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local/dashboard/quick_add.schema.json",
+  "title": "QuickAddTask",
+  "type": "object",
+  "required": ["title"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "course": {"type": "string"},
+    "title": {"type": "string", "minLength": 3},
+    "notes": {"type": "string"},
+    "category": {"type": "string", "enum": ["setup", "content", "technical", "materials", "assessment", "communication"]},
+    "est_minutes": {"type": "integer", "minimum": 5, "maximum": 480},
+    "due_at": {"type": "string", "format": "date-time"},
+    "depends_on": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+  }
+}
+

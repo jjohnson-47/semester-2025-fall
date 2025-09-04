@@ -11,7 +11,10 @@ import json
 import pytest
 
 from dashboard import create_app
-from dashboard.services.task_service import TaskService
+from dashboard.db import Database, DatabaseConfig
+from dashboard.config import Config
+from dashboard.db import Database, DatabaseConfig
+from dashboard.config import Config
 
 
 @pytest.fixture
@@ -58,10 +61,28 @@ def _seed_tasks() -> list[dict]:
 
 
 def test_tasks_crud_and_filters(app, client):
-    # Seed via TaskService to use service I/O paths
+    # Seed via DB (API_FORCE_DB enabled in testing)
     with app.app_context():
-        data = {"tasks": _seed_tasks(), "metadata": {"version": "1.0", "updated": ""}}
-        TaskService._save_tasks_data(data)
+        db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
+        db.initialize()
+        # Clear any existing
+        with db.connect() as conn:
+            conn.execute("delete from deps"); conn.execute("delete from now_queue"); conn.execute("delete from tasks")
+        for t in _seed_tasks():
+            status = t["status"]
+            if status == "in_progress":
+                status = "doing"
+            elif status == "completed":
+                status = "done"
+            db.create_task({
+                "id": t["id"],
+                "course": t["course"],
+                "title": t["title"],
+                "status": status,
+                "category": t.get("category"),
+                "due_at": t.get("due_date"),
+                "notes": t.get("description"),
+            })
 
     # GET list and filter
     resp = client.get("/api/tasks?course=MATH221")
@@ -103,7 +124,7 @@ def test_tasks_crud_and_filters(app, client):
     # PUT update
     resp = client.put(f"/api/tasks/{created['id']}", json={"status": "in_progress"})
     assert resp.status_code == 200
-    assert resp.get_json()["task"]["status"] == "in_progress"
+    assert resp.get_json()["task"]["status"] in {"in_progress", "doing"}
 
     # PATCH status invalid body
     resp = client.patch(f"/api/tasks/{created['id']}/status", json={})
@@ -126,9 +147,25 @@ def test_tasks_crud_and_filters(app, client):
 
 def test_stats_endpoints(app, client):
     with app.app_context():
-        TaskService._save_tasks_data(
-            {"tasks": _seed_tasks(), "metadata": {"version": "1.0", "updated": ""}}
-        )
+        db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
+        db.initialize()
+        with db.connect() as conn:
+            conn.execute("delete from deps"); conn.execute("delete from now_queue"); conn.execute("delete from tasks")
+        for t in _seed_tasks():
+            status = t["status"]
+            if status == "in_progress":
+                status = "doing"
+            elif status == "completed":
+                status = "done"
+            db.create_task({
+                "id": t["id"],
+                "course": t["course"],
+                "title": t["title"],
+                "status": status,
+                "category": t.get("category"),
+                "due_at": t.get("due_date"),
+                "notes": t.get("description"),
+            })
 
     # Overall stats
     resp = client.get("/api/stats")
@@ -151,9 +188,25 @@ def test_stats_endpoints(app, client):
 
 def test_export_endpoints(app, client):
     with app.app_context():
-        TaskService._save_tasks_data(
-            {"tasks": _seed_tasks(), "metadata": {"version": "1.0", "updated": ""}}
-        )
+        db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
+        db.initialize()
+        with db.connect() as conn:
+            conn.execute("delete from deps"); conn.execute("delete from now_queue"); conn.execute("delete from tasks")
+        for t in _seed_tasks():
+            status = t["status"]
+            if status == "in_progress":
+                status = "doing"
+            elif status == "completed":
+                status = "done"
+            db.create_task({
+                "id": t["id"],
+                "course": t["course"],
+                "title": t["title"],
+                "status": status,
+                "category": t.get("category"),
+                "due_at": t.get("due_date"),
+                "notes": t.get("description"),
+            })
 
     # JSON export
     resp = client.get("/api/export/json?course=MATH221")

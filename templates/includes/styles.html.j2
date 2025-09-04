@@ -1,0 +1,36 @@
+{# Style include template for v2 architecture #}
+{# This template handles both embedded and linked CSS based on deployment context #}
+
+{% if font_imports %}
+    {{ font_imports | safe }}
+{% endif %}
+
+{% if style_mode == 'embedded' %}
+    {# Embedded styles for standalone HTML (LOCAL deployment) #}
+    <style>
+        /* ========================================
+           Base Course Styles
+           ======================================== */
+        {{ base_css_content | safe }}
+        
+        {% if course_css_content %}
+        /* ========================================
+           {{ course_code }} Course-Specific Styles
+           ======================================== */
+        {{ course_css_content | safe }}
+        {% endif %}
+    </style>
+{% else %}
+    {# External stylesheets for production deployment #}
+    <link rel="stylesheet" href="{{ base_css_path }}">
+    {% if course_css_path %}
+    <link rel="stylesheet" href="{{ course_css_path }}">
+    {% endif %}
+{% endif %}
+
+{# Optional inline overrides can still be added in individual templates #}
+{% if additional_styles %}
+    <style>
+        {{ additional_styles | safe }}
+    </style>
+{% endif %}

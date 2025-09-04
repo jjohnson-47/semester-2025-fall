@@ -1,0 +1,32 @@
+name: Smoke
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Sync dependencies (dashboard + testing)
+        run: |
+          uv sync --extra dashboard --extra testing
+
+      - name: Run smoke checks (spawn server)
+        env:
+          BUILD_MODE: v2
+          DASH_PORT: 5055
+        run: |
+          uv run python scripts/ci/smoke.py --spawn

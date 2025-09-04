@@ -1,0 +1,20 @@
+{
+  "name": "semester-2025-fall",
+  "version": "1.0.0",
+  "description": "Interactive tools for Fall 2025 semester courses",
+  "private": true,
+  "scripts": {
+    "dev": "python -m http.server 8002 -d site/interactive",
+    "serve:interactive": "python -m http.server 8002 -d site/interactive",
+    "test": "echo \"No tests configured yet\""
+  },
+  "dependencies": {
+    "katex": "^0.16.22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jjohnson-47/semester-2025-fall.git"
+  },
+  "author": "Jeff Johnson",
+  "license": "MIT"
+}

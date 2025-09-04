@@ -1,0 +1,211 @@
+{
+  "identity": {
+    "code": {
+      "value": "MATH221",
+      "provenance": {
+        "source": "original",
+        "confidence": 1.0,
+        "timestamp": "2025-08-25T12:00:00Z"
+      },
+      "field_name": "code"
+    },
+    "name": {
+      "value": "Linear Algebra",
+      "provenance": {
+        "source": "original",
+        "confidence": 1.0,
+        "timestamp": "2025-08-25T12:00:00Z"
+      },
+      "field_name": "name"
+    },
+    "credits": {
+      "value": 3,
+      "provenance": {
+        "source": "original",
+        "confidence": 1.0,
+        "timestamp": "2025-08-25T12:00:00Z"
+      },
+      "field_name": "credits"
+    },
+    "term": {
+      "value": "Fall",
+      "provenance": {
+        "source": "original",
+        "confidence": 1.0,
+        "timestamp": "2025-08-25T12:00:00Z"
+      },
+      "field_name": "term"
+    },
+    "year": {
+      "value": 2025,
+      "provenance": {
+        "source": "original",
+        "confidence": 1.0,
+        "timestamp": "2025-08-25T12:00:00Z"
+      },
+      "field_name": "year"
+    }
+  },
+  "instructor": {
+    "name": {
+      "value": "Dr. Smith",
+      "provenance": {
+        "source": "original",
+        "confidence": 1.0,
+        "timestamp": "2025-08-25T12:00:00Z"
+      },
+      "field_name": "instructor_name"
+    },
+    "email": {
+      "value": "smith@carleton.edu",
+      "provenance": {
+        "source": "original",
+        "confidence": 1.0,
+        "timestamp": "2025-08-25T12:00:00Z"
+      },
+      "field_name": "instructor_email"
+    },
+    "office": {
+      "value": "CMC 324",
+      "provenance": {
+        "source": "original",
+        "confidence": 1.0,
+        "timestamp": "2025-08-25T12:00:00Z"
+      },
+      "field_name": "instructor_office"
+    },
+    "office_hours": {
+      "value": "MWF 2:00-3:00 PM",
+      "provenance": {
+        "source": "original",
+        "confidence": 1.0,
+        "timestamp": "2025-08-25T12:00:00Z"
+      },
+      "field_name": "instructor_office_hours"
+    }
+  },
+  "evaluation_components": [
+    {
+      "name": {
+        "value": "Homework",
+        "provenance": {
+          "source": "original",
+          "confidence": 1.0,
+          "timestamp": "2025-08-25T12:00:00Z"
+        },
+        "field_name": "component_name"
+      },
+      "weight": {
+        "value": 30,
+        "provenance": {
+          "source": "original",
+          "confidence": 1.0,
+          "timestamp": "2025-08-25T12:00:00Z"
+        },
+        "field_name": "component_weight"
+      },
+      "count": {
+        "value": 10,
+        "provenance": {
+          "source": "original",
+          "confidence": 1.0,
+          "timestamp": "2025-08-25T12:00:00Z"
+        },
+        "field_name": "component_count"
+      }
+    },
+    {
+      "name": {
+        "value": "Quizzes",
+        "provenance": {
+          "source": "original",
+          "confidence": 1.0,
+          "timestamp": "2025-08-25T12:00:00Z"
+        },
+        "field_name": "component_name"
+      },
+      "weight": {
+        "value": 20,
+        "provenance": {
+          "source": "original",
+          "confidence": 1.0,
+          "timestamp": "2025-08-25T12:00:00Z"
+        },
+        "field_name": "component_weight"
+      },
+      "count": {
+        "value": 5,
+        "provenance": {
+          "source": "original",
+          "confidence": 1.0,
+          "timestamp": "2025-08-25T12:00:00Z"
+        },
+        "field_name": "component_count"
+      }
+    },
+    {
+      "name": {
+        "value": "Midterms",
+        "provenance": {
+          "source": "original",
+          "confidence": 1.0,
+          "timestamp": "2025-08-25T12:00:00Z"
+        },
+        "field_name": "component_name"
+      },
+      "weight": {
+        "value": 30,
+        "provenance": {
+          "source": "original",
+          "confidence": 1.0,
+          "timestamp": "2025-08-25T12:00:00Z"
+        },
+        "field_name": "component_weight"
+      },
+      "count": {
+        "value": 2,
+        "provenance": {
+          "source": "original",
+          "confidence": 1.0,
+          "timestamp": "2025-08-25T12:00:00Z"
+        },
+        "field_name": "component_count"
+      }
+    },
+    {
+      "name": {
+        "value": "Final Exam",
+        "provenance": {
+          "source": "original",
+          "confidence": 1.0,
+          "timestamp": "2025-08-25T12:00:00Z"
+        },
+        "field_name": "component_name"
+      },
+      "weight": {
+        "value": 20,
+        "provenance": {
+          "source": "original",
+          "confidence": 1.0,
+          "timestamp": "2025-08-25T12:00:00Z"
+        },
+        "field_name": "component_weight"
+      }
+    }
+  ],
+  "metadata": {
+    "normalized_at": "2025-08-25T12:00:00Z",
+    "schema_version": "1.1.0",
+    "normalization_rules": [
+      "extract_identity",
+      "extract_instructor",
+      "extract_schedule",
+      "extract_evaluation",
+      "apply_date_rules",
+      "validate_course"
+    ],
+    "warnings": [],
+    "errors": [],
+    "confidence": 0.95
+  }
+}

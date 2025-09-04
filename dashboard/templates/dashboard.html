@@ -126,20 +126,21 @@
                         <i class="bi bi-book"></i> Course Content
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#syllabus-preview"><i class="bi bi-file-text"></i> Preview Syllabi</a></li>
-                        <li><a class="dropdown-item" href="#schedule-preview"><i class="bi bi-calendar3"></i> Preview Schedules</a></li>
+                        <li><a class="dropdown-item" href="/preview"><i class="bi bi-eye"></i> Preview All Materials</a></li>
+                        <li><a class="dropdown-item" href="/syllabi"><i class="bi bi-file-text"></i> View Syllabi</a></li>
+                        <li><a class="dropdown-item" href="/schedules"><i class="bi bi-calendar3"></i> View Schedules</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/api/export/docx"><i class="bi bi-file-earmark-word"></i> Export DOCX</a></li>
+                        <li><a class="dropdown-item" href="/api/export/docx"><i class="bi bi-download"></i> Download All (DOCX)</a></li>
                     </ul>
                 </div>
                 
                 <div class="nav-item dropdown me-2">
                     <a class="btn btn-success dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-mortarboard"></i> Blackboard
+                        <i class="bi bi-cloud-upload"></i> Deploy
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="https://courses.jeffsthings.com/embed/generator/" target="_blank"><i class="bi bi-code-square"></i> iframe Generator</a></li>
-                        <li><a class="dropdown-item" href="#embed-codes"><i class="bi bi-clipboard-code"></i> Copy Embed Codes</a></li>
+                        <li><a class="dropdown-item" href="/embed/syllabus/MATH221" target="_blank"><i class="bi bi-box-arrow-up-right"></i> Preview Embed</a></li>
+                        <li><a class="dropdown-item" href="https://courses.jeffsthings.com/embed/generator/" target="_blank"><i class="bi bi-code-square"></i> Embed Generator</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="https://courses.jeffsthings.com/" target="_blank"><i class="bi bi-globe"></i> Production Site</a></li>
                     </ul>
@@ -147,13 +148,16 @@
                 
                 <div class="nav-item dropdown">
                     <a class="btn btn-info dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-tools"></i> Tools
+                        <i class="bi bi-gear"></i> System
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#build-status"><i class="bi bi-gear"></i> Build Status</a></li>
-                        <li><a class="dropdown-item" href="#task-management"><i class="bi bi-list-check"></i> Task Management</a></li>
+                        <li><a class="dropdown-item" href="/api/stats" target="_blank"><i class="bi bi-graph-up"></i> Build Statistics</a></li>
+                        <li><a class="dropdown-item" href="/api/tasks" target="_blank"><i class="bi bi-list-check"></i> Task API</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#site-preview" onclick="startSitePreview()"><i class="bi bi-eye"></i> Local Preview</a></li>
+                        <li><a class="dropdown-item" href="http://localhost:8001/" target="_blank"><i class="bi bi-server"></i> Local Server</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="openQuickAddModal()"><i class="bi bi-plus-circle"></i> Quick Add</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="refreshNowQueue('medium', 90)"><i class="bi bi-lightning"></i> Refresh Now Queue</a></li>
+                        <li><a class="dropdown-item" href="/api/retro/weekly" target="_blank"><i class="bi bi-calendar3"></i> Weekly Retro</a></li>
                     </ul>
                 </div>
             </div>
@@ -161,12 +165,14 @@
             <!-- Status and info -->
             <div class="d-flex align-items-center">
                 <span class="badge bg-secondary me-2">Fall 2025</span>
+                <span id="phase-badge-top" class="badge bg-dark me-2" title="Phase weights loading...">Phase: …</span>
                 <small class="navbar-text">Updated: {{ updated }}</small>
             </div>
         </div>
     </nav>
 
     <div class="container-fluid mt-3">
+        <div id="cycle-banner" class="alert alert-danger d-none" role="alert"></div>
         <div class="row">
             <!-- Stats sidebar -->
             <div class="col-md-2">
@@ -195,6 +201,27 @@
                     <small>Complete</small>
                 </div>
 
+                <div class="stats-card bg-light" id="analytics-card">
+                    <h6 class="mb-1">Weekly Velocity</h6>
+                    <div id="velocity">—</div>
+                    <hr>
+                    <h6 class="mb-1">Aging (todo/review)</h6>
+                    <div id="aging">—</div>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="openRetroModal()">
+                            <i class="bi bi-calendar3"></i> Open Retro
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-card bg-light">
+                    <h6 class="mb-1">Legend</h6>
+                    <div class="small">
+                        <span class="badge bg-secondary">Quick</span>
+                        <span class="ms-1">Quick-added task</span>
+                    </div>
+                </div>
+
                 <hr>
 
                 <div class="filter-pills">
@@ -210,61 +237,39 @@
 
             <!-- Main content -->
             <div class="col-md-10">
-                <!-- Document Preview -->
-                <div class="card mb-3 mt-3">
-                    <div class="card-header d-flex align-items-center justify-content-between"
-                         style="cursor: pointer;" onclick="toggleDocumentPreview()">
-                        <div>
-                            <i class="bi bi-chevron-down" id="document-collapse-icon"></i>
-                            <strong>📄 Document Preview</strong>
-                            <small class="text-muted ms-2">Click to toggle</small>
-                        </div>
-                        <div onclick="event.stopPropagation();" class="d-flex gap-2">
-                            <a href="/syllabus-preview" class="btn btn-sm btn-primary" target="_blank">
-                                <i class="bi bi-arrows-fullscreen"></i> Full Preview
-                            </a>
-                            <div class="btn-group btn-group-sm" id="download-buttons">
-                                <button class="btn btn-sm btn-success" onclick="downloadDocument('html')" title="Download as HTML">
-                                    <i class="bi bi-file-code"></i> HTML
-                                </button>
-                                <button class="btn btn-sm btn-info" onclick="downloadDocument('docx')" title="Download as DOCX">
-                                    <i class="bi bi-file-word"></i> DOCX
-                                </button>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center" onclick="event.stopPropagation();">
-                            <div class="btn-group btn-group-sm me-3" role="group">
-                                <input type="radio" class="btn-check" name="doc-type" id="doc-syllabus" value="syllabus" checked>
-                                <label class="btn btn-outline-primary" for="doc-syllabus">Syllabus</label>
-                                <input type="radio" class="btn-check" name="doc-type" id="doc-schedule" value="schedule">
-                                <label class="btn btn-outline-primary" for="doc-schedule">Schedule</label>
-                            </div>
-                            <label class="me-2 mb-0" for="preview-course">Course:</label>
-                            <select id="preview-course" class="form-select form-select-sm me-3" style="width: 180px;">
-                                {% set course_codes = courses | map(attribute='code') | list %}
-                                {% for c in courses %}
-                                <option value="{{ c.code }}">{{ c.code }} - {{ c.name }}</option>
-                                {% endfor %}
-                            </select>
-                            <div class="form-check form-switch" id="calendar-toggle" style="display: inline-block; min-width: 140px;">
-                                <input class="form-check-input" type="checkbox" id="with-calendar" checked>
-                                <label class="form-check-label" for="with-calendar">Include calendar</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body p-0" id="document-preview-body">
-                        <iframe id="document-frame" src="http://localhost:8000/courses/{{ (courses[0].code if courses else 'MATH221') }}/fall-2025/syllabus/" style="width: 100%; height: 720px; border: 0;">
-                        </iframe>
-                    </div>
-                </div>
-                <div id="search-box">
+                <!-- Task Management Search -->
+                <div id="search-box" class="mt-3">
                     <input type="text" class="form-control" id="task-search"
                            placeholder="🔍 Search tasks... (/ to focus)">
                 </div>
 
                 {% if now_queue %}
                 <div class="alert alert-info mt-3">
-                    <h5 class="alert-heading">🎯 Now Queue - Focus on These Tasks</h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="alert-heading mb-0">🎯 Now Queue - Focus on These Tasks</h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <span id="phase-badge" class="badge bg-secondary me-2" title="Phase weights loading...">Phase: …</span>
+                            <label for="energy-select" class="form-label me-1 mb-0 small">Energy</label>
+                            <select id="energy-select" class="form-select form-select-sm" style="width:auto">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                            <label for="courses-select" class="form-label ms-2 me-1 mb-0 small">Courses <span id="courses-count" class="text-muted">0/0</span></label>
+                            <select id="courses-select" class="form-select form-select-sm" multiple style="width:auto; min-width:160px">
+                                {% for c in courses %}
+                                  <option value="{{ c.code|default(c.id)|default(c) }}">{{ c.code|default(c.id)|default(c) }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="btn-group ms-1" role="group" aria-label="Course select helpers">
+                              <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setCoursesSelectAll(true)">All</button>
+                              <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setCoursesSelectAll(false)">None</button>
+                            </div>
+                            <label for="timebox-input" class="form-label ms-2 me-1 mb-0 small">Timebox</label>
+                            <input id="timebox-input" type="number" class="form-control form-control-sm" style="width:90px" min="15" step="15" value="90">
+                            <button class="btn btn-sm btn-outline-primary ms-2" onclick="refreshNowQueueFromControls()">Refresh</button>
+                        </div>
+                    </div>
                     <p class="mb-2">The most impactful tasks to work on right now:</p>
                     <div class="row">
                         {% for task in now_queue[:7] %}
@@ -277,13 +282,15 @@
                                                 <i class="bi bi-chevron-right task-expand-icon" id="now-expand-{{ task.id }}"></i>
                                                 {% if task.is_chain_head %}➜{% else %}○{% endif %}
                                                 [{{ task.course }}] {{ task.title }}
+                                                {% if task.quick_added %}
+                                                    <span class="badge bg-secondary ms-1" title="Quick added">Quick</span>
+                                                {% endif %}
                                             </strong>
                                             {% if task.smart_score %}
-                                                <span class="badge bg-primary ms-2">Score: {{ "%.1f"|format(task.smart_score) }}</span>
+                                                <span class="badge bg-primary ms-2" onclick="explainTask('{{ task.id }}')" title="Explain score">Score: {{ "%.1f"|format(task.smart_score) }}</span>
                                             {% endif %}
-                                            {% if task.unblock_count > 0 %}
-                                                <span class="badge bg-success ms-1">Unblocks: {{ task.unblock_count }}</span>
-                                            {% endif %}
+                                            {% set upstream = (task.depends_on | length) if task.depends_on else 0 %}
+                                            <span class="badge bg-light text-dark ms-1" title="DAG: upstream | downstream">◀ {{ upstream }} | ▶ {{ task.unblock_count|default(0) }}</span>
                                             {% if task.chain_anchor %}
                                                 <span class="text-muted ms-2">→ {{ task.chain_anchor.split('-')[-1] }}</span>
                                             {% endif %}
@@ -302,11 +309,17 @@
                                         {% if task.checklist %}
                                         <div class="checklist mb-2">
                                             <strong class="small">Checklist:</strong>
+                                            <div class="checklist-controls mb-1">
+                                                <button class="btn btn-sm btn-outline-secondary btn-sm" onclick="selectAllChecklist('now-{{ task.id }}', true)">All</button>
+                                                <button class="btn btn-sm btn-outline-secondary btn-sm" onclick="selectAllChecklist('now-{{ task.id }}', false)">None</button>
+                                            </div>
                                             {% for item in task.checklist %}
                                             <div class="checklist-item small">
                                                 <input type="checkbox"
+                                                       class="checklist-checkbox-now-{{ task.id }}"
                                                        id="now-check-{{ task.id }}-{{ loop.index }}"
-                                                       {% if item.done %}checked{% endif %}>
+                                                       {% if item.done %}checked{% endif %}
+                                                       onchange="updateChecklist('{{ task.id }}')">
                                                 <label for="now-check-{{ task.id }}-{{ loop.index }}">
                                                     {{ item.text|default(item) }}
                                                 </label>
@@ -327,6 +340,15 @@
                                             <button class="btn btn-sm btn-warning"
                                                     onclick="event.stopPropagation(); updateStatus('{{ task.id }}', 'blocked')">
                                                 <i class="bi bi-exclamation-triangle"></i> Mark Blocked
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-info"
+                                                    onclick="event.stopPropagation(); explainTask('{{ task.id }}')">
+                                                <i class="bi bi-info-circle"></i> Explain
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary"
+                                                    onclick="event.stopPropagation(); refreshNowQueueForCourse('{{ task.course }}')"
+                                                    title="Refresh Now Queue for {{ task.course }} only">
+                                                <i class="bi bi-funnel"></i> Only {{ task.course }}
                                             </button>
                                         </div>
                                     </div>
@@ -360,12 +382,19 @@
                                         {% endif %}
                                         <i class="bi bi-chevron-right task-expand-icon" id="expand-{{ task.id }}"></i>
                                         {{ task.title }}
+                                        {% if task.quick_added %}
+                                            <span class="badge bg-secondary ms-1" title="Quick added">Quick</span>
+                                        {% endif %}
                                         {% if task.smart_score %}
-                                            <small class="text-muted">({{ "%.0f"|format(task.smart_score) }})</small>
+                                            <small class="text-muted" style="cursor:pointer" onclick="explainTask('{{ task.id }}')">({{ "%.0f"|format(task.smart_score) }})</small>
                                         {% endif %}
                                     </h6>
                                     <div class="task-details" id="details-{{ task.id }}" style="display: none;">
                                         <p class="card-text text-muted small mt-2">{{ task.description }}</p>
+                                        <div class="mb-2">
+                                            {% set upstream = (task.depends_on | length) if task.depends_on else 0 %}
+                                            <span class="badge bg-light text-dark" title="DAG: upstream | downstream">◀ {{ upstream }} | ▶ {{ task.unblock_count|default(0) }}</span>
+                                        </div>
 
                                         {% if task.notes %}
                                         <div class="alert alert-light mt-2">
@@ -383,16 +412,27 @@
                                             <button class="btn btn-sm btn-warning" onclick="updateStatus('{{ task.id }}', 'blocked')">
                                                 <i class="bi bi-exclamation-triangle"></i> Mark Blocked
                                             </button>
+                                            <button class="btn btn-sm btn-outline-secondary"
+                                                    onclick="refreshNowQueueForCourse('{{ task.course }}')"
+                                                    title="Refresh Now Queue for {{ task.course }} only">
+                                                <i class="bi bi-funnel"></i> Only {{ task.course }}
+                                            </button>
                                         </div>
                                     </div>
 
                                     {% if task.checklist %}
                                     <div class="checklist">
+                                        <div class="checklist-controls mb-2">
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="selectAllChecklist('{{ task.id }}', true)">Select All</button>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="selectAllChecklist('{{ task.id }}', false)">Select None</button>
+                                        </div>
                                         {% for item in task.checklist %}
                                         <div class="checklist-item">
                                             <input type="checkbox"
+                                                   class="checklist-checkbox-{{ task.id }}"
                                                    id="check-{{ task.id }}-{{ loop.index }}"
-                                                   {% if item.done %}checked{% endif %}>
+                                                   {% if item.done %}checked{% endif %}
+                                                   onchange="updateChecklist('{{ task.id }}')">
                                             <label for="check-{{ task.id }}-{{ loop.index }}">
                                                 {{ item.text|default(item) }}
                                             </label>
@@ -464,60 +504,246 @@
     </div>
 
     <script>
-        // Document preview controls
-        (function() {
-            const courseSelect = document.getElementById('preview-course');
-            const withCalToggle = document.getElementById('with-calendar');
-            const calendarToggleDiv = document.getElementById('calendar-toggle');
-            const frame = document.getElementById('document-frame');
-            const syllabusRadio = document.getElementById('doc-syllabus');
-            const scheduleRadio = document.getElementById('doc-schedule');
+        function refreshNowQueue(energy='medium', timebox=90, coursesCsv='') {
+            const qs = new URLSearchParams({ energy: energy, timebox: String(timebox) });
+            if (coursesCsv) qs.set('courses', coursesCsv);
+            fetch(`/api/now_queue/refresh?${qs.toString()}`, {method: 'POST'})
+              .then(r=>r.json()).then(d=>{
+                showNotification('Now Queue refreshed', 'success');
+                setTimeout(()=>location.reload(), 300);
+              }).catch(err=>console.error('refresh error', err));
+        }
 
-            function updatePreview() {
-                const course = courseSelect.value;
-                const docType = document.querySelector('input[name="doc-type"]:checked').value;
-                // Use production-optimized content from site/
-                const baseUrl = 'http://localhost:8000';
-                
-                if (docType === 'syllabus') {
-                    // For syllabus, use embed version without calendar, full version with calendar
-                    const path = withCalToggle.checked ? 'syllabus' : 'syllabus/embed';
-                    const url = `${baseUrl}/courses/${course}/fall-2025/${path}/`;
-                    frame.src = url;
-                    calendarToggleDiv.style.visibility = 'visible';
-                } else {
-                    // Schedule always uses embed version
-                    const url = `${baseUrl}/courses/${course}/fall-2025/schedule/embed/`;
-                    frame.src = url;
-                    calendarToggleDiv.style.visibility = 'hidden';
-                }
+        function refreshNowQueueFromControls() {
+            const energy = document.getElementById('energy-select')?.value || 'medium';
+            const tb = parseInt(document.getElementById('timebox-input')?.value || '90', 10);
+            const sel = document.getElementById('courses-select');
+            let selectedCourses = [];
+            if (sel) { selectedCourses = Array.from(sel.selectedOptions).map(o=>o.value); }
+            try { localStorage.setItem('nowq_energy', energy); } catch(e) {}
+            try { localStorage.setItem('nowq_timebox', String(isNaN(tb) ? 90 : tb)); } catch(e) {}
+            try { localStorage.setItem('nowq_courses', JSON.stringify(selectedCourses)); } catch(e) {}
+            const csv = selectedCourses.join(',');
+            refreshNowQueue(energy, isNaN(tb) ? 90 : tb, csv);
+        }
+        // Health and cycle banner
+        fetch('/api/health').then(r=>r.json()).then(h=>{
+            if (h && h.dag_ok === false) {
+                const banner = document.getElementById('cycle-banner');
+                banner.classList.remove('d-none');
+                const path = (h.cycle_path || []).join(' → ');
+                const sug = h.break_suggestion ? `<button class=\"btn btn-sm btn-outline-danger ms-2\" onclick=\"breakCycle('${h.break_suggestion}')\">Break by blocking ${h.break_suggestion}</button>` : '';
+                banner.innerHTML = `<strong>Dependency cycle detected:</strong> ${path} ${sug}`;
             }
-            
-            // Download document function
-            window.downloadDocument = function(format) {
-                const course = courseSelect.value;
-                const docType = document.querySelector('input[name="doc-type"]:checked').value;
-                
-                if (docType === 'schedule') {
-                    // Download schedule
-                    const url = `/api/schedule/download/${course}.${format}`;
-                    window.location.href = url;
-                } else {
-                    // Download syllabus
-                    const variant = withCalToggle.checked ? 'with_calendar' : 'embed';
-                    const url = `/api/syllabus/download/${course}.${format}?variant=${variant}`;
-                    window.location.href = url;
-                }
-            }
+        }).catch(()=>{});
 
-            if (courseSelect && withCalToggle && frame) {
-                courseSelect.addEventListener('change', updatePreview);
-                withCalToggle.addEventListener('change', updatePreview);
-                syllabusRadio.addEventListener('change', updatePreview);
-                scheduleRadio.addEventListener('change', updatePreview);
+        // Load phase badges (top and Now Queue)
+        fetch('/api/phase').then(r=>r.json()).then(p=>{
+            const badge = document.getElementById('phase-badge');
+            const badgeTop = document.getElementById('phase-badge-top');
+            if (!badge || !p) return;
+            const key = (p.phase || 'in_term');
+            const title = Object.entries(p.weights || {}).map(([k,v])=>`${k}: ${v}`).join('\n');
+            badge.textContent = `Phase: ${key.replace('_',' ')}`;
+            badge.setAttribute('title', title);
+            if (badgeTop) {
+                badgeTop.textContent = `Phase: ${key.replace('_',' ')}`;
+                badgeTop.setAttribute('title', title);
+            }
+        }).catch(()=>{});
+
+        // Initialize Now Queue controls from localStorage
+        (function initNowQueueControls(){
+            try {
+                const e = localStorage.getItem('nowq_energy');
+                if (e) { const sel = document.getElementById('energy-select'); if (sel) sel.value = e; }
+                const tb = localStorage.getItem('nowq_timebox');
+                if (tb) { const inp = document.getElementById('timebox-input'); if (inp) inp.value = tb; }
+                const courses = JSON.parse(localStorage.getItem('nowq_courses') || '[]');
+                if (courses && courses.length) {
+                    const sel = document.getElementById('courses-select');
+                    if (sel) { Array.from(sel.options).forEach(o=>{ if (courses.includes(o.value)) o.selected = true; }); }
+                }
+                updateCoursesCount();
+                const cs = document.getElementById('courses-select');
+                if (cs) cs.addEventListener('change', ()=>{ updateCoursesCount(); persistCoursesSelection(); });
+            } catch(e) {}
+        })();
+
+        function updateCoursesCount() {
+            const cs = document.getElementById('courses-select');
+            const el = document.getElementById('courses-count');
+            if (!cs || !el) return;
+            const total = cs.options.length;
+            const selected = Array.from(cs.selectedOptions).length;
+            el.textContent = `${selected}/${total}`;
+        }
+
+        function persistCoursesSelection() {
+            try {
+                const cs = document.getElementById('courses-select');
+                if (!cs) return;
+                const selectedCourses = Array.from(cs.selectedOptions).map(o=>o.value);
+                localStorage.setItem('nowq_courses', JSON.stringify(selectedCourses));
+            } catch(e) {}
+        }
+
+        function setCoursesSelectAll(all) {
+            const cs = document.getElementById('courses-select');
+            if (!cs) return;
+            Array.from(cs.options).forEach(o=>{ o.selected = !!all; });
+            updateCoursesCount();
+            persistCoursesSelection();
+        }
+
+        function refreshNowQueueForCourse(course) {
+            if (!course) return;
+            try { localStorage.setItem('nowq_courses', JSON.stringify([course])); } catch(e) {}
+            const cs = document.getElementById('courses-select');
+            if (cs) { Array.from(cs.options).forEach(o=>{ o.selected = (o.value === course); }); updateCoursesCount(); }
+            const energy = (document.getElementById('energy-select')?.value) || (localStorage.getItem('nowq_energy') || 'medium');
+            const tbStr = (document.getElementById('timebox-input')?.value) || (localStorage.getItem('nowq_timebox') || '90');
+            const tb = parseInt(tbStr, 10);
+            refreshNowQueue(energy, isNaN(tb) ? 90 : tb, course);
+        }
+
+        // Analytics summary fetch
+        fetch('/api/analytics/summary').then(r=>r.json()).then(s=>{
+            if (!s || s.error) return;
+            const v = document.getElementById('velocity');
+            const a = document.getElementById('aging');
+            if (v) v.textContent = `${s.velocity.total} tasks/week (top: ${s.velocity.top_category || '—'})`;
+            if (a) a.textContent = `${s.aging.todo_gt7} todo >7d, ${s.aging.review_gt7} review >7d`;
+        }).catch(()=>{});
+        // Explain modal template injection
+        (function ensureExplainModal(){
+            if (!document.getElementById('explainModal')) {
+                const modal = document.createElement('div');
+                modal.id = 'explainModal';
+                modal.className = 'modal fade';
+                modal.tabIndex = -1;
+                modal.innerHTML = `
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="explainModalLabel">Explain</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="explainModalBody">
+                      <div class="text-muted">Loading…</div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>`;
+                document.body.appendChild(modal);
             }
         })();
 
+        // Retro modal template injection
+        (function ensureRetroModal(){
+            if (!document.getElementById('retroModal')) {
+                const modal = document.createElement('div');
+                modal.id = 'retroModal';
+                modal.className = 'modal fade';
+                modal.tabIndex = -1;
+                modal.innerHTML = `
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="retroModalLabel">Weekly Retro</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="retroModalBody">
+                      <div class="text-muted">Loading…</div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>`;
+                document.body.appendChild(modal);
+            }
+        })();
+
+        // Quick Add modal template injection
+        (function ensureQuickAddModal(){
+            if (!document.getElementById('quickAddModal')) {
+                const modal = document.createElement('div');
+                modal.id = 'quickAddModal';
+                modal.className = 'modal fade';
+                modal.tabIndex = -1;
+                modal.innerHTML = `
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="quickAddModalLabel">Quick Add Task</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" id="qa-ai-toggle">
+                        <label class="form-check-label" for="qa-ai-toggle">AI structuring (use free-text)</label>
+                      </div>
+                      <div class="mb-2">
+                        <label class="form-label small" for="qa-text">Free-text
+                          <i class="bi bi-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="right" title="Format: [COURSE] Title (cat:category est:minutes due:YYYY-MM-DD). Example: [MATH251] Update rubric (cat:assessment est:30 due:2025-08-20)"></i>
+                        </label>
+                        <textarea id="qa-text" class="form-control" placeholder="[MATH251] Update rubric (cat:assessment est:30 due:2025-08-20)"></textarea>
+                      </div>
+                      <div class="mb-2">
+                        <label class="form-label small" for="qa-title">Title</label>
+                        <input id="qa-title" class="form-control" placeholder="Short task title">
+                      </div>
+                      <div class="row g-2">
+                        <div class="col">
+                          <label class="form-label small" for="qa-course">Course</label>
+                          <select id="qa-course" class="form-select">
+                            <option value="">(none)</option>
+                            {% for c in courses %}
+                              <option value="{{ c.code|default(c.id)|default(c) }}">{{ c.code|default(c.id)|default(c) }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                        <div class="col">
+                          <label class="form-label small" for="qa-category">Category</label>
+                          <select id="qa-category" class="form-select">
+                            <option value="">(none)</option>
+                            <option>setup</option>
+                            <option>content</option>
+                            <option>technical</option>
+                            <option>materials</option>
+                            <option>assessment</option>
+                            <option>communication</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="row g-2 mt-1">
+                        <div class="col">
+                          <label class="form-label small" for="qa-est">Est. minutes</label>
+                          <input id="qa-est" type="number" min="5" step="5" class="form-control" placeholder="45">
+                        </div>
+                        <div class="col">
+                          <label class="form-label small" for="qa-due">Due (YYYY-MM-DD)</label>
+                          <input id="qa-due" type="date" class="form-control">
+                        </div>
+                      </div>
+                      <div class="mt-2">
+                        <label class="form-label small" for="qa-deps">Depends on (comma-separated IDs)</label>
+                        <input id="qa-deps" class="form-control" placeholder="TASK-1, TASK-2">
+                      </div>
+                      <div id="qa-errors" class="text-danger small mt-2" style="display:none"></div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-primary" onclick="submitQuickAdd()">Add Task</button>
+                    </div>
+                  </div>
+                </div>`;
+                document.body.appendChild(modal);
+            }
+        })();
         // Update task status
         function updateStatus(taskId, status) {
             if (!taskId || taskId === 'None' || taskId === 'undefined') {
@@ -576,6 +802,18 @@
             });
         }
 
+        function breakCycle(taskId) {
+            if (!taskId) return;
+            fetch(`/api/task/${taskId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'blocked', notes: 'Deferred to break dependency cycle' })
+            }).then(r=>r.json()).then(_=>{
+                showNotification(`Blocked ${taskId} to break cycle`, 'warning');
+                setTimeout(()=>location.reload(), 500);
+            }).catch(err=>console.error('breakCycle error', err));
+        }
+
         // Show notification
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
@@ -597,6 +835,102 @@
                 card.style.display = text.includes(searchTerm) ? 'block' : 'none';
             });
         });
+
+        // Fetch retro payload lazily on open
+        function openRetroModal() {
+            fetch('/api/retro/weekly')
+              .then(r=>r.json())
+              .then(p=>{
+                  const body = document.getElementById('retroModalBody');
+                  const lines = [];
+                  lines.push(`<div><strong>Completed:</strong> ${p.completed}</div>`);
+                  if (p.categories && p.categories.length) {
+                      lines.push('<div class=\'mt-2\'><strong>Top Categories</strong></div>');
+                      lines.push('<ul class=\'small\'>' + p.categories.slice(0,5).map(c=>`<li>${c[0]}: ${c[1]}</li>`).join('') + '</ul>');
+                  }
+                  if (p.top_keywords && p.top_keywords.length) {
+                      lines.push('<div class=\'mt-2\'><strong>Themes</strong></div>');
+                      lines.push('<div class=\'small\'>' + p.top_keywords.map(k=>`${k[0]} (${k[1]})`).join(', ') + '</div>');
+                  }
+                  body.innerHTML = lines.join('');
+                  const retroModal = new bootstrap.Modal(document.getElementById('retroModal'));
+                  retroModal.show();
+              }).catch(err=>{
+                  console.error('retro error', err);
+              });
+        }
+
+        function openQuickAddModal() {
+            const m = new bootstrap.Modal(document.getElementById('quickAddModal'));
+            try { const last = localStorage.getItem('qa_course'); if (last) { const sel = document.getElementById('qa-course'); if (sel) sel.value = last; } } catch(e) {}
+            m.show();
+        }
+
+        function submitQuickAdd() {
+            const useAI = document.getElementById('qa-ai-toggle').checked;
+            const text = (document.getElementById('qa-text').value || '').trim();
+            const title = (document.getElementById('qa-title').value || '').trim();
+            const course = document.getElementById('qa-course').value || undefined;
+            const category = document.getElementById('qa-category').value || undefined;
+            const est = document.getElementById('qa-est').value;
+            const due = document.getElementById('qa-due').value;
+            const depsStr = document.getElementById('qa-deps').value || '';
+            const deps = depsStr.split(',').map(s=>s.trim()).filter(Boolean);
+
+            const errors = [];
+            if (!useAI && title.length < 3) errors.push('Title must be at least 3 characters (or enable AI with free-text).');
+            if (useAI && text.length < 3) errors.push('Provide free-text for AI structuring.');
+            const errEl = document.getElementById('qa-errors');
+            if (errors.length) {
+                errEl.style.display = 'block';
+                errEl.innerHTML = errors.map(e=>`<div>• ${e}</div>`).join('');
+                return;
+            } else {
+                errEl.style.display = 'none';
+                errEl.innerHTML = '';
+            }
+
+            const payload = useAI ? { text } : { title };
+            if (course) payload.course = course;
+            if (category) payload.category = category;
+            if (est) payload.est_minutes = parseInt(est, 10);
+            if (due) payload.due_at = due;
+            if (deps.length) payload.depends_on = deps;
+
+            if (course) { try { localStorage.setItem('qa_course', course); } catch(e) {} }
+
+            const qs = useAI ? '?use_ai=1' : '';
+            fetch(`/api/quick_add${qs}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(r=>r.json()).then(resp=>{
+                if (resp && resp.success) {
+                    showNotification('Task added', 'success');
+                    const mEl = document.getElementById('quickAddModal');
+                    const m = bootstrap.Modal.getInstance(mEl); if (m) m.hide();
+                    setTimeout(()=>location.reload(), 300);
+                } else {
+                    errEl.style.display = 'block';
+                    if (resp && resp.details) {
+                        errEl.innerHTML = resp.details.map(d=>`<div>• ${d}</div>`).join('');
+                    } else {
+                        errEl.textContent = resp.error || 'Failed to add task';
+                    }
+                }
+            }).catch(err=>{
+                errEl.style.display = 'block';
+                errEl.textContent = String(err);
+            });
+        }
+
+        // Initialize all tooltips
+        (function initTooltips(){
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+              new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+        })();
 
         // Toggle task details
         function toggleTaskDetails(taskId) {
@@ -630,27 +964,51 @@
             }
         }
 
-        // Toggle Document Preview
-        function toggleDocumentPreview() {
-            const body = document.getElementById('document-preview-body');
-            const icon = document.getElementById('document-collapse-icon');
 
-            if (body) {
-                if (body.style.display === 'none') {
-                    body.style.display = 'block';
-                    if (icon) icon.className = 'bi bi-chevron-down';
-                    localStorage.setItem('documentPreviewCollapsed', 'false');
-                } else {
-                    body.style.display = 'none';
-                    if (icon) icon.className = 'bi bi-chevron-right';
-                    localStorage.setItem('documentPreviewCollapsed', 'true');
-                }
-            }
+        // Select all/none for checklists
+        function selectAllChecklist(taskId, selectAll) {
+            const checkboxes = document.querySelectorAll(`.checklist-checkbox-${taskId}`);
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll;
+            });
+            updateChecklist(taskId);
         }
 
-        // For backward compatibility
-        function toggleSyllabusPreview() {
-            toggleDocumentPreview();
+        // Update checklist status
+        function updateChecklist(taskId) {
+            const checkboxes = document.querySelectorAll(`.checklist-checkbox-${taskId}`);
+            const checklist = [];
+            
+            checkboxes.forEach((checkbox, index) => {
+                const label = checkbox.nextElementSibling;
+                checklist.push({
+                    text: label ? label.textContent.trim() : '',
+                    done: checkbox.checked
+                });
+            });
+
+            // Save checklist state
+            fetch(`/api/task/${taskId}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({checklist: checklist})
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showNotification('Checklist updated', 'success');
+                } else {
+                    console.error('Failed to update checklist:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating checklist:', error);
+            });
         }
 
         // Keyboard shortcuts
@@ -680,20 +1038,6 @@
             }
         });
 
-        // Restore document preview state on load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check both old and new keys for backward compatibility
-            const isCollapsed = localStorage.getItem('documentPreviewCollapsed') === 'true' ||
-                               localStorage.getItem('syllabusPreviewCollapsed') === 'true';
-            if (isCollapsed) {
-                const body = document.getElementById('document-preview-body');
-                const icon = document.getElementById('document-collapse-icon');
-                if (body) {
-                    body.style.display = 'none';
-                    if (icon) icon.className = 'bi bi-chevron-right';
-                }
-            }
-        });
 
         // Checklist handling
         document.querySelectorAll('.checklist input').forEach(checkbox => {
@@ -823,6 +1167,35 @@
                 }
             });
         });
+
+        // Explain panel (modal)
+        function explainTask(taskId) {
+            fetch(`/api/explain/${taskId}`)
+              .then(r => r.json())
+              .then(data => {
+                  const modalTitle = document.getElementById('explainModalLabel');
+                  const modalBody = document.getElementById('explainModalBody');
+                  if (!data || data.error) {
+                      modalTitle.textContent = 'Explain';
+                      modalBody.innerHTML = `<div class="text-danger">${data?.error || 'Failed to load'}</div>`;
+                  } else {
+                      modalTitle.textContent = `Explain: ${data.task_id}`;
+                      const rows = (data.explain || []).map(e => `<div class=\"d-flex justify-content-between\"><span>${e.factor}</span><strong>${e.contrib}</strong></div>`).join('');
+                      const cut = (data.minimal_unblock || []).join(', ');
+                      modalBody.innerHTML = `
+                        <div class=\"mb-2\">Score: <strong>${data.score}</strong></div>
+                        <div class=\"mb-2\">Minimal unblocking cut: <code>${cut || '—'}</code></div>
+                        <div class=\"mb-2\"><strong>Factors</strong></div>
+                        <div class=\"small\">${rows}</div>
+                      `;
+                  }
+                  const explainModal = new bootstrap.Modal(document.getElementById('explainModal'));
+                  explainModal.show();
+              })
+              .catch(err => {
+                  console.error('Explain error', err);
+              });
+        }
     </script>
 </body>
 </html>
