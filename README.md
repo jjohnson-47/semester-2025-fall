@@ -150,6 +150,19 @@ BUILD_MODE=v2 make all
 | `make ids-dry-run` | Generate stable IDs into build/normalized/ (dry-run) |
 | `make pipeline` | Run enhanced build pipeline with reports |
 
+#### Enhanced Pipeline (flags)
+
+```bash
+# Run all stages with verbose logs
+$(PYTHON) scripts/build_pipeline.py --courses MATH221 MATH251 STAT253 -v
+
+# Simulate without writing files
+$(PYTHON) scripts/build_pipeline.py --courses MATH221 --dry-run
+
+# Run a single stage (e.g., projection)
+$(PYTHON) scripts/build_pipeline.py --courses MATH221 --stage project
+```
+
 ### V2 Quality Assurance
 
 ```bash

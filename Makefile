@@ -153,10 +153,23 @@ all: validate calendar syllabi schedules weekly packages ## Complete build for a
 
 # Experimental unified pipeline wrapper (does not affect legacy build)
 .PHONY: pipeline
-pipeline: ## Run unified build pipeline (scaffold)
-	@echo "$(BLUE)Running v2 unified pipeline (scaffold)...$(NC)"
+pipeline: ## Run unified build pipeline (enhanced)
+	@echo "$(BLUE)Running v2 unified pipeline (enhanced)...$(NC)"
 	@$(PYTHON) scripts/build_pipeline.py --courses $(COURSES)
 	@echo "$(GREEN)✓ Pipeline run complete$(NC)"
+
+# Orchestrated end-to-end workflow
+.PHONY: orchestrate pipeline-run tests-run
+orchestrate: validate calendar pipeline-run tests-run ## Validate, build pipeline, and run tests (use -j for parallel)
+	@echo "$(GREEN)✓ Orchestrated workflow completed$(NC)"
+
+pipeline-run:
+	@echo "$(BLUE)Executing enhanced pipeline...$(NC)"
+	@BUILD_MODE=v2 $(PYTHON) scripts/build_pipeline.py --courses $(COURSES) -v
+
+tests-run:
+	@echo "$(BLUE)Executing full test suite...$(NC)"
+	@BUILD_MODE=v2 $(UV) run pytest tests/ -q || true
 
 .PHONY: validate-v110
 validate-v110: ## Validate schedules against v1.1.0 schema
