@@ -8,7 +8,16 @@ without disrupting usage or documentation that referenced this path.
 
 from __future__ import annotations
 
+import warnings
 from scripts.build_pipeline import BuildPipeline as BuildPipeline  # noqa: F401
+
+# Deprecation notice: Keep for a short window post-merge, then remove.
+warnings.warn(
+    "scripts.build_pipeline_impl is deprecated and will be removed after Fall 2025. "
+    "Use scripts.build_pipeline instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
 def main() -> None:  # pragma: no cover - CLI shim

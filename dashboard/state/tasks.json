@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "exported": "2025-09-04T04:42:19Z"
+    "exported": "2025-09-04T06:31:25Z"
   },
   "tasks": [
     {
@@ -15,8 +15,8 @@
       "category": "setup",
       "anchor": false,
       "description": null,
-      "created_at": "2025-09-04T04:42:17Z",
-      "updated_at": "2025-09-04T04:42:17Z"
+      "created_at": "2025-09-04T06:31:23Z",
+      "updated_at": "2025-09-04T06:31:23Z"
     },
     {
       "id": "X-2",
@@ -30,8 +30,8 @@
       "category": "content",
       "anchor": false,
       "description": null,
-      "created_at": "2025-09-04T04:42:17Z",
-      "updated_at": "2025-09-04T04:42:17Z"
+      "created_at": "2025-09-04T06:31:23Z",
+      "updated_at": "2025-09-04T06:31:23Z"
     },
     {
       "id": "X-3",
@@ -45,11 +45,11 @@
       "category": "assessment",
       "anchor": false,
       "description": null,
-      "created_at": "2025-09-04T04:42:17Z",
-      "updated_at": "2025-09-04T04:42:17Z"
+      "created_at": "2025-09-04T06:31:23Z",
+      "updated_at": "2025-09-04T06:31:23Z"
     },
     {
-      "id": "MATH221-20250904044219",
+      "id": "MATH221-20250904063125",
       "course": "MATH221",
       "title": "New Quick Task",
       "status": "todo",
@@ -60,8 +60,8 @@
       "category": "setup",
       "anchor": false,
       "description": null,
-      "created_at": "2025-09-04T04:42:19Z",
-      "updated_at": "2025-09-04T04:42:19Z"
+      "created_at": "2025-09-04T06:31:25Z",
+      "updated_at": "2025-09-04T06:31:25Z"
     }
   ]
 }

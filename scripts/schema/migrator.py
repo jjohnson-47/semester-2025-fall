@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from typing import Any
+import warnings
 
 
 def migrate_schedule_file(course: str, in_path: str | Path, out_path: str | Path) -> dict[str, Any]:
@@ -43,3 +44,11 @@ def migrate_all(content_root: str | Path = "content/courses") -> list[Path]:  # 
       out_paths.append(out)
   return out_paths
 
+
+# Deprecation notice: Keep for a short window post-merge, then remove.
+warnings.warn(
+    "scripts.schema.migrator is deprecated and will be removed after Fall 2025. "
+    "Use scripts.migrations.add_stable_ids and current v1.1.0 helpers instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
