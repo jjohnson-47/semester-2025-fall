@@ -11,7 +11,7 @@ jobs:
     name: Validate JSON
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v3
       - name: Sync deps
         run: uv sync --all-extras
@@ -22,7 +22,7 @@ jobs:
     name: Lint and Format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v3
       - name: Sync deps
         run: uv sync --all-extras
@@ -35,7 +35,7 @@ jobs:
     name: Type Check (mypy --strict)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v3
       - name: Sync deps
         run: uv sync --all-extras
@@ -46,7 +46,7 @@ jobs:
     name: Tests (unit)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v3
       - name: Sync deps
         run: uv sync --all-extras
@@ -62,7 +62,7 @@ jobs:
     name: Tests (integration & others)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v3
       - name: Sync deps
         run: uv sync --all-extras
