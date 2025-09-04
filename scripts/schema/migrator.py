@@ -1,56 +1,45 @@
-#!/usr/bin/env python3
-"""Schema migrator (v1.0.0 → v1.1.0 scaffolding).
+"""Schema migrator (compat) bridging to current migration utilities.
 
-Provides utilities to evolve course JSON to newer schemas without
-breaking existing behavior. This module does not mutate repo files by
-default; it exposes helpers that callers can run against copies.
+Provides a minimal facade expected by the feature branch to migrate schedules
+to v1.1.0 with stable IDs. Internally delegates to `scripts.migrations`.
 """
 
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-MigrationFn = Callable[[dict[str, Any]], dict[str, Any]]
+
+def migrate_schedule_file(course: str, in_path: str | Path, out_path: str | Path) -> dict[str, Any]:
+  """Migrate a single schedule JSON to v1.1.0 with stable IDs.
+
+  Returns the migrated payload for further inspection.
+  """
+  from scripts.migrations.add_stable_ids import infer_term_label, migrate_schedule
+
+  in_p = Path(in_path)
+  out_p = Path(out_path)
+  prefix = infer_term_label(Path("variables/semester.json"))
+  payload = json.loads(in_p.read_text(encoding="utf-8"))
+  migrated = migrate_schedule(course, payload, prefix)
+  out_p.parent.mkdir(parents=True, exist_ok=True)
+  out_p.write_text(json.dumps(migrated, indent=2), encoding="utf-8")
+  return migrated
 
 
-@dataclass(frozen=True)
-class Migration:
-    source: str
-    target: str
-    apply: MigrationFn
-
-
-class SchemaMigrator:
-    """Apply schema migrations in order."""
-
-    def __init__(self) -> None:
-        self._migrations: dict[tuple[str, str], MigrationFn] = {}
-
-    def register(self, source: str, target: str, fn: MigrationFn) -> None:
-        self._migrations[(source, target)] = fn
-
-    def get_chain(self, from_version: str, to_version: str) -> list[MigrationFn]:
-        if from_version == to_version:
-            return []
-        key = (from_version, to_version)
-        if key in self._migrations:
-            return [self._migrations[key]]
-        raise ValueError(f"No direct migration path {from_version} -> {to_version}")
-
-    def migrate(self, data: dict[str, Any], from_version: str, to_version: str) -> dict[str, Any]:
-        result = dict(data)
-        for step in self.get_chain(from_version, to_version):
-            result = step(result)
-            meta = result.setdefault("_meta", {})
-            meta["schemaVersion"] = to_version
-        return result
-
-    @staticmethod
-    def write_json(path: Path, data: dict[str, Any]) -> None:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+def migrate_all(content_root: str | Path = "content/courses") -> list[Path]:  # pragma: no cover - utility
+  """Migrate all course schedules under the content root into build/normalized."""
+  out_paths: list[Path] = []
+  root = Path(content_root)
+  for course_dir in root.iterdir():
+    if not course_dir.is_dir():
+      continue
+    course = course_dir.name
+    sched = course_dir / "schedule.json"
+    if sched.exists():
+      out = Path("build/normalized") / course / "schedule.v1_1_0.json"
+      migrate_schedule_file(course, sched, out)
+      out_paths.append(out)
+  return out_paths
 
