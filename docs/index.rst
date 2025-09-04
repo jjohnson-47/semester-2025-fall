@@ -82,7 +82,7 @@ The dashboard follows a layered architecture:
                     │
    ┌─────────────────────────────────────┐
    │       Service Layer                 │
-   │  (DependencyService, TaskService)   │
+   │         (DependencyService)         │
    └─────────────────────────────────────┘
                     │
    ┌─────────────────────────────────────┐
@@ -92,7 +92,7 @@ The dashboard follows a layered architecture:
                     │
    ┌─────────────────────────────────────┐
    │       Storage Layer                 │
-   │     (JSON / Future: Database)       │
+   │      (SQLite DB with JSON I/O)      │
    └─────────────────────────────────────┘
 
 API Documentation

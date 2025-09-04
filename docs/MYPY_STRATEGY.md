@@ -131,12 +131,16 @@ def is_valid_task(data: Any) -> TypeGuard[TaskDict]:
 
 ### Pattern 3: Protocol Classes
 
+Note: In v2, the legacy `TaskService` has been removed. Prefer repository-style
+protocols that reflect DB operations.
+
 ```python
 from typing import Protocol
 
-class TaskService(Protocol):
+class Repository(Protocol):
     def get_task(self, task_id: str) -> TaskDict | None: ...
-    def save_task(self, task: TaskDict) -> bool: ...
+    def list_tasks(self) -> list[TaskDict]: ...
+    def update_task_fields(self, task_id: str, fields: dict[str, object]) -> bool: ...
 ```
 
 ## Automation & Tooling

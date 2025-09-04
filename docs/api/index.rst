@@ -70,15 +70,10 @@ DependencyService
    .. automethod:: get_critical_path
    .. automethod:: validate_dependencies
 
-TaskService
-^^^^^^^^^^^
+DB Repository
+^^^^^^^^^^^^^
 
-.. automodule:: dashboard.services.task_service
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: dashboard.services.task_service.TaskService
+.. automodule:: dashboard.db
    :members:
    :undoc-members:
    :show-inheritance:

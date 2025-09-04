@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A δ for your ε: Rigorous Limits Training</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --success: #38ef7d;
+            --error: #ff6b6b;
+            --warning: #ffd93d;
+            --bg-gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --animation-speed: 0.3s;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1400px;
+            width: 100%;
+            padding: 30px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: var(--bg-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .mode-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--primary);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--animation-speed) ease;
+            font-weight: 600;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow);
+        }
+
+        .mode-btn:focus {
+            outline: 3px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 968px) {
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .graph-section, .controls-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        canvas {
+            width: 100%;
+            height: 400px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: crosshair;
+        }
+
+        .jarvis-face {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            position: relative;
+            transition: all var(--animation-speed) ease;
+        }
+
+        .face-circle {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--warning), #ffb347);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(255, 183, 71, 0.4);
+            transition: all var(--animation-speed) ease;
+        }
+
+        .face-circle.happy {
+            background: linear-gradient(135deg, #6dd5ed, var(--success));
+            box-shadow: 0 5px 20px rgba(56, 239, 125, 0.4);
+        }
+
+        .face-circle.sad {
+            background: linear-gradient(135deg, var(--error), #ee5a24);
+            box-shadow: 0 5px 20px rgba(238, 90, 36, 0.4);
+        }
+
+        .eye {
+            width: 10px;
+            height: 16px;
+            background: #333;
+            border-radius: 50%;
+            position: absolute;
+            top: 35%;
+            transition: all var(--animation-speed) ease;
+        }
+
+        .eye.left { left: 30%; }
+        .eye.right { right: 30%; }
+
+        .face-circle.happy .eye {
+            height: 10px;
+            top: 38%;
+        }
+
+        .mouth {
+            position: absolute;
+            bottom: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--bg-gradient);
+            outline: none;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        input[type="range"]:hover {
+            opacity: 1;
+        }
+
+        input[type="range"]:focus {
+            outline: 3px solid var(--primary);
+            outline-offset: 3px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .value-display {
+            min-width: 60px;
+            padding: 5px 10px;
+            background: var(--bg-gradient);
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .formula-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .formula-input:focus {
+            outline: none;
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .proof-box {
+            background: rgba(102, 126, 234, 0.05);
+            border-left: 4px solid var(--primary);
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .proof-box.error {
+            background: rgba(255, 107, 107, 0.05);
+            border-left-color: var(--error);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            background: var(--bg-gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--animation-speed) ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:focus {
+            outline: 3px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.1em;
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #89f7fe, #66a6ff);
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .level-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .level-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: all var(--animation-speed) ease;
+            cursor: pointer;
+        }
+
+        .level-dot.active {
+            background: var(--bg-gradient);
+            transform: scale(1.3);
+        }
+
+        .level-dot.completed {
+            background: linear-gradient(135deg, #11998e, var(--success));
+        }
+
+        .hint-button {
+            background: linear-gradient(135deg, var(--warning), #ffb347);
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .status-region {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: none;
+        }
+
+        .tutorial-overlay.show {
+            display: block;
+        }
+
+        .tutorial-box {
+            position: absolute;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            animation: bounceIn 0.5s ease;
+        }
+
+        .export-button {
+            background: linear-gradient(135deg, #11998e, var(--success));
+            margin-top: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .formula-help {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .one-sided-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 15px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background var(--animation-speed) ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--primary);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform var(--animation-speed) ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>A δ for your ε</h1>
+            <p class="subtitle">Master the formal definition through proof-based learning</p>
+        </div>
+
+        <div class="mode-selector" role="tablist" aria-label="Game modes">
+            <button class="mode-btn active" role="tab" aria-selected="true" aria-controls="game-content" data-mode="learn">
+                Learn Mode
+            </button>
+            <button class="mode-btn" role="tab" aria-selected="false" aria-controls="game-content" data-mode="play">
+                Play Mode
+            </button>
+            <button class="mode-btn" role="tab" aria-selected="false" aria-controls="game-content" data-mode="prove">
+                Prove Mode
+            </button>
+        </div>
+
+        <div class="level-indicator" id="levelIndicator" role="navigation" aria-label="Level progress">
+            <!-- Level dots will be added here -->
+        </div>
+
+        <div class="game-area" id="game-content" role="tabpanel">
+            <div class="graph-section">
+                <canvas id="graphCanvas" role="img" aria-label="Interactive graph showing function, epsilon band, and delta neighborhood"></canvas>
+                <div aria-live="polite" aria-atomic="true" class="status-region" id="graphStatus"></div>
+            </div>
+
+            <div class="controls-section">
+                <div class="jarvis-face" role="img" aria-label="Visual feedback indicator">
+                    <div class="face-circle" id="faceCircle">
+                        <div class="eye left"></div>
+                        <div class="eye right"></div>
+                        <div class="mouth">
+                            <svg width="50" height="30">
+                                <path d="M 10 15 Q 25 25 40 15" stroke="#333" stroke-width="3" fill="none" id="mouthPath"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h3>Current Challenge</h3>
+                    <p id="functionDisplay">Function: f(x) = x²</p>
+                    <p id="pointDisplay">Point: x* = 1.4</p>
+                    <p id="limitDisplay">Limit: L = 1.96</p>
+                    <div class="formula" style="font-family: monospace; margin-top: 10px;">
+                        Goal: ∀ε>0, ∃δ>0 such that<br>
+                        0 < |x - x*| < δ ⟹ |f(x) - L| < ε
+                    </div>
+                </div>
+
+                <div id="learnContent" style="display: none;">
+                    <div class="info-box" style="background: rgba(255, 217, 61, 0.1); border-left: 3px solid var(--warning);">
+                        <h4>Step-by-Step Guide</h4>
+                        <p id="learnStep">Step 1: Observe the epsilon band (vertical tolerance)</p>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="epsilonSlider">
+                        Epsilon (ε) - Vertical Tolerance
+                    </label>
+                    <div class="slider-container">
+                        <input type="range" id="epsilonSlider" min="0.1" max="2" step="0.05" value="0.6"
+                               aria-label="Epsilon value" aria-valuemin="0.1" aria-valuemax="2" aria-valuenow="0.6">
+                        <span class="value-display" id="epsilonValue" aria-live="polite">0.60</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="deltaSlider">
+                        Delta (δ) - Horizontal Window
+                        <span class="one-sided-toggle">
+                            <span style="font-size: 0.9em; font-weight: normal;">One-sided:</span>
+                            <div class="toggle-switch" id="oneSidedToggle" role="switch" aria-checked="false" tabindex="0">
+                                <span class="sr-only">Toggle one-sided limit</span>
+                            </div>
+                        </span>
+                    </label>
+                    <div class="slider-container">
+                        <input type="range" id="deltaSlider" min="0.01" max="1" step="0.01" value="0.1"
+                               aria-label="Delta value" aria-valuemin="0.01" aria-valuemax="1" aria-valuenow="0.1">
+                        <span class="value-display" id="deltaValue" aria-live="polite">0.10</span>
+                    </div>
+                </div>
+
+                <div id="proveContent" style="display: none;">
+                    <div class="control-group">
+                        <label class="control-label" for="formulaInput">
+                            Enter δ(ε) Formula:
+                        </label>
+                        <input type="text" id="formulaInput" class="formula-input" 
+                               placeholder="e.g., min(1, eps/7)" 
+                               aria-describedby="formulaHelp">
+                        <div id="formulaHelp" class="formula-help">
+                            Use: eps, min(), max(), abs(), sqrt(), numbers, and basic operators
+                        </div>
+                    </div>
+                </div>
+
+                <div id="proofBox" class="proof-box" style="display: none;" role="region" aria-label="Proof explanation">
+                    <!-- Proof will appear here -->
+                </div>
+
+                <button class="hint-button" id="hintButton">
+                    Need a Hint? <span class="sr-only">(10 point penalty)</span>
+                </button>
+                <div id="hintContainer" role="status" aria-live="polite"></div>
+
+                <div class="button-group">
+                    <button id="checkButton" aria-label="Check current answer">Check Answer</button>
+                    <button class="secondary" id="nextButton" style="display: none;" aria-label="Continue to next level">Next Level</button>
+                </div>
+
+                <div class="score-display" role="status" aria-live="polite" aria-atomic="true">
+                    Score: <span id="scoreValue">0</span> | Level: <span id="levelValue">1</span>/5
+                </div>
+
+                <button class="export-button" id="exportButton" aria-label="Export progress data">Export Progress</button>
+            </div>
+        </div>
+
+        <div class="tutorial-overlay" id="tutorialOverlay" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">
+            <div class="tutorial-box" id="tutorialBox">
+                <h3 id="tutorialTitle">Welcome to A δ for your ε!</h3>
+                <p id="tutorialText">Learn the rigorous definition of limits through interactive visualization.</p>
+                <button id="tutorialNext">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration from URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const config = {
+            mode: urlParams.get('mode') || 'learn',
+            seed: urlParams.get('seed') || '0',
+            course: urlParams.get('course') || 'default',
+            showTutorial: urlParams.get('tutorial') !== 'false'
+        };
+
+        // Game state
+        let gameState = {
+            mode: config.mode,
+            currentLevel: 0,
+            score: 0,
+            hintsUsed: 0,
+            attempts: 0,
+            completedLevels: [],
+            startTime: Date.now(),
+            oneSided: false,
+            side: 'both', // 'both', 'left', 'right'
+            levels: [
+                {
+                    id: 'linear',
+                    func: (x) => 2 * x + 1,
+                    funcStr: "f(x) = 2x + 1",
+                    xStar: 2,
+                    limit: 5,
+                    epsilonRange: [0.1, 1.5],
+                    validator: 'linear',
+                    params: { m: 2 },
+                    hint: "Linear functions are the simplest! δ and ε have a constant ratio.",
+                    detailedHint: "For f(x) = mx + b, we have |f(x) - L| = |m||x - x*|. So choose δ = ε/|m|."
+                },
+                {
+                    id: 'quadratic',
+                    func: (x) => x * x,
+                    funcStr: "f(x) = x²",
+                    xStar: 1.4,
+                    limit: 1.96,
+                    epsilonRange: [0.1, 2],
+                    validator: 'quadratic',
+                    params: { a: 1.4 },
+                    hint: "For x², factor the difference: |x² - a²| = |x - a||x + a|",
+                    detailedHint: "First restrict |x - a| < 1 to bound |x + a|. Then |x + a| < |a| + 1. Choose δ = min{1, ε/(|a| + 1)}."
+                },
+                {
+                    id: 'sine',
+                    func: (x) => Math.sin(x),
+                    funcStr: "f(x) = sin(x)",
+                    xStar: Math.PI / 2,
+                    limit: 1,
+                    epsilonRange: [0.05, 0.5],
+                    validator: 'sine',
+                    params: {},
+                    hint: "The derivative of sin(x) is cos(x), which has maximum absolute value 1.",
+                    detailedHint: "By the Mean Value Theorem, |sin(x) - sin(x*)| ≤ |x - x*|. So δ = ε works!"
+                },
+                {
+                    id: 'cubic',
+                    func: (x) => x * x * x,
+                    funcStr: "f(x) = x³",
+                    xStar: 1,
+                    limit: 1,
+                    epsilonRange: [0.1, 1],
+                    validator: 'cubic',
+                    params: {},
+                    hint: "Factor x³ - 1 = (x - 1)(x² + x + 1)",
+                    detailedHint: "If |x - 1| < 1, then 0 < x < 2, so x² + x + 1 < 7. Choose δ = min{1, ε/7}."
+                },
+                {
+                    id: 'reciprocal',
+                    func: (x) => 1 / x,
+                    funcStr: "f(x) = 1/x",
+                    xStar: 0.5,
+                    limit: 2,
+                    epsilonRange: [0.1, 1],
+                    validator: 'reciprocal',
+                    params: {},
+                    hint: "Keep x away from 0 by restricting the interval first.",
+                    detailedHint: "Restrict x ∈ (0.25, 0.75) with δ ≤ 0.25. On this interval, |f'(x)| = 1/x² ≤ 16. So δ = min{0.25, ε/16}."
+                }
+            ]
+        };
+
+        // Rigorous validators
+        const validators = {
+            linear: (eps, delta, params) => ({
+                valid: delta <= eps / Math.abs(params.m),
+                maxDelta: eps / Math.abs(params.m),
+                proof: `PROOF:
+Given: f(x) = ${params.m}x + b, limit at x* exists.
+Need: ∀ε>0, ∃δ>0 : 0 < |x - x*| < δ ⟹ |f(x) - L| < ε
+
+Step 1: Analyze |f(x) - L|
+  |f(x) - L| = |${params.m}x + b - L|
+             = |${params.m}||x - x*|
+
+Step 2: Choose δ
+  Want: |${params.m}||x - x*| < ε
+  If |x - x*| < δ = ε/|${params.m}| = ε/${Math.abs(params.m)}
+  Then: |f(x) - L| = ${Math.abs(params.m)}|x - x*| < ${Math.abs(params.m)} · (ε/${Math.abs(params.m)}) = ε ✓
+
+Conclusion: δ = ε/${Math.abs(params.m)} works for all ε > 0.`,
+                error: delta > eps / Math.abs(params.m) ? 
+                    `Your δ = ${delta.toFixed(3)} is too large. Need δ ≤ ε/|m| = ${(eps/Math.abs(params.m)).toFixed(3)}` : ''
+            }),
+
+            quadratic: (eps, delta, params) => {
+                const maxDelta = Math.min(1, eps / (Math.abs(params.a) + 1));
+                return {
+                    valid: delta <= maxDelta,
+                    maxDelta: maxDelta,
+                    proof: `PROOF:
+Given: f(x) = x², limit at x* = ${params.a} is L = ${params.a}²
+Need: ∀ε>0, ∃δ>0 : 0 < |x - x*| < δ ⟹ |f(x) - L| < ε
+
+Step 1: Factor the difference
+  |x² - ${params.a}²| = |x - ${params.a}||x + ${params.a}|
+
+Step 2: Bound |x + ${params.a}|
+  Restrict: |x - ${params.a}| < 1
+  Then: ${params.a - 1} < x < ${params.a + 1}
+  So: |x + ${params.a}| < |${params.a}| + 1 = ${Math.abs(params.a) + 1}
+
+Step 3: Choose δ
+  Want: |x - ${params.a}||x + ${params.a}| < ε
+  With restriction: |x + ${params.a}| < ${Math.abs(params.a) + 1}
+  Need: |x - ${params.a}| < ε/${Math.abs(params.a) + 1}
+  
+  δ = min{1, ε/${Math.abs(params.a) + 1}} = min{1, ${(eps/(Math.abs(params.a) + 1)).toFixed(3)}} = ${maxDelta.toFixed(3)}
+
+Verification: If |x - ${params.a}| < δ, then
+  |x² - ${params.a}²| < δ · ${Math.abs(params.a) + 1} ≤ ε ✓`,
+                    error: delta > maxDelta ? 
+                        `Your δ = ${delta.toFixed(3)} is too large. Need δ ≤ min{1, ε/(|a|+1)} = ${maxDelta.toFixed(3)}` : ''
+                };
+            },
+
+            sine: (eps, delta) => ({
+                valid: delta <= eps,
+                maxDelta: eps,
+                proof: `PROOF:
+Given: f(x) = sin(x), limit exists at x*
+Need: ∀ε>0, ∃δ>0 : 0 < |x - x*| < δ ⟹ |f(x) - L| < ε
+
+Step 1: Apply Mean Value Theorem
+  For some c between x and x*:
+  |sin(x) - sin(x*)| = |cos(c)||x - x*|
+
+Step 2: Bound the derivative
+  Since |cos(c)| ≤ 1 for all c:
+  |sin(x) - sin(x*)| ≤ |x - x*|
+
+Step 3: Choose δ
+  Want: |sin(x) - sin(x*)| < ε
+  Since |sin(x) - sin(x*)| ≤ |x - x*|
+  Choose: δ = ε
+
+Verification: If |x - x*| < δ = ε, then
+  |sin(x) - sin(x*)| ≤ |x - x*| < ε ✓`,
+                error: delta > eps ? 
+                    `Your δ = ${delta.toFixed(3)} is too large. Since |sin'(x)| ≤ 1, δ = ε = ${eps.toFixed(3)} suffices.` : ''
+            }),
+
+            cubic: (eps, delta) => {
+                const maxDelta = Math.min(1, eps / 7);
+                return {
+                    valid: delta <= maxDelta,
+                    maxDelta: maxDelta,
+                    proof: `PROOF:
+Given: f(x) = x³, limit at x* = 1 is L = 1
+Need: ∀ε>0, ∃δ>0 : 0 < |x - 1| < δ ⟹ |x³ - 1| < ε
+
+Step 1: Factor x³ - 1
+  x³ - 1 = (x - 1)(x² + x + 1)
+  So: |x³ - 1| = |x - 1||x² + x + 1|
+
+Step 2: Bound |x² + x + 1|
+  Restrict: |x - 1| < 1, so 0 < x < 2
+  For x ∈ (0, 2): x² + x + 1 < 4 + 2 + 1 = 7
+  
+Step 3: Choose δ
+  Want: |x - 1||x² + x + 1| < ε
+  With bound: |x² + x + 1| < 7
+  Need: |x - 1| < ε/7
+  
+  δ = min{1, ε/7} = min{1, ${(eps/7).toFixed(3)}} = ${maxDelta.toFixed(3)}
+
+Verification: If |x - 1| < δ, then
+  |x³ - 1| = |x - 1||x² + x + 1| < δ · 7 ≤ ε ✓`,
+                    error: delta > maxDelta ? 
+                        `Your δ = ${delta.toFixed(3)} is too large. Need δ ≤ min{1, ε/7} = ${maxDelta.toFixed(3)}` : ''
+                };
+            },
+
+            reciprocal: (eps, delta) => {
+                const maxDelta = Math.min(0.25, eps / 16);
+                return {
+                    valid: delta <= maxDelta,
+                    maxDelta: maxDelta,
+                    proof: `PROOF:
+Given: f(x) = 1/x, limit at x* = 0.5 is L = 2
+Need: ∀ε>0, ∃δ>0 : 0 < |x - 0.5| < δ ⟹ |1/x - 2| < ε
+
+Step 1: Analyze |1/x - 2|
+  |1/x - 2| = |1/x - 1/0.5| = |0.5 - x|/(x · 0.5) = 2|x - 0.5|/x
+
+Step 2: Bound 1/x
+  Restrict: |x - 0.5| < 0.25, so 0.25 < x < 0.75
+  For x ∈ (0.25, 0.75): 1/x < 1/0.25 = 4
+  So: |1/x - 2| = 2|x - 0.5|/x < 2|x - 0.5|/0.25 = 8|x - 0.5|
+
+Alternative (MVT): On (0.25, 0.75), |f'(x)| = 1/x² ≤ 1/0.25² = 16
+  So: |1/x - 2| ≤ 16|x - 0.5|
+
+Step 3: Choose δ
+  Want: |1/x - 2| < ε
+  Need: 16|x - 0.5| < ε, so |x - 0.5| < ε/16
+  
+  δ = min{0.25, ε/16} = min{0.25, ${(eps/16).toFixed(3)}} = ${maxDelta.toFixed(3)}
+
+Verification: If |x - 0.5| < δ, then
+  |1/x - 2| ≤ 16|x - 0.5| < 16δ ≤ ε ✓`,
+                    error: delta > maxDelta ? 
+                        `Your δ = ${delta.toFixed(3)} is too large. Need δ ≤ min{0.25, ε/16} = ${maxDelta.toFixed(3)}` : ''
+                };
+            }
+        };
+
+        // Canvas setup
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        let canvasWidth, canvasHeight;
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            canvasWidth = rect.width;
+            canvasHeight = rect.height;
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            setMode(config.mode);
+            initLevel();
+            drawGraph();
+            updateLevelIndicator();
+            setupKeyboardNavigation();
+            
+            // Load saved progress
+            loadProgress();
+            
+            if (config.showTutorial && gameState.mode === 'learn') {
+                showTutorial();
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            drawGraph();
+        });
+
+        // Mode management
+        function setMode(mode) {
+            gameState.mode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+                btn.setAttribute('aria-selected', btn.dataset.mode === mode);
+            });
+            
+            // Show/hide mode-specific content
+            document.getElementById('learnContent').style.display = mode === 'learn' ? 'block' : 'none';
+            document.getElementById('proveContent').style.display = mode === 'prove' ? 'block' : 'none';
+            
+            // Update UI based on mode
+            if (mode === 'learn') {
+                updateLearnStep();
+            }
+        }
+
+        // Level initialization
+        function initLevel() {
+            const level = gameState.levels[gameState.currentLevel];
+            
+            document.getElementById('functionDisplay').textContent = `Function: ${level.funcStr}`;
+            document.getElementById('pointDisplay').textContent = `Point: x* = ${level.xStar.toFixed(2)}`;
+            document.getElementById('limitDisplay').textContent = `Limit: L = ${level.limit.toFixed(2)}`;
+            
+            const epsilonSlider = document.getElementById('epsilonSlider');
+            epsilonSlider.min = level.epsilonRange[0];
+            epsilonSlider.max = level.epsilonRange[1];
+            epsilonSlider.value = (level.epsilonRange[0] + level.epsilonRange[1]) / 2;
+            
+            document.getElementById('epsilonValue').textContent = parseFloat(epsilonSlider.value).toFixed(2);
+            document.getElementById('deltaSlider').value = 0.1;
+            document.getElementById('deltaValue').textContent = '0.10';
+            
+            document.getElementById('hintContainer').innerHTML = '';
+            document.getElementById('proofBox').style.display = 'none';
+            document.getElementById('nextButton').style.display = 'none';
+            
+            if (gameState.mode === 'prove') {
+                document.getElementById('formulaInput').value = '';
+            }
+            
+            gameState.hintsUsed = 0;
+            gameState.attempts = 0;
+            
+            updateFace(false);
+            announceStatus('New level loaded: ' + level.funcStr);
+        }
+
+        // Graph drawing
+        function drawGraph() {
+            const level = gameState.levels[gameState.currentLevel];
+            const epsilon = parseFloat(document.getElementById('epsilonSlider').value);
+            const delta = parseFloat(document.getElementById('deltaSlider').value);
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            // Set up coordinate system
+            const padding = 40;
+            const graphWidth = canvasWidth - 2 * padding;
+            const graphHeight = canvasHeight - 2 * padding;
+            
+            // Determine view bounds
+            const xMin = level.xStar - 2;
+            const xMax = level.xStar + 2;
+            const yMin = level.limit - 2;
+            const yMax = level.limit + 2;
+            
+            function toScreenX(x) {
+                return padding + ((x - xMin) / (xMax - xMin)) * graphWidth;
+            }
+            
+            function toScreenY(y) {
+                return padding + ((yMax - y) / (yMax - yMin)) * graphHeight;
+            }
+            
+            // Draw grid
+            ctx.strokeStyle = '#f0f0f0';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i <= 10; i++) {
+                const x = xMin + (i / 10) * (xMax - xMin);
+                const y = yMin + (i / 10) * (yMax - yMin);
+                
+                ctx.beginPath();
+                ctx.moveTo(toScreenX(x), padding);
+                ctx.lineTo(toScreenX(x), canvasHeight - padding);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(padding, toScreenY(y));
+                ctx.lineTo(canvasWidth - padding, toScreenY(y));
+                ctx.stroke();
+            }
+            
+            // Draw axes
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding, toScreenY(0));
+            ctx.lineTo(canvasWidth - padding, toScreenY(0));
+            ctx.moveTo(toScreenX(0), padding);
+            ctx.lineTo(toScreenX(0), canvasHeight - padding);
+            ctx.stroke();
+            
+            // Draw epsilon band
+            ctx.fillStyle = 'rgba(102, 126, 234, 0.15)';
+            ctx.fillRect(
+                padding,
+                toScreenY(level.limit + epsilon),
+                graphWidth,
+                toScreenY(level.limit - epsilon) - toScreenY(level.limit + epsilon)
+            );
+            
+            // Draw delta region based on one-sided setting
+            ctx.fillStyle = 'rgba(118, 75, 162, 0.15)';
+            if (gameState.oneSided) {
+                if (gameState.side === 'left') {
+                    ctx.fillRect(
+                        toScreenX(level.xStar - delta),
+                        padding,
+                        toScreenX(level.xStar) - toScreenX(level.xStar - delta),
+                        graphHeight
+                    );
+                } else {
+                    ctx.fillRect(
+                        toScreenX(level.xStar),
+                        padding,
+                        toScreenX(level.xStar + delta) - toScreenX(level.xStar),
+                        graphHeight
+                    );
+                }
+            } else {
+                ctx.fillRect(
+                    toScreenX(level.xStar - delta),
+                    padding,
+                    toScreenX(level.xStar + delta) - toScreenX(level.xStar - delta),
+                    graphHeight
+                );
+            }
+            
+            // Draw function
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = 0; i <= 200; i++) {
+                const x = xMin + (i / 200) * (xMax - xMin);
+                const y = level.func(x);
+                if (i === 0) {
+                    ctx.moveTo(toScreenX(x), toScreenY(y));
+                } else {
+                    ctx.lineTo(toScreenX(x), toScreenY(y));
+                }
+            }
+            ctx.stroke();
+            
+            // Check validity using rigorous validator
+            const validator = validators[level.validator];
+            const validationResult = validator(epsilon, delta, level.params || {});
+            const isValid = validationResult.valid;
+            
+            // Highlight delta region of function
+            ctx.strokeStyle = isValid ? '#38ef7d' : '#ff6b6b';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            
+            const deltaStart = gameState.oneSided && gameState.side === 'right' ? level.xStar : level.xStar - delta;
+            const deltaEnd = gameState.oneSided && gameState.side === 'left' ? level.xStar : level.xStar + delta;
+            
+            for (let i = 0; i <= 50; i++) {
+                const x = deltaStart + (i / 50) * (deltaEnd - deltaStart);
+                if (Math.abs(x - level.xStar) > 0.001) { // Exclude the point itself
+                    const y = level.func(x);
+                    if (i === 0 || Math.abs(x - level.xStar) < 0.001) {
+                        ctx.moveTo(toScreenX(x), toScreenY(y));
+                    } else {
+                        ctx.lineTo(toScreenX(x), toScreenY(y));
+                    }
+                }
+            }
+            ctx.stroke();
+            
+            // Draw limit point
+            ctx.fillStyle = '#667eea';
+            ctx.beginPath();
+            ctx.arc(toScreenX(level.xStar), toScreenY(level.limit), 6, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Draw labels
+            ctx.fillStyle = '#666';
+            ctx.font = '12px sans-serif';
+            ctx.fillText(`ε = ${epsilon.toFixed(2)}`, padding + 5, toScreenY(level.limit + epsilon) - 5);
+            ctx.fillText(`δ = ${delta.toFixed(2)}`, toScreenX(deltaStart) + 5, padding + 15);
+            ctx.fillText(`(${level.xStar.toFixed(2)}, ${level.limit.toFixed(2)})`, 
+                        toScreenX(level.xStar) + 10, toScreenY(level.limit) - 10);
+            
+            // Update status for screen readers
+            const statusText = isValid ? 
+                'Valid: Function stays within epsilon band for the current delta' : 
+                'Invalid: Function escapes epsilon band. Try a smaller delta.';
+            document.getElementById('graphStatus').textContent = statusText;
+        }
+
+        // Check validity
+        function checkValidity() {
+            const level = gameState.levels[gameState.currentLevel];
+            const epsilon = parseFloat(document.getElementById('epsilonSlider').value);
+            const delta = parseFloat(document.getElementById('deltaSlider').value);
+            
+            const validator = validators[level.validator];
+            const result = validator(epsilon, delta, level.params || {});
+            
+            return result.valid;
+        }
+
+        // Update face
+        function updateFace(isHappy) {
+            const faceCircle = document.getElementById('faceCircle');
+            const mouthPath = document.getElementById('mouthPath');
+            
+            if (isHappy) {
+                faceCircle.className = 'face-circle happy';
+                mouthPath.setAttribute('d', 'M 10 20 Q 25 10 40 20');
+                faceCircle.setAttribute('aria-label', 'Success indicator: smiling face');
+            } else {
+                faceCircle.className = 'face-circle sad';
+                mouthPath.setAttribute('d', 'M 10 10 Q 25 20 40 10');
+                faceCircle.setAttribute('aria-label', 'Try again indicator: sad face');
+            }
+        }
+
+        // Update level indicator
+        function updateLevelIndicator() {
+            const indicator = document.getElementById('levelIndicator');
+            indicator.innerHTML = '';
+            
+            for (let i = 0; i < gameState.levels.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'level-dot';
+                dot.setAttribute('role', 'button');
+                dot.setAttribute('aria-label', `Level ${i + 1}: ${gameState.levels[i].funcStr}`);
+                dot.setAttribute('tabindex', '0');
+                
+                if (i === gameState.currentLevel) {
+                    dot.classList.add('active');
+                    dot.setAttribute('aria-current', 'true');
+                } else if (gameState.completedLevels.includes(i)) {
+                    dot.classList.add('completed');
+                }
+                
+                dot.addEventListener('click', () => jumpToLevel(i));
+                dot.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        jumpToLevel(i);
+                    }
+                });
+                
+                indicator.appendChild(dot);
+            }
+        }
+
+        function jumpToLevel(levelIndex) {
+            if (levelIndex >= 0 && levelIndex < gameState.levels.length) {
+                gameState.currentLevel = levelIndex;
+                document.getElementById('levelValue').textContent = levelIndex + 1;
+                initLevel();
+                drawGraph();
+                updateLevelIndicator();
+            }
+        }
+
+        // Learn mode step updates
+        function updateLearnStep() {
+            if (gameState.mode !== 'learn') return;
+            
+            const steps = [
+                "Step 1: Observe the epsilon band (blue horizontal region) - this is your vertical tolerance.",
+                "Step 2: Adjust delta (purple vertical region) to control the horizontal window.",
+                "Step 3: Watch the function curve - it turns green when ALL points in the delta region stay within epsilon.",
+                "Step 4: The face smiles when you've found a valid delta!",
+                "Step 5: Try different epsilon values and find the corresponding delta each time."
+            ];
+            
+            const currentStep = Math.min(gameState.attempts, steps.length - 1);
+            document.getElementById('learnStep').textContent = steps[currentStep];
+        }
+
+        // Formula evaluation
+        function evaluateFormula(formula, eps) {
+            try {
+                // Simple safe evaluation for common patterns
+                const cleanFormula = formula.toLowerCase().trim();
+                
+                // Replace common functions
+                let result = cleanFormula
+                    .replace(/eps/g, eps)
+                    .replace(/epsilon/g, eps)
+                    .replace(/min\(/g, 'Math.min(')
+                    .replace(/max\(/g, 'Math.max(')
+                    .replace(/abs\(/g, 'Math.abs(')
+                    .replace(/sqrt\(/g, 'Math.sqrt(');
+                
+                // Safely evaluate using Function constructor
+                const func = new Function('Math', `return ${result}`);
+                return func(Math);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Event listeners
+        document.getElementById('epsilonSlider').addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            document.getElementById('epsilonValue').textContent = value.toFixed(2);
+            e.target.setAttribute('aria-valuenow', value);
+            drawGraph();
+            updateFace(checkValidity());
+            
+            if (gameState.mode === 'learn') {
+                updateLearnStep();
+            }
+        });
+
+        document.getElementById('deltaSlider').addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            document.getElementById('deltaValue').textContent = value.toFixed(2);
+            e.target.setAttribute('aria-valuenow', value);
+            drawGraph();
+            updateFace(checkValidity());
+        });
+
+        document.getElementById('oneSidedToggle').addEventListener('click', () => {
+            gameState.oneSided = !gameState.oneSided;
+            gameState.side = gameState.oneSided ? 'right' : 'both';
+            
+            const toggle = document.getElementById('oneSidedToggle');
+            toggle.classList.toggle('active');
+            toggle.setAttribute('aria-checked', gameState.oneSided);
+            
+            drawGraph();
+            updateFace(checkValidity());
+        });
+
+        document.getElementById('checkButton').addEventListener('click', () => {
+            gameState.attempts++;
+            
+            const level = gameState.levels[gameState.currentLevel];
+            const epsilon = parseFloat(document.getElementById('epsilonSlider').value);
+            const delta = parseFloat(document.getElementById('deltaSlider').value);
+            
+            let isValid = false;
+            let proof = '';
+            
+            if (gameState.mode === 'prove' && document.getElementById('formulaInput').value) {
+                // Check formula
+                const formula = document.getElementById('formulaInput').value;
+                const computedDelta = evaluateFormula(formula, epsilon);
+                
+                if (computedDelta !== null && computedDelta > 0) {
+                    const validator = validators[level.validator];
+                    const result = validator(epsilon, computedDelta, level.params || {});
+                    isValid = result.valid;
+                    proof = isValid ? result.proof : result.error;
+                } else {
+                    proof = "Error: Invalid formula. Please check your syntax.";
+                }
+            } else {
+                // Check slider value
+                const validator = validators[level.validator];
+                const result = validator(epsilon, delta, level.params || {});
+                isValid = result.valid;
+                proof = isValid ? result.proof : result.error;
+            }
+            
+            if (isValid) {
+                const points = Math.max(100 - (gameState.attempts - 1) * 10 - gameState.hintsUsed * 20, 10);
+                gameState.score += points;
+                
+                if (!gameState.completedLevels.includes(gameState.currentLevel)) {
+                    gameState.completedLevels.push(gameState.currentLevel);
+                }
+                
+                document.getElementById('scoreValue').textContent = gameState.score;
+                
+                // Show proof
+                const proofBox = document.getElementById('proofBox');
+                proofBox.className = 'proof-box';
+                proofBox.innerHTML = proof;
+                proofBox.style.display = 'block';
+                
+                updateFace(true);
+                announceStatus(`Success! You earned ${points} points. ${proof.split('\n')[0]}`);
+                
+                if (gameState.currentLevel < gameState.levels.length - 1) {
+                    document.getElementById('nextButton').style.display = 'block';
+                }
+                
+                saveProgress();
+            } else {
+                updateFace(false);
+                
+                if (proof) {
+                    const proofBox = document.getElementById('proofBox');
+                    proofBox.className = 'proof-box error';
+                    proofBox.innerHTML = proof;
+                    proofBox.style.display = 'block';
+                }
+                
+                announceStatus('Not quite right. ' + proof);
+            }
+            
+            if (gameState.mode === 'learn') {
+                updateLearnStep();
+            }
+        });
+
+        document.getElementById('hintButton').addEventListener('click', () => {
+            const level = gameState.levels[gameState.currentLevel];
+            gameState.hintsUsed++;
+            
+            const hintContainer = document.getElementById('hintContainer');
+            const hintText = gameState.hintsUsed === 1 ? level.hint : level.detailedHint;
+            hintContainer.innerHTML = `<div class="hint-text" style="background: rgba(255, 217, 61, 0.1); border-left: 3px solid var(--warning); padding: 10px; margin-top: 10px; border-radius: 5px;">${hintText}</div>`;
+            
+            announceStatus('Hint: ' + hintText);
+        });
+
+        document.getElementById('nextButton').addEventListener('click', nextLevel);
+
+        function nextLevel() {
+            if (gameState.currentLevel < gameState.levels.length - 1) {
+                gameState.currentLevel++;
+                document.getElementById('levelValue').textContent = gameState.currentLevel + 1;
+                initLevel();
+                drawGraph();
+                updateLevelIndicator();
+            } else {
+                announceStatus(`Congratulations! You've completed all levels with a score of ${gameState.score}!`);
+            }
+        }
+
+        // Mode switching
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setMode(btn.dataset.mode);
+                initLevel();
+                drawGraph();
+            });
+        });
+
+        // Keyboard navigation
+        function setupKeyboardNavigation() {
+            document.addEventListener('keydown', (e) => {
+                const epsilonSlider = document.getElementById('epsilonSlider');
+                const deltaSlider = document.getElementById('deltaSlider');
+                
+                if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
+                    return; // Don't interfere with text input
+                }
+                
+                switch(e.key) {
+                    case 'ArrowUp':
+                        if (e.shiftKey) {
+                            epsilonSlider.value = Math.min(parseFloat(epsilonSlider.value) + 0.05, parseFloat(epsilonSlider.max));
+                            epsilonSlider.dispatchEvent(new Event('input'));
+                        } else {
+                            deltaSlider.value = Math.min(parseFloat(deltaSlider.value) + 0.01, parseFloat(deltaSlider.max));
+                            deltaSlider.dispatchEvent(new Event('input'));
+                        }
+                        e.preventDefault();
+                        break;
+                    case 'ArrowDown':
+                        if (e.shiftKey) {
+                            epsilonSlider.value = Math.max(parseFloat(epsilonSlider.value) - 0.05, parseFloat(epsilonSlider.min));
+                            epsilonSlider.dispatchEvent(new Event('input'));
+                        } else {
+                            deltaSlider.value = Math.max(parseFloat(deltaSlider.value) - 0.01, parseFloat(deltaSlider.min));
+                            deltaSlider.dispatchEvent(new Event('input'));
+                        }
+                        e.preventDefault();
+                        break;
+                    case 'Enter':
+                        if (e.target.tagName !== 'BUTTON') {
+                            document.getElementById('checkButton').click();
+                            e.preventDefault();
+                        }
+                        break;
+                    case 'h':
+                    case 'H':
+                        if (e.target.tagName !== 'INPUT') {
+                            document.getElementById('hintButton').click();
+                            e.preventDefault();
+                        }
+                        break;
+                }
+            });
+        }
+
+        // Progress management
+        function saveProgress() {
+            const progress = {
+                score: gameState.score,
+                currentLevel: gameState.currentLevel,
+                completedLevels: gameState.completedLevels,
+                mode: gameState.mode,
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem('epsilonDeltaProgress', JSON.stringify(progress));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('epsilonDeltaProgress');
+            if (saved) {
+                try {
+                    const progress = JSON.parse(saved);
+                    gameState.score = progress.score || 0;
+                    gameState.completedLevels = progress.completedLevels || [];
+                    document.getElementById('scoreValue').textContent = gameState.score;
+                    updateLevelIndicator();
+                } catch (e) {
+                    console.error('Failed to load progress:', e);
+                }
+            }
+        }
+
+        // Export progress
+        document.getElementById('exportButton').addEventListener('click', () => {
+            const exportData = {
+                course: config.course,
+                score: gameState.score,
+                completedLevels: gameState.completedLevels.map(i => gameState.levels[i].id),
+                totalTime: Math.floor((Date.now() - gameState.startTime) / 1000),
+                timestamp: new Date().toISOString(),
+                mode: gameState.mode
+            };
+            
+            const json = JSON.stringify(exportData, null, 2);
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(json).then(() => {
+                announceStatus('Progress data copied to clipboard!');
+                alert('Progress data copied to clipboard! Paste it into your assignment submission.');
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = json;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('Progress data copied to clipboard!');
+            });
+        });
+
+        // Tutorial
+        function showTutorial() {
+            const overlay = document.getElementById('tutorialOverlay');
+            const box = document.getElementById('tutorialBox');
+            const text = document.getElementById('tutorialText');
+            const nextBtn = document.getElementById('tutorialNext');
+            
+            const steps = [
+                { title: "Welcome to A δ for your ε!", text: "Learn the rigorous definition of limits through interactive visualization." },
+                { title: "The Goal", text: "For any epsilon (ε) tolerance, find a delta (δ) that keeps the function within bounds." },
+                { title: "Visual Feedback", text: "Green curve = success! The face smiles when you've found the right delta." },
+                { title: "Three Modes", text: "Learn Mode: Guided tutorial\nPlay Mode: Free exploration\nProve Mode: Enter formulas for δ(ε)" },
+                { title: "Keyboard Shortcuts", text: "Arrow keys: Adjust sliders\nShift+Arrow: Adjust epsilon\nEnter: Check answer\nH: Get hint" }
+            ];
+            
+            let currentStep = 0;
+            
+            function showStep() {
+                if (currentStep < steps.length) {
+                    document.getElementById('tutorialTitle').textContent = steps[currentStep].title;
+                    text.textContent = steps[currentStep].text;
+                    overlay.classList.add('show');
+                    currentStep++;
+                } else {
+                    overlay.classList.remove('show');
+                }
+            }
+            
+            showStep();
+            
+            nextBtn.addEventListener('click', showStep);
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('show');
+                }
+            });
+        }
+
+        // Accessibility helpers
+        function announceStatus(message) {
+            const status = document.createElement('div');
+            status.className = 'sr-only';
+            status.setAttribute('role', 'status');
+            status.setAttribute('aria-live', 'polite');
+            status.textContent = message;
+            document.body.appendChild(status);
+            setTimeout(() => status.remove(), 1000);
+        }
+
+        // Initialize on page load
+        document.getElementById('levelValue').textContent = '1';
+        document.getElementById('scoreValue').textContent = '0';
+    </script>
+</body>
+</html>
