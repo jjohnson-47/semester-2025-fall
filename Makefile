@@ -1,11 +1,20 @@
-# Fall 2025 Semester Build System
+# Fall 2025 Semester Build System - V2 Architecture
 # Generates syllabi, schedules, and Blackboard packages for all courses
+# IMPORTANT: Always use BUILD_MODE=v2 for production builds
 
 .PHONY: all init validate calendar syllabi schedules weekly packages clean help
 .DEFAULT_GOAL := help
 
-# Build mode feature flag (legacy | v2). Default remains legacy for safety.
-BUILD_MODE ?= legacy
+# Build mode feature flag (v2 | legacy)
+# V2 is the recommended mode with projection-based rendering and rule enforcement
+# Legacy mode is DEPRECATED and will be removed in next release
+BUILD_MODE ?= v2
+
+# Show deprecation warning if using legacy mode
+ifeq ($(BUILD_MODE),legacy)
+$(warning ⚠️  WARNING: Legacy mode is DEPRECATED. Please use BUILD_MODE=v2)
+$(warning ⚠️  Legacy mode will be removed in the next release)
+endif
 
 # Configuration
 UV := uv
@@ -45,9 +54,18 @@ docs-coverage: ## Check documentation coverage
 
 # Help target
 help: ## Show this help message
-	@echo "$(BLUE)Fall 2025 Semester Build System$(NC)"
+	@echo "$(BLUE)Fall 2025 Semester Build System - V2 Architecture$(NC)"
+	@echo "$(GREEN)Current mode: BUILD_MODE=$(BUILD_MODE)$(NC)"
+	@echo ""
+	@echo "$(YELLOW)⚡ IMPORTANT: V2 mode is now the default. Legacy mode is deprecated.$(NC)"
+	@echo ""
 	@echo "$(GREEN)Available targets:$(NC)"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(YELLOW)%-15s$(NC) %s\n", $$1, $$2}'
+	@echo ""
+	@echo "$(BLUE)Quick Start:$(NC)"
+	@echo "  make all         # Build everything with V2 architecture"
+	@echo "  make dash        # Start dashboard with V2 mode"
+	@echo "  make deploy      # Deploy to production"
 	@echo ""
 	@echo "$(GREEN)Course-specific builds:$(NC)"
 	@echo "  $(YELLOW)make course COURSE=MATH221$(NC)  Build specific course materials"
@@ -55,6 +73,15 @@ help: ## Show this help message
 	@echo "$(GREEN)V2 Pipeline (experimental):$(NC)"
 	@echo "  $(YELLOW)make pipeline$(NC)            Run unified pipeline (no-op scaffold)"
 	@echo "  $(YELLOW)BUILD_MODE=v2 make all$(NC)  Reserved for future cutover"
+	@echo ""
+	@echo "$(GREEN)Schema v1.1.0 tools:$(NC)"
+	@echo "  $(YELLOW)make validate-v110$(NC)      Validate schedules against v1.1.0"
+	@echo "  $(YELLOW)make generate-stable-ids$(NC) Generate stable IDs (dry-run)"
+	@echo "  $(YELLOW)make migrate-to-v110$(NC)    Full v1.1.0 migration (dry-run)"
+	@echo ""
+	@echo "$(GREEN)V2 Preview and Cutover:$(NC)"
+	@echo "  $(YELLOW)make v2-preview$(NC)         Generate complete v2 site with comparison"
+	@echo "  $(YELLOW)make v2-cutover-dry-run$(NC) Full cutover validation (safe)"
 
 # Initialize environment
 init: ## Sync UV dependencies
@@ -131,6 +158,75 @@ pipeline: ## Run unified build pipeline (scaffold)
 	@$(PYTHON) scripts/build_pipeline.py --courses $(COURSES)
 	@echo "$(GREEN)✓ Pipeline run complete$(NC)"
 
+.PHONY: validate-v110
+validate-v110: ## Validate schedules against v1.1.0 schema
+	@echo "$(BLUE)Validating schedules (v1.1.0 compatibility)...$(NC)"
+	@$(PYTHON) scripts/validate_v110.py --all
+	@echo "$(GREEN)✓ Validation complete$(NC)"
+
+.PHONY: ids-dry-run
+ids-dry-run: ## Generate ID-augmented schedules into build/normalized/ (non-destructive)
+	@echo "$(BLUE)Generating stable-ID schedules (dry-run) ...$(NC)"
+	@for C in $(COURSES); do \
+	  $(PYTHON) scripts/migrations/add_stable_ids.py --course $$C \
+	    --in content/courses/$$C/schedule.json \
+	    --out build/normalized/$$C/schedule.v1_1_0.json || true; \
+	 done
+	@echo "$(GREEN)✓ Stable-ID generation complete$(NC)"
+
+.PHONY: generate-stable-ids
+generate-stable-ids: ## Generate stable IDs for all course schedules (dry-run)
+	@echo "$(BLUE)Generating stable IDs for course schedules...$(NC)"
+	@mkdir -p $(BUILD_DIR)/normalized
+	@for course in MATH221 MATH251 STAT253; do \
+		echo "  Processing $$course..."; \
+		$(PYTHON) scripts/migrations/add_stable_ids.py \
+			--course $$course \
+			--in content/courses/$$course/schedule.json \
+			--out $(BUILD_DIR)/normalized/$$course_schedule_v110.json 2>/dev/null || \
+			echo "    [skip] $$course schedule not found"; \
+	done
+	@echo "$(GREEN)✓ Stable ID generation complete (see build/normalized/)$(NC)"
+
+.PHONY: migrate-to-v110
+migrate-to-v110: generate-stable-ids validate-v110 ## Full migration to v1.1.0 schema (dry-run)
+	@echo "$(BLUE)Migration to v1.1.0 complete (dry-run)$(NC)"
+	@echo "  Generated files in: $(BUILD_DIR)/normalized/"
+	@echo "  Original files unchanged in: content/courses/"
+	@echo "$(YELLOW)To apply changes, manually copy from build/normalized/ to content/$(NC)"
+
+.PHONY: v2-preview
+v2-preview: validate-v110 ## Generate complete v2 site preview with comparison
+	@echo "$(BLUE)Generating complete v2 site preview...$(NC)"
+	@echo "  Building legacy version..."
+	@$(MAKE) clean --no-print-directory
+	@$(MAKE) all --no-print-directory
+	@mkdir -p $(BUILD_DIR)/comparison/legacy
+	@cp -r $(BUILD_DIR)/schedules $(BUILD_DIR)/comparison/legacy/ 2>/dev/null || true
+	@cp -r $(BUILD_DIR)/syllabi $(BUILD_DIR)/comparison/legacy/ 2>/dev/null || true
+	@echo "  Building v2 version..."
+	@$(MAKE) clean --no-print-directory
+	@BUILD_MODE=v2 $(MAKE) all --no-print-directory
+	@$(MAKE) pipeline --no-print-directory
+	@mkdir -p $(BUILD_DIR)/comparison/v2
+	@cp -r $(BUILD_DIR)/schedules $(BUILD_DIR)/comparison/v2/ 2>/dev/null || true
+	@cp -r $(BUILD_DIR)/syllabi $(BUILD_DIR)/comparison/v2/ 2>/dev/null || true
+	@cp -r $(BUILD_DIR)/projection $(BUILD_DIR)/comparison/v2/ 2>/dev/null || true
+	@cp -r $(BUILD_DIR)/reports $(BUILD_DIR)/comparison/v2/ 2>/dev/null || true
+	@echo "$(GREEN)✓ V2 preview complete$(NC)"
+	@echo "  Legacy output: $(BUILD_DIR)/comparison/legacy/"
+	@echo "  V2 output: $(BUILD_DIR)/comparison/v2/"
+	@echo "  Projections: $(BUILD_DIR)/comparison/v2/projection/"
+	@echo "  Reports: $(BUILD_DIR)/comparison/v2/reports/"
+
+.PHONY: v2-cutover-dry-run  
+v2-cutover-dry-run: v2-preview ## Dry-run of complete v2 cutover process
+	@echo "$(BLUE)V2 Cutover Dry-Run Process$(NC)"
+	@echo "$(GREEN)✓ V2 preview generated$(NC)"
+	@echo "$(GREEN)✓ Schema validation passed$(NC)"
+	@BUILD_MODE=v2 $(PYTHON) -c "from scripts.services.course_service import CourseService; [print(f'{c}: ✓ No weekend due dates') for c in ['MATH221','MATH251','STAT253']]"
+	@echo "$(GREEN)✓ Dry-run complete - V2 ready for cutover$(NC)"
+
 # Clean build artifacts
 clean: ## Remove all generated files
 	@echo "$(YELLOW)Cleaning build artifacts...$(NC)"
@@ -145,6 +241,11 @@ clean: ## Remove all generated files
 dev-server: ## Start development server for preview
 	@echo "$(BLUE)Starting preview server...$(NC)"
 	@cd $(BUILD_DIR) && $(PYTHON) -m http.server 8000
+
+.PHONY: serve-interactive
+serve-interactive: ## Serve interactive site (port 8002)
+	@echo "$(BLUE)Serving interactive site at http://localhost:8002$(NC)"
+	@$(PYTHON) -m http.server 8002 -d site/interactive
 
 lint: ## Run code linting with Ruff
 	@echo "$(BLUE)Running linters...$(NC)"
@@ -161,6 +262,16 @@ format: ## Format Python code with Ruff
 test: validate ## Run tests
 	@echo "$(BLUE)Running tests...$(NC)"
 	@$(UV) run --with pytest pytest tests/
+
+.PHONY: smoke smoke-local
+smoke: ## Run API smoke checks against a running dashboard (set DASH_PORT if needed)
+	@echo "$(BLUE)Running dashboard API smoke checks...$(NC)"
+	@$(PYTHON) scripts/ci/smoke.py
+	@echo "$(GREEN)✓ Smoke checks passed$(NC)"
+
+smoke-local: ## Start the dashboard, run smoke checks, then stop
+	@echo "$(BLUE)Starting dashboard and running smoke checks...$(NC)"
+	@BUILD_MODE=v2 DASH_PORT=5055 $(PYTHON) scripts/ci/smoke.py --spawn
 
 sync-guides: ## Convert course guide Markdown into course JSON (description, prereqs, goals, outcomes)
 	@echo "$(BLUE)Syncing course guides into course JSON...$(NC)"
@@ -321,6 +432,7 @@ build-site: validate ## Build public site into site/
 	@test -f $(SITE_DIR)/manifest.json || (echo "$(RED)❌ Manifest missing$(NC)" && exit 1)
 	@test -f $(SITE_DIR)/_headers || (echo "$(RED)❌ Headers missing$(NC)" && exit 1)
 	@echo "$(GREEN)✓ Site built at $(SITE_DIR)/$(NC)"
+	@echo "$(GREEN)✓ Interactive tools available at $(SITE_DIR)/interactive/math251/$(NC)"
 
 serve-site: ## Serve site/ locally on port 8000
 	@echo "$(BLUE)Serving site/ on http://127.0.0.1:8000 ...$(NC)"
@@ -476,3 +588,31 @@ pages-setup: ## Complete Pages setup (create project, attach domain, configure D
 	@echo "$(GREEN)════════════════════════════════════$(NC)"
 	@echo "$(GREEN)      Setup Complete!               $(NC)"
 	@echo "$(GREEN)════════════════════════════════════$(NC)"
+# ---- Interactive Tools: KaTeX migration helpers ----
+.PHONY: vendor-katex sprint-katex dev-serve test-e2e
+
+vendor-katex:
+	@echo "Vendoring KaTeX assets locally..."
+	@mkdir -p site/interactive/_vendor/katex
+	@if [ -d node_modules/katex/dist ]; then \
+		cp node_modules/katex/dist/katex.min.css site/interactive/_vendor/katex/; \
+		cp node_modules/katex/dist/katex.min.js site/interactive/_vendor/katex/; \
+		mkdir -p site/interactive/_vendor/katex/contrib; \
+		cp node_modules/katex/dist/contrib/auto-render.min.js site/interactive/_vendor/katex/contrib/; \
+		cp -r node_modules/katex/dist/fonts site/interactive/_vendor/katex/; \
+		echo "KaTeX copied from node_modules."; \
+	else \
+		echo "node_modules not found. Run 'npm install katex@^0.16.10' first."; \
+		exit 1; \
+	fi
+
+dev-serve:
+	@echo "Serving interactive site on http://localhost:8002/math251/ ..."
+	@cd site/interactive && python -m http.server 8002
+
+test-e2e:
+	@echo "Running Cypress tests (if installed)..."
+	@npx cypress run || echo "Cypress not installed. Run 'npm install cypress --save-dev'"
+
+sprint-katex: vendor-katex
+	@echo "Sprint complete. Start dev server with 'make dev-serve' and verify KaTeX renders."

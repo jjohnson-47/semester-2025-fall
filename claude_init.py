@@ -16,9 +16,9 @@ from pathlib import Path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
-from dashboard.advanced_orchestrator import AdvancedOrchestrator
-from dashboard.agents import AGENT_REGISTRY
-from dashboard.orchestration_agent import MasterOrchestrationAgent
+from dashboard.advanced_orchestrator import AdvancedOrchestrator  # noqa: E402
+from dashboard.agents import AGENT_REGISTRY  # noqa: E402
+from dashboard.orchestration_agent import MasterOrchestrationAgent  # noqa: E402
 
 # Configure logging
 logging.basicConfig(
@@ -220,7 +220,7 @@ async def main():
     # Start monitoring in background
     # Note: In actual Claude Code integration, this would run as a background task
     # For now, we just set it up but don't block
-    monitor_task = asyncio.create_task(system.start_monitoring())
+    _monitor_task = asyncio.create_task(system.start_monitoring())
 
     # Return system for Claude to use
     return system

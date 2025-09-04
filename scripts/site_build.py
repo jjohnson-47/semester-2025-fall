@@ -62,7 +62,7 @@ def copy_if_exists(src: Path, dst: Path) -> None:
 def convert_to_embed_version(html_content: str, course_code: str) -> str:
     """Convert full syllabus HTML to embed-friendly version."""
     # CSS paths are already absolute, no conversion needed
-    
+
     # Add iframe-specific styles for better embedding
     iframe_styles = """
     <style>
@@ -88,11 +88,11 @@ def convert_to_embed_version(html_content: str, course_code: str) -> str:
         }
     </style>
     """
-    
+
     # Insert iframe styles before closing head tag
     if "</head>" in html_content:
         html_content = html_content.replace("</head>", iframe_styles + "\n</head>")
-    
+
     return html_content
 
 
@@ -100,7 +100,7 @@ def copy_js_assets(out_assets: Path) -> None:
     """Copy JavaScript assets to the site assets directory."""
     src_js_dir = PROJECT_ROOT / "assets" / "js"
     dst_js_dir = out_assets / "js"
-    
+
     if src_js_dir.exists():
         ensure_dir(dst_js_dir)
         for js_file in src_js_dir.glob("*.js"):
@@ -156,14 +156,14 @@ def build_syllabus_pages(
     # Use existing high-quality syllabi from build/ directory
     build_dir = PROJECT_ROOT / "build" / "syllabi"
     syllabus_html_path = build_dir / f"{course_code}.html"
-    syllabus_with_calendar_path = build_dir / f"{course_code}_with_calendar.html"
-    
+    # syllabus_with_calendar_path would be: build_dir / f"{course_code}_with_calendar.html"
+
     # Output directories
     base = out_dir / "courses" / course_code / term / "syllabus"
     base_embed = base / "embed"
     ensure_dir(base)
     ensure_dir(base_embed)
-    
+
     if not syllabus_html_path.exists():
         print(f"Warning: {syllabus_html_path} not found. Run 'make syllabi' first.")
         # Create placeholder
@@ -175,14 +175,14 @@ def build_syllabus_pages(
     else:
         # Read the high-quality syllabus HTML
         full_html = syllabus_html_path.read_text(encoding="utf-8")
-        
+
         # Create embed version by making it iframe-friendly
         embed_html = convert_to_embed_version(full_html, course_code)
-        
+
         # Write the full and embed versions
         (base / "index.html").write_text(full_html, encoding="utf-8")
         (base_embed / "index.html").write_text(embed_html, encoding="utf-8")
-    
+
     # Relative URLs for manifest
     rel_full = f"/courses/{course_code}/{term}/syllabus/"
     rel_embed = f"/courses/{course_code}/{term}/syllabus/embed/"
@@ -205,13 +205,13 @@ def build_schedule_pages(
     # Use existing high-quality schedules from build/ directory
     build_dir = PROJECT_ROOT / "build" / "schedules"
     schedule_html_path = build_dir / f"{course_code}_schedule.html"
-    
+
     # Output directories
     base = out_dir / "courses" / course_code / term / "schedule"
     base_embed = base / "embed"
     ensure_dir(base)
     ensure_dir(base_embed)
-    
+
     if not schedule_html_path.exists():
         print(f"Warning: {schedule_html_path} not found. Run 'make schedules' first.")
         # Create placeholder
@@ -223,14 +223,14 @@ def build_schedule_pages(
     else:
         # Read the high-quality schedule HTML
         full_html = schedule_html_path.read_text(encoding="utf-8")
-        
+
         # Create embed version by making it iframe-friendly
         embed_html = convert_to_embed_version(full_html, course_code)
-        
+
         # Write the full and embed versions
         (base / "index.html").write_text(full_html, encoding="utf-8")
         (base_embed / "index.html").write_text(embed_html, encoding="utf-8")
-    
+
     # Relative URLs for manifest
     rel_full = f"/courses/{course_code}/{term}/schedule/"
     rel_embed = f"/courses/{course_code}/{term}/schedule/embed/"
@@ -361,10 +361,10 @@ def build_site(cfg: SiteConfig, include_docs: list[str], exclude_docs: list[str]
 
     # Site templates root
     site_templates = PROJECT_ROOT / "templates" / "site"
-    
+
     # Create index.html from template
     index_path = cfg.out_dir / "index.html"
-    
+
     # Check if index template exists
     index_template_path = site_templates / "index.html.j2"
     if index_template_path.exists():
@@ -375,9 +375,9 @@ def build_site(cfg: SiteConfig, include_docs: list[str], exclude_docs: list[str]
     else:
         # Fall back to construction page if no template
         index_content = create_default_index(cfg.courses, cfg.term)
-    
+
     index_path.write_text(index_content)
-    
+
     # Prepare shared builders
     sb = SyllabusBuilder(template_dir="templates", output_dir="build/syllabi")
     schedule_builder = ScheduleBuilder(output_dir="build/schedules")

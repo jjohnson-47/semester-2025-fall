@@ -1,8 +1,8 @@
 /* MATH251 Calculus I - Course-specific styling */
 
 :root {
-  /* MATH251 Theme: Blackboard-compatible blue-green palette */
-  --course-primary: #0066cc;      /* Blackboard accessible blue */
+  /* MATH251 Theme: Blackboard-compatible green palette */
+  --course-primary: #006600;      /* Blackboard accessible green */
   --course-accent: #009900;       /* Blackboard accessible green */
   --course-highlight: #f0f7ff;    /* Light blue background */
   --course-border: #99ccff;       /* Light blue border */

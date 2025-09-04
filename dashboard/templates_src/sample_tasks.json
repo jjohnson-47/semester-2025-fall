@@ -1,0 +1,25 @@
+{
+  "templates": [
+    {
+      "id": "task-1",
+      "title": "Prepare lecture for {course}",
+      "category": "content",
+      "priority": "high",
+      "days_after_start": 0
+    },
+    {
+      "id": "task-2",
+      "title": "Grade Quiz 1 for {course}",
+      "category": "assessment",
+      "priority": "medium",
+      "days_after_start": 7
+    },
+    {
+      "id": "task-3",
+      "title": "Update course website for {course}",
+      "category": "technical",
+      "priority": "low",
+      "days_after_start": 14
+    }
+  ]
+}

@@ -1,11 +1,11 @@
 /* STAT253 Statistics - Course-specific styling */
 
 :root {
-  /* STAT253 Theme: Blackboard-compatible purple-green palette */
-  --course-primary: #663399;      /* Blackboard accessible purple */
-  --course-accent: #009900;       /* Blackboard accessible green */
-  --course-highlight: #f7f0ff;    /* Light purple background */
-  --course-border: #cc99ff;       /* Light purple border */
+  /* STAT253 Theme: Blackboard-compatible orange-teal palette */
+  --course-primary: #cc6600;      /* Blackboard accessible orange */
+  --course-accent: #006666;       /* Blackboard accessible teal */
+  --course-highlight: #fff5e6;    /* Light orange background */
+  --course-border: #ffcc99;       /* Light orange border */
   
   /* Override global colors for this course */
   --color-primary: var(--course-primary);
