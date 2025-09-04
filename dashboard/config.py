@@ -93,6 +93,8 @@ class Config:
     # Features
     AUTO_SNAPSHOT = os.environ.get("DASH_AUTO_SNAPSHOT", "true").lower() == "true"
     ENABLE_PROFILING = False
+    # Force API endpoints to use DB-backed implementations (overrides testing fallbacks)
+    API_FORCE_DB = os.environ.get("API_FORCE_DB", "false").lower() in {"1", "true", "yes"}
 
     # Public hosting URL for iframe generation (production deployment)
     PUBLIC_BASE_URL = os.environ.get(
@@ -180,6 +182,7 @@ class TestingConfig(Config):
 
     # Disable auto snapshot in tests
     AUTO_SNAPSHOT = False
+    API_FORCE_DB = True
 
     # Fast password hashing for tests
     BCRYPT_LOG_ROUNDS = 4

@@ -70,7 +70,7 @@ class CalendarSyncAgent(BaseAgent):
         # Load semester dates
         semester_file = Path("variables/semester.json")
         with open(semester_file) as f:
-            semester = json.load(f)
+            _semester = json.load(f)
 
         # Update each course's due dates
         for course in ["MATH221", "MATH251", "STAT253"]:
@@ -78,7 +78,7 @@ class CalendarSyncAgent(BaseAgent):
 
             if due_dates_file.exists():
                 with open(due_dates_file) as f:
-                    due_dates = json.load(f)
+                    _due_dates = json.load(f)
 
                 # Update dates based on semester calendar
                 # This would normally update actual dates

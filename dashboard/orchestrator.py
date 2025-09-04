@@ -72,7 +72,7 @@ class TaskOrchestrator:
         Returns:
             Analysis results including parallelizable tasks, critical path, and bottlenecks.
         """
-        task_map = {t["id"]: t for t in tasks}
+        _task_map = {t["id"]: t for t in tasks}
 
         # Build dependency graph
         graph = defaultdict(list)
@@ -142,7 +142,7 @@ class TaskOrchestrator:
         return cycles
 
     def _find_parallel_tasks(
-        self, tasks: list[dict], graph: dict, reverse_graph: dict
+        self, tasks: list[dict], _graph: dict, reverse_graph: dict
     ) -> list[set[str]]:
         """Identify groups of tasks that can be executed in parallel."""
         parallel_groups = []

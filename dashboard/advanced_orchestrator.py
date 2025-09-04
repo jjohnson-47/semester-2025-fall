@@ -461,7 +461,7 @@ class AdvancedOrchestrator:
         logger.error(f"Task failed: {task_id} - {error}")
 
         # Trigger compensation if part of workflow
-        for workflow_id, workflow in self.workflows.items():
+        for _workflow_id, workflow in self.workflows.items():
             if task_id in workflow.context.get("tasks", []):
                 await workflow.compensate()
 

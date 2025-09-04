@@ -127,7 +127,7 @@ class QAValidatorAgent(BaseAgent):
         broken_links = []
 
         # Check HTML files for broken links
-        for html_file in Path("build").rglob("*.html"):
+        for _html_file in Path("build").rglob("*.html"):
             # This would normally check actual links
             # For now, just return success
             pass

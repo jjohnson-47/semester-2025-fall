@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Schedules - Fall 2025</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-top: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+        }
+        
+        .page-header {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .page-header h1 {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header p {
+            color: #666;
+            margin: 0;
+        }
+        
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .schedule-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .schedule-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .schedule-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+        }
+        
+        .schedule-header.math221 {
+            background: linear-gradient(135deg, #0066cc, #004499);
+        }
+        
+        .schedule-header.math251 {
+            background: linear-gradient(135deg, #006600, #004400);
+        }
+        
+        .schedule-header.stat253 {
+            background: linear-gradient(135deg, #cc6600, #994400);
+        }
+        
+        .course-code {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .course-name {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+        
+        .schedule-preview {
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .week-summary {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .week-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: #007bff;
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .week-info {
+            flex: 1;
+        }
+        
+        .week-dates {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .week-topic {
+            font-size: 0.9rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .schedule-actions {
+            padding: 1.5rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-action {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .btn-view {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-view:hover {
+            background: #0056b3;
+            color: white;
+        }
+        
+        .btn-embed {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-embed:hover {
+            background: #5a6268;
+            color: white;
+        }
+        
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .nav-back:hover {
+            background: #f8f9fa;
+            color: #333;
+            transform: translateX(-3px);
+        }
+        
+        .stats-row {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .stat-item i {
+            color: #17a2b8;
+        }
+        
+        .preview-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="nav-back">
+            <i class="bi bi-arrow-left"></i>
+            Back to Dashboard
+        </a>
+        
+        <div class="page-header">
+            <h1><i class="bi bi-calendar3"></i> Course Schedules</h1>
+            <p>Fall 2025 - Version 2 Architecture</p>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <i class="bi bi-check-circle"></i>
+                    <span>{{ schedules|length }} schedules available</span>
+                </div>
+                <div class="stat-item">
+                    <i class="bi bi-calendar-week"></i>
+                    <span>15 weeks + finals</span>
+                </div>
+                <div class="stat-item">
+                    <i class="bi bi-ban"></i>
+                    <span>No weekend due dates</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="schedule-grid">
+            {% for schedule in schedules %}
+            <div class="schedule-card">
+                <div class="schedule-header {{ schedule.code.lower() }}">
+                    <div class="course-code">{{ schedule.code }}</div>
+                    <div class="course-name">{{ schedule.name }}</div>
+                </div>
+                <div class="schedule-preview">
+                    <div class="preview-label">First 3 Weeks</div>
+                    <div class="week-summary">
+                        <div class="week-number">1</div>
+                        <div class="week-info">
+                            <div class="week-dates">Aug 25 - Aug 29</div>
+                            <div class="week-topic">Course Introduction</div>
+                        </div>
+                    </div>
+                    <div class="week-summary">
+                        <div class="week-number">2</div>
+                        <div class="week-info">
+                            <div class="week-dates">Sep 1 - Sep 5</div>
+                            <div class="week-topic">Fundamentals</div>
+                        </div>
+                    </div>
+                    <div class="week-summary">
+                        <div class="week-number">3</div>
+                        <div class="week-info">
+                            <div class="week-dates">Sep 8 - Sep 12</div>
+                            <div class="week-topic">Core Concepts</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="schedule-actions">
+                    <div class="action-buttons">
+                        <a href="{{ schedule.url }}" class="btn-action btn-view">
+                            <i class="bi bi-eye"></i> View Schedule
+                        </a>
+                        <a href="{{ schedule.embed_url }}" class="btn-action btn-embed" target="_blank">
+                            <i class="bi bi-code-square"></i> Embed View
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

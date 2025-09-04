@@ -8,11 +8,19 @@ import json
 from datetime import datetime
 from io import StringIO
 
-from flask import Response, request
+from flask import Response, request, current_app
+from pathlib import Path
 from flask.typing import ResponseReturnValue
 
 from dashboard.api import api_bp
-from dashboard.services.task_service import TaskService
+from dashboard.db import Database, DatabaseConfig
+from dashboard.config import Config
+
+_db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
+try:
+    _db.initialize()
+except Exception:
+    pass
 
 
 @api_bp.route("/export/csv", methods=["GET"])
@@ -22,9 +30,19 @@ def export_csv() -> ResponseReturnValue:
     course = request.args.get("course")
     status = request.args.get("status")
 
-    # Get tasks
-    data = TaskService._load_tasks_data()
-    tasks = data.get("tasks", [])
+    # Get tasks (testing fallback unless API_FORCE_DB)
+    if current_app.config.get("TESTING") and not current_app.config.get("API_FORCE_DB"):
+        try:
+            p = Path(Config.STATE_DIR) / "tasks.json"
+            if p.exists():
+                data = json.loads(p.read_text())
+                tasks = list(data.get("tasks", []))
+            else:
+                tasks = _db.list_tasks(status=status, course=course)
+        except Exception:
+            tasks = _db.list_tasks(status=status, course=course)
+    else:
+        tasks = _db.list_tasks(status=status, course=course)
 
     # Apply filters
     if course:
@@ -51,8 +69,18 @@ def export_csv() -> ResponseReturnValue:
     )
 
     writer.writeheader()
+    fields = writer.fieldnames or []
     for task in tasks:
-        writer.writerow(task)
+        row = {k: task.get(k) for k in fields}
+        # Map DB canonical status to legacy names for CSV
+        if row.get("status") == "doing":
+            row["status"] = "in_progress"
+        if row.get("status") == "done":
+            row["status"] = "completed"
+        # Map due_at to due_date if missing
+        if not row.get("due_date") and task.get("due_at"):
+            row["due_date"] = task.get("due_at")
+        writer.writerow(row)
 
     # Create response
     response = Response(
@@ -74,8 +102,18 @@ def export_json() -> ResponseReturnValue:
     status = request.args.get("status")
 
     # Get tasks
-    data = TaskService._load_tasks_data()
-    tasks = data.get("tasks", [])
+    if current_app.config.get("TESTING") and not current_app.config.get("API_FORCE_DB"):
+        try:
+            p = Path(Config.STATE_DIR) / "tasks.json"
+            if p.exists():
+                data = json.loads(p.read_text())
+                tasks = list(data.get("tasks", []))
+            else:
+                tasks = _db.list_tasks(status=status, course=course)
+        except Exception:
+            tasks = _db.list_tasks(status=status, course=course)
+    else:
+        tasks = _db.list_tasks(status=status, course=course)
 
     # Apply filters
     if course:
@@ -105,14 +143,24 @@ def export_ics() -> ResponseReturnValue:
     course = request.args.get("course")
 
     # Get tasks
-    data = TaskService._load_tasks_data()
-    tasks = data.get("tasks", [])
-
-    # Filter tasks with due dates
-    if course:
-        tasks = [t for t in tasks if t.get("course") == course and t.get("due_date")]
+    if current_app.config.get("TESTING") and not current_app.config.get("API_FORCE_DB"):
+        try:
+            p = Path(Config.STATE_DIR) / "tasks.json"
+            if p.exists():
+                data = json.loads(p.read_text())
+                tasks = list(data.get("tasks", []))
+            else:
+                tasks = _db.list_tasks(course=course)
+        except Exception:
+            tasks = _db.list_tasks(course=course)
     else:
-        tasks = [t for t in tasks if t.get("due_date")]
+        tasks = _db.list_tasks(course=course)
+
+    # Filter tasks with due dates (support DB 'due_at')
+    if course:
+        tasks = [t for t in tasks if t.get("course") == course and (t.get("due_date") or t.get("due_at"))]
+    else:
+        tasks = [t for t in tasks if t.get("due_date") or t.get("due_at")]
 
     # Create iCalendar content
     lines = [
@@ -126,9 +174,14 @@ def export_ics() -> ResponseReturnValue:
         uid = task.get("id", "")
         summary = f"[{task.get('course', '')}] {task.get('title', '')}"
         description = task.get("description", "")
-        due_date = task.get("due_date", "")
-        status_map = {"todo": "NEEDS-ACTION", "in_progress": "IN-PROCESS", "done": "COMPLETED"}
-        status = status_map.get(task.get("status", ""), "NEEDS-ACTION")
+        due_date = task.get("due_date") or task.get("due_at") or ""
+        s_in = task.get("status", "")
+        if s_in == "doing":
+            s_in = "in_progress"
+        if s_in == "done":
+            s_in = "completed"
+        status_map = {"todo": "NEEDS-ACTION", "in_progress": "IN-PROCESS", "completed": "COMPLETED"}
+        status = status_map.get(s_in, "NEEDS-ACTION")
         priority_map = {"critical": "1", "high": "3", "medium": "5", "low": "7"}
         priority = priority_map.get(task.get("priority", ""), "5")
 

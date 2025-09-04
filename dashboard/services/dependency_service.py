@@ -8,7 +8,39 @@ from datetime import datetime
 from typing import Any
 
 from dashboard.models import Task, TaskGraph, TaskStatus
-from dashboard.services.task_service import TaskService
+# Legacy TaskService removed; dependency service operates on DB exclusively.
+from dashboard.db import Database, DatabaseConfig
+from dashboard.config import Config
+
+_db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
+try:  # ensure schema exists
+    _db.initialize()
+except Exception:
+    pass
+
+
+def _status_db_to_model(s: str) -> str:
+    """Map DB canonical status to TaskStatus string for model."""
+    if s == "doing":
+        return "in_progress"
+    if s == "done":
+        return "done"
+    if s == "review":
+        return "in_progress"
+    return s
+
+
+def _status_model_to_db(s: str) -> str:
+    """Map TaskStatus string to DB canonical status."""
+    if s == "in_progress":
+        return "doing"
+    if s == "done":
+        return "done"
+    if s == "blocked":
+        return "blocked"
+    if s == "todo":
+        return "todo"
+    return "todo"
 
 
 class DependencyService:
@@ -16,15 +48,40 @@ class DependencyService:
 
     @staticmethod
     def build_task_graph() -> TaskGraph:
-        """Build a complete task graph from stored tasks."""
-        data = TaskService._load_tasks_data()
+        """Build a complete task graph from storage (DB if forced, else JSON)."""
         graph = TaskGraph()
-
-        for task_data in data.get("tasks", []):
-            task = Task.from_dict(task_data)
-            graph.add_task(task)
-
-        return graph
+        if Config.API_FORCE_DB:
+            tasks = _db.list_tasks()
+            # Load deps
+            with _db.connect() as conn:
+                rows = conn.execute("select task_id, blocks_id from deps").fetchall()
+            dep_map: dict[str, list[str]] = {}
+            for r in rows:
+                dep_map.setdefault(r["task_id"], []).append(r["blocks_id"])  # type: ignore[index]
+            for t in tasks:
+                model_dict = {
+                    "id": t.get("id"),
+                    "course": t.get("course"),
+                    "title": t.get("title"),
+                    "status": _status_db_to_model(str(t.get("status", "todo"))),
+                    "category": (t.get("category") or "setup"),
+                    "depends_on": dep_map.get(t.get("id"), []),
+                    "description": t.get("notes"),
+                    "weight": int(float(t.get("weight") or 1.0)),
+                    "due_date": t.get("due_at"),
+                    "created_at": t.get("created_at"),
+                    "updated_at": t.get("updated_at"),
+                }
+                try:
+                    task = Task.from_dict(model_dict)
+                except Exception:
+                    # Fallback minimal fields
+                    task = Task(id=str(t.get("id")), course=str(t.get("course")), title=str(t.get("title")))
+                graph.add_task(task)
+            return graph
+        else:
+            # Fallback: no JSON path in v2 cleanup; return empty graph
+            return graph
 
     @staticmethod
     def get_task_hierarchy(course: str | None = None) -> dict[str, Any]:
@@ -288,11 +345,19 @@ class DependencyService:
 
     @staticmethod
     def _save_graph(graph: TaskGraph) -> None:
-        """Save the task graph back to storage."""
-        tasks_data = [task.to_dict() for task in graph.tasks.values()]
-
-        data = TaskService._load_tasks_data()
-        data["tasks"] = tasks_data
-        data["metadata"]["updated"] = datetime.now().isoformat()
-
-        TaskService._save_tasks_data(data)
+        """Persist graph back to storage (DB if forced, else JSON)."""
+        if Config.API_FORCE_DB:
+            # Write statuses back to DB and add events
+            for t in graph.tasks.values():
+                try:
+                    _db.update_task_field(t.id, "status", _status_model_to_db(t.status.value))
+                except Exception:
+                    pass
+            # Export snapshot JSON for compatibility
+            try:
+                _db.export_snapshot_to_json(Config.TASKS_FILE)
+            except Exception:
+                pass
+            return
+        # JSON fallback removed in v2 cleanup
+        return

@@ -10,7 +10,9 @@ from flask import render_template, request
 
 from dashboard.api import api_bp
 from dashboard.services.dependency_service import DependencyService
-from dashboard.services.task_service import TaskService
+from flask import current_app
+from dashboard.db import Database, DatabaseConfig
+from dashboard.config import Config
 
 
 @api_bp.route("/tasks/<task_id>/status", methods=["POST"])
@@ -24,7 +26,7 @@ def update_task_status_htmx(task_id: str) -> str | tuple[str, int]:
     if not new_status:
         return render_template("_error.html", message="Status required"), 400
 
-    # Update status and get affected tasks
+    # Update status and get affected tasks (DB-backed if API_FORCE_DB)
     result = DependencyService.update_task_status(task_id, new_status)
 
     if "error" in result:
@@ -200,7 +202,25 @@ def quick_add_task() -> str | tuple[str, int]:
         "category": "setup",
     }
 
-    TaskService.create_task(task_data)
+    if True:  # DB-only; legacy TaskService path removed
+        db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
+        try:
+            db.initialize()
+        except Exception:
+            pass
+        db.create_task({
+            "course": task_data["course"],
+            "title": task_data["title"],
+            "status": "todo",
+            "category": task_data.get("category"),
+            "notes": task_data.get("description"),
+        })
+        try:
+            db.export_snapshot_to_json(Config.TASKS_FILE)
+        except Exception:
+            pass
+    else:
+        pass
 
     # Return updated task list
     hierarchy = DependencyService.get_task_hierarchy()
