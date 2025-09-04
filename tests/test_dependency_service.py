@@ -321,30 +321,20 @@ class TestDependencyService:
     )
     def test_dependency_depth_calculation(self, setup_test_environment, depth, expected_max):
         """Test calculation of dependency depth with various chain lengths."""
-        tasks_file = setup_test_environment
-
-        # Create a chain of tasks with specified depth
-        tasks = []
+        db = setup_test_environment
+        # Create a chain of tasks with specified depth in the DB
         for i in range(depth):
-            task = {
-                "id": f"TASK-{i}",
-                "course": "TEST",
-                "title": f"Task {i}",
-                "status": "blocked" if i > 0 else "todo",
-                "priority": "medium",
-                "category": "setup",
-                "depends_on": [f"TASK-{i - 1}"] if i > 0 else [],
-                "parent_id": None,
-            }
-            tasks.append(task)
-
-        data = {
-            "tasks": tasks,
-            "metadata": {"version": "2.0", "updated": datetime.now().isoformat()},
-        }
-
-        with open(tasks_file, "w") as f:
-            json.dump(data, f)
+            db.create_task(
+                {
+                    "id": f"TASK-{i}",
+                    "course": "TEST",
+                    "title": f"Task {i}",
+                    "status": "blocked" if i > 0 else "todo",
+                    "priority": "medium",
+                    "category": "setup",
+                    "depends_on": [f"TASK-{i - 1}"] if i > 0 else [],
+                }
+            )
 
         service = DependencyService()
         stats = service.get_dependency_stats()
@@ -354,10 +344,8 @@ class TestDependencyService:
     @pytest.mark.slow
     def test_large_graph_performance(self, setup_test_environment):
         """Test performance with a large task graph."""
-        tasks_file = setup_test_environment
-
-        # Create a large graph with 100 tasks
-        tasks = []
+        db = setup_test_environment
+        # Create a large graph with 100 tasks directly in the DB
         for i in range(100):
             task = {
                 "id": f"TASK-{i:03d}",
@@ -369,15 +357,7 @@ class TestDependencyService:
                 "depends_on": [f"TASK-{i - 1:03d}"] if i > 0 and i % 3 != 0 else [],
                 "parent_id": f"TASK-{i // 10:03d}" if i > 9 else None,
             }
-            tasks.append(task)
-
-        data = {
-            "tasks": tasks,
-            "metadata": {"version": "2.0", "updated": datetime.now().isoformat()},
-        }
-
-        with open(tasks_file, "w") as f:
-            json.dump(data, f)
+            db.create_task(task)
 
         service = DependencyService()
 

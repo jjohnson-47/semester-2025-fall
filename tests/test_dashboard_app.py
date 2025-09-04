@@ -147,6 +147,23 @@ class TestDashboardRoutes:
     @pytest.mark.dashboard
     def test_api_tasks_filter_by_course(self, client, sample_tasks):
         """Test filtering tasks by course."""
+        # Seed DB
+        from dashboard.app import _db as _db_mod
+        for t in sample_tasks["tasks"]:
+            st = t["status"]
+            if st == "in_progress":
+                st = "doing"
+            if st == "completed":
+                st = "done"
+            _db_mod.create_task({
+                "id": t["id"],
+                "course": t["course"],
+                "title": t["title"],
+                "status": st,
+                "category": t.get("category"),
+                "due_at": t.get("due_date"),
+                "notes": t.get("description"),
+            })
         response = client.get("/api/tasks?course=MATH221")
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -156,6 +173,23 @@ class TestDashboardRoutes:
     @pytest.mark.dashboard
     def test_api_tasks_filter_by_status(self, client, sample_tasks):
         """Test filtering tasks by status."""
+        # Seed DB
+        from dashboard.app import _db as _db_mod
+        for t in sample_tasks["tasks"]:
+            st = t["status"]
+            if st == "in_progress":
+                st = "doing"
+            if st == "completed":
+                st = "done"
+            _db_mod.create_task({
+                "id": t["id"],
+                "course": t["course"],
+                "title": t["title"],
+                "status": st,
+                "category": t.get("category"),
+                "due_at": t.get("due_date"),
+                "notes": t.get("description"),
+            })
         response = client.get("/api/tasks?status=completed")
         assert response.status_code == 200
         data = json.loads(response.data)

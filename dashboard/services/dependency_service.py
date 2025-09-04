@@ -65,6 +65,7 @@ class DependencyService:
                     "title": t.get("title"),
                     "status": _status_db_to_model(str(t.get("status", "todo"))),
                     "category": (t.get("category") or "setup"),
+                    "parent_id": t.get("parent_id"),
                     "depends_on": dep_map.get(t.get("id"), []),
                     "description": t.get("notes"),
                     "weight": int(float(t.get("weight") or 1.0)),
@@ -347,10 +348,30 @@ class DependencyService:
     def _save_graph(graph: TaskGraph) -> None:
         """Persist graph back to storage (DB if forced, else JSON)."""
         if Config.API_FORCE_DB:
-            # Write statuses back to DB and add events
+            # Upsert tasks and dependencies to DB, then export snapshot
             for t in graph.tasks.values():
                 try:
-                    _db.update_task_field(t.id, "status", _status_model_to_db(t.status.value))
+                    existing = _db.get_task(t.id)
+                    if not existing:
+                        _db.create_task(
+                            {
+                                "id": t.id,
+                                "course": t.course,
+                                "title": t.title,
+                                "status": _status_model_to_db(t.status.value),
+                                "parent_id": t.parent_id,
+                                "due_at": t.due_date.isoformat() if hasattr(t.due_date, "isoformat") and t.due_date else None,
+                                "weight": t.weight,
+                                "category": t.category.value if hasattr(t.category, "value") else str(t.category),
+                                "notes": t.description,
+                                "depends_on": list(t.depends_on),
+                            }
+                        )
+                    else:
+                        _db.update_task_field(t.id, "status", _status_model_to_db(t.status.value))
+                        # Ensure dependencies are present
+                        if t.depends_on:
+                            _db.add_deps(t.id, t.depends_on)
                 except Exception:
                     pass
             # Export snapshot JSON for compatibility

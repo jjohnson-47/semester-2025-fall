@@ -218,7 +218,17 @@ class ScheduleBuilder:
 
         if is_v2_enabled():
             # Use v2 schedule projection weeks with due date enhancement
-            projection_weeks = get_schedule_projection_weeks(course_code)
+            # Respect injected content_root for tests by instantiating CourseService directly
+            try:
+                from scripts.services.course_service import CourseService as _CS
+
+                svc = _CS(content_dir=self.content_root / "content")
+                projection = svc.get_projection(course_code, "schedule")
+                projection_weeks = (
+                    projection.data.get("weeks", []) if projection and projection.data else []
+                )
+            except Exception:
+                projection_weeks = get_schedule_projection_weeks(course_code)
             if projection_weeks:
                 for idx, pw in enumerate(projection_weeks, 1):
                     # Get corresponding calendar week for date calculation
@@ -227,13 +237,12 @@ class ScheduleBuilder:
                     else:
                         cal_week = None
 
-                    date_range = pw.get("date_range", "")
-                    if not date_range and cal_week:
+                    # Always compute date_range from calendar to ensure alignment
+                    date_range = ""
+                    if cal_week:
                         date_range = self._format_dates_range(cal_week["start"], cal_week["end"])
 
-                    holidays = pw.get("holidays", [])
-                    if not holidays and cal_week:
-                        holidays = cal_week.get("holidays", [])
+                    holidays = cal_week.get("holidays", []) if cal_week else []
                     holidays_str = f" ({', '.join(holidays)})" if holidays else ""
 
                     # Process assignments with due dates

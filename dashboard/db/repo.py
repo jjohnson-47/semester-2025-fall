@@ -77,6 +77,7 @@ class Database:
                 course text,
                 title text not null,
                 status text check(status in ('todo','doing','review','done','blocked')) not null,
+                parent_id text,
                 due_at text,
                 est_minutes integer,
                 weight real default 1.0,
@@ -138,6 +139,12 @@ class Database:
             conn.execute("create index if not exists idx_deps_blocks on deps(blocks_id)")
             # Add optional columns if absent
             try:
+                cols = [r[1] for r in conn.execute("PRAGMA table_info(tasks)").fetchall()]
+                if "parent_id" not in cols:
+                    conn.execute("alter table tasks add column parent_id text")
+            except sqlite3.DatabaseError:
+                pass
+            try:
                 conn.execute("alter table tasks add column checklist text")
             except sqlite3.DatabaseError:
                 pass
@@ -170,6 +177,7 @@ class Database:
                     "course": task.get("course"),
                     "title": task.get("title") or "",
                     "status": task.get("status") or "todo",
+                    "parent_id": task.get("parent_id"),
                     "due_at": task.get("due_date") or task.get("due"),
                     "est_minutes": task.get("est_minutes"),
                     "weight": float(task.get("weight", 1.0)),
@@ -186,7 +194,7 @@ class Database:
                     conn.execute(
                         """
                         update tasks set course=:course, title=:title, status=:status,
-                               due_at=:due_at, est_minutes=:est_minutes, weight=:weight,
+                               parent_id=:parent_id, due_at=:due_at, est_minutes=:est_minutes, weight=:weight,
                                category=:category, anchor=:anchor, notes=:notes, updated_at=:updated_at
                          where id=:id
                         """,
@@ -196,8 +204,8 @@ class Database:
                 else:
                     conn.execute(
                         """
-                        insert into tasks(id, course, title, status, due_at, est_minutes, weight, category, anchor, notes, created_at, updated_at)
-                        values(:id, :course, :title, :status, :due_at, :est_minutes, :weight, :category, :anchor, :notes, :created_at, :updated_at)
+                        insert into tasks(id, course, title, status, parent_id, due_at, est_minutes, weight, category, anchor, notes, created_at, updated_at)
+                        values(:id, :course, :title, :status, :parent_id, :due_at, :est_minutes, :weight, :category, :anchor, :notes, :created_at, :updated_at)
                         """,
                         fields,
                     )
@@ -221,7 +229,7 @@ class Database:
         """Export all tasks to a JSON payload compatible with original files."""
         with self.connect() as conn:
             rows = conn.execute(
-                "select id, course, title, status, due_at, est_minutes, weight, category, anchor, notes, checklist, created_at, updated_at from tasks"
+                "select id, course, title, status, parent_id, due_at, est_minutes, weight, category, anchor, notes, checklist, created_at, updated_at from tasks"
             ).fetchall()
             deps = conn.execute("select task_id, blocks_id from deps").fetchall()
 
@@ -236,6 +244,7 @@ class Database:
                 "course": row["course"],
                 "title": row["title"],
                 "status": row["status"],
+                "parent_id": row["parent_id"],
                 "due_date": row["due_at"],
                 "est_minutes": row["est_minutes"],
                 "weight": row["weight"],
@@ -355,6 +364,7 @@ class Database:
             "course": task.get("course"),
             "title": task.get("title") or "",
             "status": task.get("status") or "todo",
+            "parent_id": task.get("parent_id"),
             "due_at": task.get("due_at") or task.get("due_date"),
             "est_minutes": task.get("est_minutes"),
             "weight": float(task.get("weight", 1.0)),
@@ -367,8 +377,8 @@ class Database:
         with self.connect() as conn:
             conn.execute(
                 """
-                insert into tasks(id, course, title, status, due_at, est_minutes, weight, category, anchor, notes, created_at, updated_at)
-                values(:id, :course, :title, :status, :due_at, :est_minutes, :weight, :category, :anchor, :notes, :created_at, :updated_at)
+                insert into tasks(id, course, title, status, parent_id, due_at, est_minutes, weight, category, anchor, notes, created_at, updated_at)
+                values(:id, :course, :title, :status, :parent_id, :due_at, :est_minutes, :weight, :category, :anchor, :notes, :created_at, :updated_at)
                 """,
                 fields,
             )
