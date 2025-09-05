@@ -1,0 +1,150 @@
+{
+  "metadata": {
+    "description": "Golden reference for database repository import/export validation",
+    "schema_version": "1.1.0", 
+    "created": "2025-09-04T20:00:00Z",
+    "purpose": "Track E DB repo testing - validates JSON import/export roundtrip",
+    "test_coverage": [
+      "JSON import with dependencies",
+      "JSON export format consistency", 
+      "Schema field mapping (due_date <-> due_at, description <-> notes)",
+      "Dependency preservation",
+      "Checklist handling",
+      "Boolean/integer conversion (anchor field)",
+      "Weight float precision"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "GOLDEN-MATH221-SETUP",
+      "course": "MATH221",
+      "title": "Setup Course Environment",
+      "status": "done",
+      "due_date": "2025-08-25",
+      "est_minutes": 30,
+      "weight": 1.0,
+      "category": "setup",
+      "anchor": true,
+      "description": "Install calculator, review syllabus, setup workspace",
+      "checklist": [
+        {"item": "Download TI-84 emulator", "done": true},
+        {"item": "Review course syllabus", "done": true},
+        {"item": "Setup study space", "done": false}
+      ],
+      "depends_on": [],
+      "created_at": "2025-08-20T10:00:00Z",
+      "updated_at": "2025-08-25T14:30:00Z"
+    },
+    {
+      "id": "GOLDEN-MATH221-HW01",
+      "course": "MATH221", 
+      "title": "Homework Set 1 - Linear Equations",
+      "status": "todo",
+      "due_date": "2025-09-10",
+      "est_minutes": 120,
+      "weight": 2.0,
+      "category": "homework",
+      "anchor": false,
+      "description": "Complete problems 1-20 from Chapter 2. Focus on solving linear equations with one variable.",
+      "checklist": [
+        {"item": "Read Chapter 2.1-2.3", "done": false},
+        {"item": "Complete odd problems 1-19", "done": false},
+        {"item": "Check answers in back of book", "done": false},
+        {"item": "Write up solutions neatly", "done": false}
+      ],
+      "depends_on": ["GOLDEN-MATH221-SETUP"],
+      "created_at": "2025-08-28T09:00:00Z",
+      "updated_at": "2025-08-28T09:00:00Z"
+    },
+    {
+      "id": "GOLDEN-MATH251-SETUP",
+      "course": "MATH251",
+      "title": "Calculus I Environment Setup", 
+      "status": "done",
+      "due_date": "2025-08-25",
+      "est_minutes": 45,
+      "weight": 1.0,
+      "category": "setup",
+      "anchor": true,
+      "description": "Setup graphing calculator and review precalculus",
+      "depends_on": [],
+      "created_at": "2025-08-20T11:00:00Z",
+      "updated_at": "2025-08-25T16:00:00Z"
+    },
+    {
+      "id": "GOLDEN-MATH251-LIMITS",
+      "course": "MATH251",
+      "title": "Study Limits and Continuity",
+      "status": "doing", 
+      "due_date": "2025-09-05",
+      "est_minutes": 180,
+      "weight": 2.5,
+      "category": "study",
+      "anchor": false,
+      "description": "Master limit concepts before derivatives unit",
+      "checklist": [
+        {"item": "Read Chapter 1.1-1.4", "done": true},
+        {"item": "Complete practice problems", "done": true},
+        {"item": "Watch Khan Academy videos", "done": false},
+        {"item": "Take practice quiz", "done": false}
+      ],
+      "depends_on": ["GOLDEN-MATH251-SETUP"],
+      "created_at": "2025-08-30T08:00:00Z",
+      "updated_at": "2025-09-02T19:30:00Z"
+    },
+    {
+      "id": "GOLDEN-STAT253-SETUP",
+      "course": "STAT253",
+      "title": "Statistics Software Setup",
+      "status": "review",
+      "due_date": "2025-08-26",
+      "est_minutes": 60,
+      "weight": 1.5,
+      "category": "setup", 
+      "anchor": true,
+      "description": "Install R and RStudio, setup project workspace",
+      "depends_on": [],
+      "created_at": "2025-08-21T14:00:00Z",
+      "updated_at": "2025-08-26T10:15:00Z"
+    },
+    {
+      "id": "GOLDEN-STAT253-DATA-TYPES",
+      "course": "STAT253",
+      "title": "Learn Data Types and Variables",
+      "status": "blocked",
+      "due_date": "2025-09-08", 
+      "est_minutes": 90,
+      "weight": 1.8,
+      "category": "concepts",
+      "anchor": false,
+      "description": "Understand qualitative vs quantitative, discrete vs continuous",
+      "checklist": [
+        {"item": "Read Chapter 1", "done": false},
+        {"item": "Complete R exercises", "done": false},
+        {"item": "Practice identifying data types", "done": false}
+      ],
+      "depends_on": ["GOLDEN-STAT253-SETUP"],
+      "created_at": "2025-08-29T13:30:00Z", 
+      "updated_at": "2025-09-01T11:20:00Z"
+    },
+    {
+      "id": "GOLDEN-INTEGRATION-TEST",
+      "course": "INTEGRATION",
+      "title": "Cross-Course Integration Project",
+      "status": "todo",
+      "due_date": "2025-12-01",
+      "est_minutes": 300,
+      "weight": 3.0,
+      "category": "project",
+      "anchor": false, 
+      "description": "Final project combining concepts from all three courses",
+      "depends_on": [
+        "GOLDEN-MATH221-HW01",
+        "GOLDEN-MATH251-LIMITS", 
+        "GOLDEN-STAT253-DATA-TYPES"
+      ],
+      "created_at": "2025-08-15T16:00:00Z",
+      "updated_at": "2025-08-15T16:00:00Z"
+    }
+  ]
+}
