@@ -3,8 +3,8 @@
 Statistics API endpoints.
 """
 
-import contextlib
 import json
+import logging
 from pathlib import Path
 
 from flask import current_app, jsonify
@@ -15,8 +15,10 @@ from dashboard.config import Config
 from dashboard.db import Database, DatabaseConfig
 
 _db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
-with contextlib.suppress(Exception):
+try:
     _db.initialize()
+except Exception as exc:  # pragma: no cover - unexpected
+    logging.getLogger(__name__).warning("DB init warning in stats API: %s", exc)
 
 
 @api_bp.route("/stats", methods=["GET"])

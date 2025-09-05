@@ -134,7 +134,7 @@ class ValidationGateway:
                     is_valid=False,
                     check_name="load_course",
                     level="error",
-                    message=f"Failed to load course: {str(e)}",
+                    message=f"Failed to load course: {e!s}",
                 )
             )
             return report

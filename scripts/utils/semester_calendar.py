@@ -13,7 +13,7 @@ from typing import Any
 
 # Optional dependencies; fall back gracefully if missing
 try:  # pragma: no cover - trivial import shim
-    import pytz
+    import pytz  # type: ignore[import-untyped]
 except Exception:  # pragma: no cover
     pytz = None  # type: ignore[assignment]
 try:  # pragma: no cover - trivial import shim
@@ -125,7 +125,7 @@ class SemesterCalendar:
         return holidays
 
     def get_weeks(self) -> list[dict[str, Any]]:
-        """Generate weekly structure for the semester (Mon–Fri buckets).
+        """Generate weekly structure for the semester (Mon-Fri buckets).
 
         Each week entry includes ``start`` (Mon), ``end`` (Fri), ``holidays``,
         and a boolean ``is_finals`` flag when within finals week.
@@ -147,10 +147,8 @@ class SemesterCalendar:
             # Check for holidays this week
             week_holidays = []
             for holiday in holidays:
-                if (
-                    "date" in holiday
-                    and current_date <= holiday["date"] <= week_end
-                    or "start" in holiday
+                if ("date" in holiday and current_date <= holiday["date"] <= week_end) or (
+                    "start" in holiday
                     and not (holiday["end"] < current_date or holiday["start"] > week_end)
                 ):
                     week_holidays.append(holiday["name"])

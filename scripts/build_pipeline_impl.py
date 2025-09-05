@@ -54,4 +54,3 @@ def main() -> None:  # pragma: no cover - CLI shim
 
 if __name__ == "__main__":
     main()
-

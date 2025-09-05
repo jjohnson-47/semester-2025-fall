@@ -6,7 +6,7 @@ and per-factor contributions. Stores no state; callers persist via repo layer.
 
 from __future__ import annotations
 
-import contextlib
+import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from math import exp
@@ -54,7 +54,7 @@ def cost_of_delay(due_ts: datetime, now: datetime) -> float:
 
 
 def freshness_decay(last_touched: datetime, now: datetime) -> float:
-    """Decay −1 per week of staleness, capped at −3."""
+    """Decay -1 per week of staleness, capped at -3."""
     days = (now - last_touched).total_seconds() / 86400.0
     return -min(3.0, days / 7.0)
 
@@ -104,8 +104,10 @@ def score_task(
 
     last_touched_str = task.get("last_touched") or task.get("updated_at")
     if last_touched_str:
-        with contextlib.suppress(Exception):
+        try:
             factors.freshness_decay = freshness_decay(datetime.fromisoformat(last_touched_str), now)
+        except Exception as exc:  # pragma: no cover - parsing
+            logging.getLogger(__name__).debug("freshness_decay parse skip: %s", exc)
 
     # Momentum based on recent completions in context (0..3)
     try:

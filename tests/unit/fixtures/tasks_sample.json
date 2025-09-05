@@ -1,0 +1,13 @@
+{
+  "tasks": [
+    {"id": "T1", "course": "MATH221", "title": "Prepare syllabus", "status": "todo"},
+    {"id": "T2", "course": "MATH221", "title": "Publish syllabus", "status": "blocked", "depends_on": ["T1"]},
+    {"id": "T3", "course": "MATH251", "title": "Set up LMS", "status": "in_progress"},
+    {"id": "T4", "course": "STAT253", "title": "Order textbooks", "status": "completed"},
+    {"id": "T5", "course": "MATH251", "title": "Record intro video", "status": "doing"},
+    {"id": "T6", "course": "STAT253", "title": "Draft schedule", "status": "todo"},
+    {"id": "T7", "course": "MATH221", "title": "Create assignments", "status": "todo", "depends_on": ["T2"]},
+    {"id": "T8", "course": "STAT253", "title": "Finalize schedule", "status": "done", "depends_on": ["T6"]}
+  ]
+}
+

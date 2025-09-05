@@ -6,9 +6,9 @@ now_queue. It exports a JSON now_queue for compatibility with the UI.
 
 from __future__ import annotations
 
-import contextlib
 import gzip
 import json
+import logging
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -66,8 +66,10 @@ class PrioritizationService:
         files = sorted(snaps.glob("tasks_*.db.gz"))
         if len(files) > self.config.snapshot_rotate:
             for old in files[: -(self.config.snapshot_rotate)]:
-                with contextlib.suppress(Exception):
+                try:
                     old.unlink()
+                except Exception as exc:  # pragma: no cover - best-effort
+                    logging.getLogger(__name__).debug("Snapshot cleanup skipped: %s", exc)
 
     # ------------------------------
     # Phase

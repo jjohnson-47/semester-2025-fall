@@ -46,7 +46,7 @@ class Provenance:
     original_value: Any | None = None
     transformation: str | None = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.timestamp is None:
             self.timestamp = datetime.now(UTC)
 
@@ -88,7 +88,7 @@ class NormalizedField:
         """Convenience accessor for confidence."""
         return self.provenance.confidence
 
-    def with_value(self, new_value: Any, rule: str = None) -> "NormalizedField":
+    def with_value(self, new_value: Any, rule: str | None = None) -> "NormalizedField":
         """Create new field with updated value."""
         return NormalizedField(
             value=new_value,
@@ -116,14 +116,14 @@ class NormalizedField:
         }
 
     @classmethod
-    def from_original(cls, value: Any, field_name: str = None) -> "NormalizedField":
+    def from_original(cls, value: Any, field_name: str | None = None) -> "NormalizedField":
         """Create field from original source data."""
         return cls(
             value=value, provenance=Provenance(source=FieldSource.ORIGINAL), field_name=field_name
         )
 
     @classmethod
-    def from_default(cls, value: Any, field_name: str = None) -> "NormalizedField":
+    def from_default(cls, value: Any, field_name: str | None = None) -> "NormalizedField":
         """Create field from default value."""
         return cls(
             value=value,

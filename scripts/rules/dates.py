@@ -35,7 +35,7 @@ class DateRules:
     version: str = "1.1.0"
     shift_log: list[DateShift] = field(default_factory=list)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.calendar is None:
             self.calendar = SemesterCalendar()
 

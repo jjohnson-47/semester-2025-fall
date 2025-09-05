@@ -49,6 +49,8 @@ jobs:
           --ignore-missing-imports
 
     - name: Run tests with coverage
+      env:
+        TEST_DB_STATEMENT_TIMEOUT_MS: "2000"
       run: |
         uv run --with pytest,pytest-cov pytest \
           --cov=scripts \
@@ -58,6 +60,9 @@ jobs:
           --cov-report=html:htmlcov \
           --cov-fail-under=80 \
           -v
+
+    - name: Coverage ratchet
+      run: make ratchet
 
     - name: Upload coverage reports
       uses: codecov/codecov-action@v4

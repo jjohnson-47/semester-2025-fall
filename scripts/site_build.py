@@ -142,12 +142,12 @@ def has_custom_due_dates(course_code: str) -> bool:
 
 def build_syllabus_pages(
     course_code: str,
-    _sb: SyllabusBuilder,  # noqa: ARG001
-    _schedule_builder: ScheduleBuilder,  # noqa: ARG001
+    _sb: SyllabusBuilder,
+    _schedule_builder: ScheduleBuilder,
     env: str,  # noqa: ARG001
     term: str,
     out_dir: Path,
-    _jinja_templates: Path,  # noqa: ARG001
+    _jinja_templates: Path,
 ) -> dict[str, str]:
     """Copy and adapt high-quality syllabus pages from build/ directory.
 
@@ -191,12 +191,12 @@ def build_syllabus_pages(
 
 def build_schedule_pages(
     course_code: str,
-    _sb: SyllabusBuilder,  # noqa: ARG001
-    _schedule_builder: ScheduleBuilder,  # noqa: ARG001
+    _sb: SyllabusBuilder,
+    _schedule_builder: ScheduleBuilder,
     env: str,  # noqa: ARG001
     term: str,
     out_dir: Path,
-    _jinja_templates: Path,  # noqa: ARG001
+    _jinja_templates: Path,
 ) -> dict[str, str]:
     """Copy and adapt high-quality schedule pages from build/ directory.
 

@@ -399,12 +399,19 @@ class AdvancedOrchestrator:
         self.workflows: dict[str, Workflow] = {}
         self.circuit_breakers: dict[str, CircuitBreaker] = {}
         self.task_stream = ReactiveStream()
+        # Track background tasks to satisfy linting and allow cleanup
+        self._bg_tasks: set[asyncio.Task[Any]] = set()
 
         # Setup event handlers
         self._setup_event_handlers()
 
         # Setup reactive streams
         self._setup_streams()
+
+    def _track_task(self, task: asyncio.Task[Any]) -> None:
+        """Track a background task for lifecycle management."""
+        self._bg_tasks.add(task)
+        task.add_done_callback(self._bg_tasks.discard)
 
     def _setup_event_handlers(self):
         """Setup event-driven handlers."""
@@ -437,7 +444,8 @@ class AdvancedOrchestrator:
         if task.get("category") == "semester_prep":
             workflow = SemesterPreparationWorkflow(f"workflow-{task['id']}", self.event_store)
             self.workflows[workflow.id] = workflow
-            asyncio.create_task(workflow.execute())
+            t = asyncio.create_task(workflow.execute(), name=f"workflow.execute:{workflow.id}")
+            self._track_task(t)
 
     async def _handle_task_completed(self, event: Event):
         """Handle task completion events."""

@@ -13,9 +13,11 @@ Key design goals:
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
+import time
 from collections.abc import Generator, Iterable
-from contextlib import contextmanager, suppress
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -48,6 +50,13 @@ class Database:
     def __init__(self, config: DatabaseConfig) -> None:
         self.config = config
         self.db_path = config.db_path
+        # Allow tests/CI to override busy timeout via env without invasive changes
+        try:
+            _test_to = int(os.getenv("TEST_DB_STATEMENT_TIMEOUT_MS", "0"))
+            if _test_to > 0:
+                self.config.busy_timeout_ms = _test_to
+        except Exception:
+            pass
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
 
     @contextmanager
@@ -59,6 +68,21 @@ class Database:
                 conn.execute("PRAGMA journal_mode=WAL")
             if self.config.busy_timeout_ms:
                 conn.execute(f"PRAGMA busy_timeout={int(self.config.busy_timeout_ms)}")
+            # Optional execution watchdog for tests: abort long-running statements
+            try:
+                _limit_ms = int(os.getenv("TEST_DB_STATEMENT_TIMEOUT_MS", "0"))
+            except Exception:
+                _limit_ms = 0
+            if _limit_ms > 0:
+                _start = time.perf_counter()
+                _limit_s = float(_limit_ms) / 1000.0
+
+                def _progress_handler() -> int:
+                    # Abort if elapsed exceeds limit; SQLite will raise an OperationalError
+                    return 1 if (time.perf_counter() - _start) > _limit_s else 0
+
+                # Check every N VM steps (1000 is a reasonable default)
+                conn.set_progress_handler(_progress_handler, 1000)
             yield conn
             conn.commit()
         finally:
@@ -142,10 +166,13 @@ class Database:
                 cols = [r[1] for r in conn.execute("PRAGMA table_info(tasks)").fetchall()]
                 if "parent_id" not in cols:
                     conn.execute("alter table tasks add column parent_id text")
-            except sqlite3.DatabaseError:
-                pass
-            with suppress(sqlite3.DatabaseError):
+            except sqlite3.DatabaseError as exc:
+                # best-effort schema evolution
+                print(f"[repo] skip parent_id add: {exc}")
+            try:
                 conn.execute("alter table tasks add column checklist text")
+            except sqlite3.DatabaseError as exc:
+                print(f"[repo] skip checklist add: {exc}")
 
     # ------------------------------
     # Import / Export
@@ -234,7 +261,7 @@ class Database:
         tasks: list[dict[str, Any]] = []
         deps_map: dict[str, list[str]] = {}
         for row in deps:
-            deps_map.setdefault(row["task_id"], []).append(row["blocks_id"])  # type: ignore[index]
+            deps_map.setdefault(row["task_id"], []).append(row["blocks_id"])
 
         for row in rows:
             task = {
@@ -257,7 +284,7 @@ class Database:
                 try:
                     import json as _json
 
-                    task["checklist"] = _json.loads(row["checklist"])  # type: ignore[index]
+                    task["checklist"] = _json.loads(row["checklist"])
                 except Exception:
                     pass
             if deps_map.get(row["id"]):

@@ -35,7 +35,6 @@ Environment Variables:
 See dashboard/API_DOCUMENTATION.md for complete API reference.
 """
 
-import contextlib
 import json
 
 # Set up logging
@@ -55,6 +54,7 @@ from dashboard.db import Database, DatabaseConfig
 from dashboard.orchestrator import AgentCoordinator, TaskOrchestrator
 from dashboard.services.prioritization import PrioritizationConfig, PrioritizationService
 from dashboard.services.retro import generate_weekly_retro
+from dashboard.startup import is_live, is_ready, startup_init
 
 logger = logging.getLogger(__name__)
 
@@ -139,6 +139,30 @@ AUTO_SNAPSHOT = Config.AUTO_SNAPSHOT
 
 # Ensure state directory exists
 STATE_DIR.mkdir(exist_ok=True)
+
+
+# Health: liveness + readiness
+# Perform startup init at import time (Flask 3 no longer has before_first_request)
+try:  # pragma: no cover - trivial glue
+    startup_init(_db)
+except Exception as exc:  # pragma: no cover
+    logger.warning("Startup init error: %s", exc)
+
+
+@app.route("/healthz/live", methods=["GET"])
+def health_live() -> ResponseReturnValue:
+    return jsonify({"live": is_live()})
+
+
+@app.route("/healthz/startup", methods=["GET"])
+def health_startup() -> ResponseReturnValue:
+    if is_ready():
+        return jsonify({"ready": True})
+    return Response(
+        response='{"ready": false}',
+        status=503,
+        content_type="application/json",
+    )
 
 
 def load_courses() -> dict[str, Any]:
@@ -476,8 +500,10 @@ def api_update_task(task_id: str) -> ResponseReturnValue:
 
     # If marking done, remove from DB+JSON now queue
     if updates.get("status") in {"done", "completed"}:
-        with contextlib.suppress(Exception):
+        try:
             _db.remove_from_now_queue(task_id)
+        except Exception as exc:
+            logger.exception("Failed removing task from now_queue: %s", exc)
         # Also update JSON now_queue
         now_queue_file = STATE_DIR / "now_queue.json"
         if now_queue_file.exists():
@@ -752,8 +778,10 @@ def api_task(task_id: str) -> ResponseReturnValue:
 
     # If completed, remove from queue both DB and JSON
     if updates.get("status") in {"done", "completed"}:
-        with contextlib.suppress(Exception):
+        try:
             _db.remove_from_now_queue(task_id)
+        except Exception as exc:
+            logger.exception("Failed removing task from now_queue: %s", exc)
         now_queue_file = STATE_DIR / "now_queue.json"
         if now_queue_file.exists():
             try:
@@ -1505,7 +1533,7 @@ def download_schedule(course_code: str, format: str) -> ResponseReturnValue:
         builder = ScheduleBuilder(output_dir="build/schedules")
         builder.build_schedule(course_code)
     except Exception as e:
-        return jsonify({"error": f"Failed to build schedule: {str(e)}"}), 500
+        return jsonify({"error": f"Failed to build schedule: {e!s}"}), 500
 
     # Get the HTML file from site directory (production-ready version)
     html_path = (
@@ -2009,11 +2037,13 @@ def api_quick_add() -> ResponseReturnValue:
         deps = payload.get("depends_on") or []
         if deps:
             _db.add_deps(task_id, deps)
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("Add deps skipped: %s", exc)
     _db.add_event(task_id, "create", None, "created")
-    with contextlib.suppress(Exception):
+    try:
         _db.add_event(task_id, "source", None, "quick_add")
+    except Exception as exc:
+        logger.debug("Add event 'source' skipped: %s", exc)
 
     # Export snapshot
     try:

@@ -9,6 +9,6 @@ from flask import Blueprint
 main_bp = Blueprint("main", __name__)
 
 # Import routes after blueprint creation to register them
-from dashboard.views import main as main  # noqa: E402, F401
+from dashboard.views import main as main  # noqa: E402
 
 # The import above is required to register routes with the blueprint

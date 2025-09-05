@@ -11,11 +11,11 @@ from .deployment import DeploymentManagerAgent
 from .qa_validator import QAValidatorAgent
 
 __all__ = [
-    "CourseContentAgent",
-    "QAValidatorAgent",
-    "CalendarSyncAgent",
     "BlackboardIntegratorAgent",
+    "CalendarSyncAgent",
+    "CourseContentAgent",
     "DeploymentManagerAgent",
+    "QAValidatorAgent",
 ]
 
 # Agent registry for automatic discovery

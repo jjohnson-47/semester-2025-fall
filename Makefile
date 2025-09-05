@@ -70,6 +70,9 @@ cov:
 cov-xml:
 	$(UV) run coverage xml -o coverage.xml
 
+ratchet:
+	$(UV) run python scripts/ci/coverage_ratchet.py coverage.xml
+
 build:
 	$(UV) run python scripts/build_pipeline.py --courses $(COURSES)
 

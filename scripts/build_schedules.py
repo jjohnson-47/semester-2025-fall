@@ -72,7 +72,7 @@ class ScheduleBuilder:
             return None
 
     def _format_dates_range(self, start: str, end_friday: str) -> str:
-        """Format a Monday–Sunday date range for display (e.g., ``Sep 02 - Sep 08``)."""
+        """Format a Monday-Sunday date range for display (e.g., ``Sep 02 - Sep 08``)."""
         start_dt = _parse_date(start)
         end_dt = _parse_date(end_friday) + timedelta(days=2)  # align to Sunday
         start_str = start_dt.strftime("%b %d")

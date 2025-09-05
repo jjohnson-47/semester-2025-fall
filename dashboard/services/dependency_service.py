@@ -4,7 +4,7 @@ Dependency resolution service for task management.
 Handles complex task relationships and auto-unlocking.
 """
 
-import contextlib
+import logging
 from datetime import datetime
 from typing import Any
 
@@ -15,8 +15,10 @@ from dashboard.db import Database, DatabaseConfig
 from dashboard.models import Task, TaskGraph, TaskStatus
 
 _db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
-with contextlib.suppress(Exception):  # ensure schema exists
+try:  # ensure schema exists
     _db.initialize()
+except Exception as exc:  # pragma: no cover - unexpected
+    logging.getLogger(__name__).warning("DB init warning in dependency service: %s", exc)
 
 
 def _status_db_to_model(s: str) -> str:
@@ -66,7 +68,7 @@ class DependencyService:
                     "status": _status_db_to_model(str(t.get("status", "todo"))),
                     "category": (t.get("category") or "setup"),
                     "parent_id": t.get("parent_id"),
-                    "depends_on": dep_map.get(t.get("id"), []),
+                    "depends_on": dep_map.get(str(t.get("id") or ""), []),
                     "description": t.get("notes"),
                     "weight": int(float(t.get("weight") or 1.0)),
                     "due_date": t.get("due_at"),
@@ -381,8 +383,10 @@ class DependencyService:
                 except Exception:
                     pass
             # Export snapshot JSON for compatibility
-            with contextlib.suppress(Exception):
+            try:
                 _db.export_snapshot_to_json(Config.TASKS_FILE)
+            except Exception as exc:
+                logging.getLogger(__name__).debug("Snapshot export skipped: %s", exc)
             return
         # JSON fallback removed in v2 cleanup
         return

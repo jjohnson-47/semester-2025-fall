@@ -269,7 +269,9 @@ class BuildPipeline:
                 "| Stage | Status | Duration | Errors | Warnings | Artifacts |",
                 "|-------|--------|----------|--------|----------|-----------|",
             ]
-            for s in summary["stages"]:
+            # help mypy understand this is a list of dicts
+            stages_list: list[dict[str, Any]] = summary["stages"]  # type: ignore[assignment]
+            for s in stages_list:
                 lines.append(
                     f"| {s['name']} | {s['status']} | {s['duration']:.2f}s | {s['errors']} | {s['warnings']} | {s['artifacts']} |"
                 )
@@ -299,7 +301,7 @@ class BuildPipeline:
         return res
 
     # ---- runner ----
-    def run(self, _force: bool = False) -> bool:
+    def run(self, force: bool = False) -> bool:  # noqa: ARG002 - back-compat signature
         # `force` kept for backward compatibility; currently unused.
         self._log("pipeline", f"courses={self.courses}")
         if self.validate().status == "failed":

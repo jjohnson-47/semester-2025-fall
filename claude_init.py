@@ -26,6 +26,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Track background tasks for lifecycle; assists linting and cleanup
+_bg_tasks: set[asyncio.Task[object]] = set()
+
+
+def _track_task(t: asyncio.Task[object]) -> None:
+    _bg_tasks.add(t)
+    t.add_done_callback(_bg_tasks.discard)
+
 
 class ClaudeOrchestrationSystem:
     """Main orchestration system for Claude Code integration."""
@@ -220,7 +228,8 @@ async def main():
     # Start monitoring in background
     # Note: In actual Claude Code integration, this would run as a background task
     # For now, we just set it up but don't block
-    _monitor_task = asyncio.create_task(system.start_monitoring())
+    _monitor_task = asyncio.create_task(system.start_monitoring(), name="system.start_monitoring")
+    _track_task(_monitor_task)
 
     # Return system for Claude to use
     return system

@@ -7,7 +7,7 @@ Provides different configuration classes for development, testing, and productio
 import os
 from datetime import timedelta
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 # Load .env file if available
 try:
@@ -79,7 +79,7 @@ class Config:
     RATELIMIT_DEFAULT = "100/hour"
 
     # CORS settings - allow iframe embedding from Blackboard and public sites
-    CORS_ORIGINS = [
+    CORS_ORIGINS: ClassVar[list[str]] = [
         "http://localhost:3000",
         "http://127.0.0.1:5055",
         "https://blackboard.alaska.edu",
@@ -210,7 +210,7 @@ class ProductionConfig(Config):
     )
 
     # Connection pool
-    SQLALCHEMY_ENGINE_OPTIONS = {
+    SQLALCHEMY_ENGINE_OPTIONS: ClassVar[dict[str, Any]] = {
         "pool_size": 10,
         "pool_recycle": 3600,
         "pool_pre_ping": True,
@@ -227,7 +227,7 @@ class ProductionConfig(Config):
     RATELIMIT_DEFAULT = "50/hour"
 
     # CORS - restrict in production
-    CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "").split(",")
+    CORS_ORIGINS: ClassVar[list[str]] = os.environ.get("CORS_ORIGINS", "").split(",")
 
     # Enable profiling if needed
     ENABLE_PROFILING = os.environ.get("ENABLE_PROFILING", "false").lower() == "true"

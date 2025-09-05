@@ -189,7 +189,7 @@ class SmartPrioritizer:
           week is -7..0.
 
         Previous implementation incorrectly used "days until start", which
-        inverted the sign and misclassified pre‑semester days as post‑semester
+        inverted the sign and misclassified pre-semester days as post-semester
         phases. We correct this by using days since start.
         """
         # Positive if today is after start, negative if before

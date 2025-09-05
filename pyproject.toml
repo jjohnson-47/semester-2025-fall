@@ -79,12 +79,12 @@ exclude = [
 
 [tool.ruff.lint]
 select = ["E","F","I","UP","B","SIM","ARG","RUF"]
-ignore = ["D"]
 ignore = [
-    "E501",  # line too long (handled by formatter)
-    "B008",  # do not perform function calls in argument defaults
-    "C901",  # too complex
-    "W191",  # indentation contains tabs
+    "D",    # pydocstyle disabled for now (docstrings enforced via other means)
+    "E501", # line too long (handled by formatter)
+    "B008", # do not perform function calls in argument defaults
+    "C901", # too complex
+    "W191", # indentation contains tabs
 ]
 
 [tool.ruff.format]

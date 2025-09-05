@@ -405,7 +405,7 @@ def main() -> None:
         if changed:
             print(f"✓ {course}: updated {', '.join(changed)}")
         else:
-            print(f"– {course}: no matching guide or no updates")
+            print(f"- {course}: no matching guide or no updates")
 
 
 if __name__ == "__main__":

@@ -3,9 +3,9 @@
 Export API endpoints for different formats.
 """
 
-import contextlib
 import csv
 import json
+import logging
 from datetime import datetime
 from io import StringIO
 from pathlib import Path
@@ -18,8 +18,10 @@ from dashboard.config import Config
 from dashboard.db import Database, DatabaseConfig
 
 _db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
-with contextlib.suppress(Exception):
+try:
     _db.initialize()
+except Exception as exc:  # pragma: no cover - unexpected
+    logging.getLogger(__name__).warning("DB init warning in export API: %s", exc)
 
 
 @api_bp.route("/export/csv", methods=["GET"])

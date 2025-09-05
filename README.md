@@ -198,6 +198,12 @@ python tests/semantic/test_html_diff_v2.py
   - `scripts/utils/schema/versions/v1_1_0.py` (module file) → import from the package path
 - These emit `DeprecationWarning` and will be removed after Fall 2025. See `docs/DEPRECATIONS.md`.
 
+## Health Checks
+
+- `GET /healthz/live`: Liveness probe. Always returns 200 with `{ "live": true }` when the process is running.
+- `GET /healthz/startup`: Readiness probe. Returns 200 `{ "ready": true }` after startup completes; returns 503 `{ "ready": false }` while dependencies are still initializing.
+- Implementation: see `dashboard/startup.py` and wiring in `dashboard/app.py`.
+
 ### Migration Path
 
 **Phase 1: Validation & Testing** (Current)

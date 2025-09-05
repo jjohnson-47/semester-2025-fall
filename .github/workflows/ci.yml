@@ -30,6 +30,8 @@ jobs:
         run: uv run ruff format --check .
       - name: Ruff lint
         run: uv run ruff check .
+      - name: Forbid suppress outside startup
+        run: bash scripts/ci/forbid_suppress.sh
       - name: Guard deprecated imports
         run: |
           set +e
@@ -63,7 +65,11 @@ jobs:
       - name: Sync deps
         run: uv sync --all-extras
       - name: Run unit tests with coverage gate
+        env:
+          TEST_DB_STATEMENT_TIMEOUT_MS: "2000"
         run: uv run pytest -m unit -q --cov=dashboard --cov=scripts --cov-branch --cov-report=xml --cov-fail-under=50
+      - name: Coverage ratchet
+        run: make ratchet
       - name: Upload coverage
         uses: actions/upload-artifact@v4
         with:
@@ -79,7 +85,11 @@ jobs:
       - name: Sync deps
         run: uv sync --all-extras
       - name: Run integration/other tests with coverage gate
+        env:
+          TEST_DB_STATEMENT_TIMEOUT_MS: "2000"
         run: uv run pytest -m "not unit" -q --cov=dashboard --cov=scripts --cov-branch --cov-report=xml --cov-fail-under=50
+      - name: Coverage ratchet
+        run: make ratchet
       - name: Upload coverage
         uses: actions/upload-artifact@v4
         with:

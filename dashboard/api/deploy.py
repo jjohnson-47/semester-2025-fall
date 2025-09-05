@@ -30,11 +30,13 @@ class DeploymentManager:
     """Manages the deployment pipeline for course content."""
 
     def __init__(self):
-        self.current_deployment = None
-        self.deployment_log = []
-        self.is_deploying = False
+        self.current_deployment: dict[str, Any] | None = None
+        self.deployment_log: list[dict[str, Any]] = []
+        self.is_deploying: bool = False
 
-    async def run_command(self, cmd: str, cwd: Path = None, env: dict = None) -> dict[str, Any]:
+    async def run_command(
+        self, cmd: str, cwd: Path | None = None, env: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Run a shell command asynchronously and capture output."""
         self.log(f"Running: {cmd}")
 
@@ -70,7 +72,7 @@ class DeploymentManager:
             return result
 
         except Exception as e:
-            self.log(f"Command exception: {str(e)}", level="error")
+            self.log(f"Command exception: {e!s}", level="error")
             return {
                 "command": cmd,
                 "returncode": -1,
@@ -229,7 +231,7 @@ class DeploymentManager:
                 deployment_result["status"] = "warning"
 
         except Exception as e:
-            self.log(f"Deployment failed: {str(e)}", level="error")
+            self.log(f"Deployment failed: {e!s}", level="error")
             deployment_result["status"] = "error"
             deployment_result["error"] = str(e)
             deployment_result["end_time"] = datetime.now().isoformat()

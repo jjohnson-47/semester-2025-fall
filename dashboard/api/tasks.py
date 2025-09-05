@@ -5,7 +5,6 @@ Handles CRUD operations for tasks using the SQLite repository layer.
 Includes status mapping for legacy values.
 """
 
-import contextlib
 import json
 from pathlib import Path
 
@@ -22,8 +21,10 @@ from dashboard.utils.decorators import validate_json
 # ------------------------------
 
 _db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
-with contextlib.suppress(Exception):  # Initialize tables if needed
+try:  # Initialize tables if needed (best-effort)
     _db.initialize()
+except Exception as exc:
+    current_app.logger.debug("DB init skipped in tasks API: %s", exc)
 
 
 CANONICAL_STATUSES = {"todo", "doing", "review", "done", "blocked"}

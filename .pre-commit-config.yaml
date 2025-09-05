@@ -1,4 +1,8 @@
 repos:
+  - repo: https://github.com/tox-dev/pyproject-fmt
+    rev: 2.5.0
+    hooks:
+      - id: pyproject-fmt
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.5.7
     hooks:
@@ -11,6 +15,13 @@ repos:
       - id: prettier
         args: ["--prose-wrap", "always"]
         additional_dependencies: ["prettier@3.3.3"]
+  - repo: local
+    hooks:
+      - id: forbid-suppress
+        name: forbid suppress outside startup
+        entry: bash scripts/ci/forbid_suppress.sh
+        language: system
+        files: \.py$
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.10.0
     hooks:

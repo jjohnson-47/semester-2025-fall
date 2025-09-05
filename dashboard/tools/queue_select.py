@@ -144,7 +144,7 @@ def select_now_queue(
         model.Add(sum(x[c.id] for c in cand if c.status == "doing") <= int(wip_cap))
 
     # Objective: maximize Σ(score*100)
-    model.Maximize(sum(int(round(c.score * 100)) * x[c.id] for c in cand))
+    model.Maximize(sum(round(c.score * 100) * x[c.id] for c in cand))
 
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = 0.05

@@ -5,4 +5,4 @@ unified adapter from ``scripts.services.projection_adapter``. Prefer importing
 from ``scripts.services.projection_adapter`` directly.
 """
 
-from scripts.services.projection_adapter import *  # noqa: F401,F403
+from scripts.services.projection_adapter import *  # noqa: F403

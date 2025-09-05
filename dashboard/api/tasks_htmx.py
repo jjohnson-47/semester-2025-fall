@@ -4,8 +4,8 @@ HTMX-specific task endpoints with out-of-band swap support.
 Implements dependency-aware updates following HTMX 2.x patterns.
 """
 
-import contextlib
-from typing import cast
+import logging
+from typing import Any
 
 from flask import render_template, request
 
@@ -52,7 +52,7 @@ def update_task_status_htmx(task_id: str) -> str | tuple[str, int]:
             oob=True,
         )
 
-    return cast(str, primary_html + oob_html)
+    return primary_html + oob_html
 
 
 @api_bp.route("/tasks/<task_id>/complete", methods=["POST"])
@@ -83,7 +83,7 @@ def quick_complete_task(task_id: str) -> str | tuple[str, int]:
             oob=True,
         )
 
-    return cast(str, completed_html + oob_html)
+    return completed_html + oob_html
 
 
 @api_bp.route("/tasks/<task_id>/children", methods=["GET"])
@@ -102,9 +102,7 @@ def get_task_children(task_id: str) -> str:
         if child_id in hierarchy["task_map"]
     ]
 
-    return cast(
-        str, render_template("_task_children.html", parent_id=task_id, tasks=children_tasks)
-    )
+    return render_template("_task_children.html", parent_id=task_id, tasks=children_tasks)
 
 
 @api_bp.route("/tasks/list", methods=["GET"])
@@ -127,7 +125,7 @@ def get_tasks_list_view() -> str:
     if assignee:
         tasks = [t for t in tasks if t.get("assignee") == assignee]
 
-    return cast(str, render_template("_task_list.html", tasks=tasks))
+    return render_template("_task_list.html", tasks=tasks)
 
 
 @api_bp.route("/tasks/kanban", methods=["GET"])
@@ -139,14 +137,19 @@ def get_tasks_kanban_view() -> str:
     all_tasks = list(hierarchy["task_map"].values())
 
     # Organize by status columns
-    kanban: dict[str, list] = {"blocked": [], "todo": [], "in_progress": [], "done": []}
+    kanban: dict[str, list[dict[str, Any]]] = {
+        "blocked": [],
+        "todo": [],
+        "in_progress": [],
+        "done": [],
+    }
 
     for task in all_tasks:
         status = task["status"]
         if status in kanban:
             kanban[status].append(task)
 
-    return cast(str, render_template("_kanban_board.html", kanban=kanban))
+    return render_template("_kanban_board.html", kanban=kanban)
 
 
 @api_bp.route("/tasks/<task_id>/dependencies", methods=["GET"])
@@ -159,19 +162,16 @@ def get_task_dependencies(task_id: str) -> str | tuple[str, int]:
     task = graph.get_task(task_id)
 
     if not task:
-        return cast(str, render_template("_error.html", message="Task not found")), 404
+        return render_template("_error.html", message="Task not found"), 404
 
     blockers = graph.get_blockers(task_id)
     blocked_by_this = graph.get_blocked_by(task_id)
 
-    return cast(
-        str,
-        render_template(
-            "_dependency_modal.html",
-            task=task.to_dict(),
-            blockers=[b.to_dict() for b in blockers],
-            blocks=[b.to_dict() for b in blocked_by_this],
-        ),
+    return render_template(
+        "_dependency_modal.html",
+        task=task.to_dict(),
+        blockers=[b.to_dict() for b in blockers],
+        blocks=[b.to_dict() for b in blocked_by_this],
     )
 
 
@@ -183,7 +183,7 @@ def quick_add_task() -> str | tuple[str, int]:
     """
     title = request.form.get("title", "").strip()
     if not title:
-        return cast(str, render_template("_error.html", message="Title required")), 400
+        return render_template("_error.html", message="Title required"), 400
 
     # Parse title for course code
     course = "MATH221"  # Default
@@ -204,8 +204,10 @@ def quick_add_task() -> str | tuple[str, int]:
 
     if True:  # DB-only; legacy TaskService path removed
         db = Database(DatabaseConfig(Config.STATE_DIR / "tasks.db"))
-        with contextlib.suppress(Exception):
+        try:
             db.initialize()
+        except Exception as exc:  # pragma: no cover - unexpected
+            logging.getLogger(__name__).warning("DB init warning in quick_add: %s", exc)
         db.create_task(
             {
                 "course": task_data["course"],
@@ -215,14 +217,16 @@ def quick_add_task() -> str | tuple[str, int]:
                 "notes": task_data.get("description"),
             }
         )
-        with contextlib.suppress(Exception):
+        try:
             db.export_snapshot_to_json(Config.TASKS_FILE)
+        except Exception as exc:
+            logging.getLogger(__name__).debug("Snapshot export skipped: %s", exc)
     else:
         pass
 
     # Return updated task list
     hierarchy = DependencyService.get_task_hierarchy()
-    return cast(str, render_template("_task_list.html", tasks=hierarchy["root_tasks"]))
+    return render_template("_task_list.html", tasks=hierarchy["root_tasks"])
 
 
 @api_bp.route("/tasks/filtered", methods=["GET"])
@@ -272,10 +276,15 @@ def get_filtered_tasks() -> str:
     view = request.args.get("view", "list")
     if view == "kanban":
         # Organize by status for Kanban
-        kanban: dict[str, list] = {"blocked": [], "todo": [], "in_progress": [], "done": []}
+        kanban: dict[str, list[dict[str, Any]]] = {
+            "blocked": [],
+            "todo": [],
+            "in_progress": [],
+            "done": [],
+        }
         for task in all_tasks:
             if task["status"] in kanban:
                 kanban[task["status"]].append(task)
-        return cast(str, render_template("_kanban_board.html", kanban=kanban))
+        return render_template("_kanban_board.html", kanban=kanban)
     else:
-        return cast(str, render_template("_task_list.html", tasks=root_tasks))
+        return render_template("_task_list.html", tasks=root_tasks)

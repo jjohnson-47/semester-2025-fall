@@ -12,7 +12,7 @@ from datetime import datetime
 from enum import Enum
 
 from scripts.rules.dates import DateRules as _DateRules
-from scripts.rules.models import AssignmentType  # noqa: F401
+from scripts.rules.models import AssignmentType
 
 
 class ShiftDirection(Enum):

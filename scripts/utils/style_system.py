@@ -45,7 +45,9 @@ class StyleSystem:
     """
 
     # Course-specific color themes (Blackboard-compatible)
-    COURSE_COLORS = {
+    from typing import ClassVar
+
+    COURSE_COLORS: ClassVar[dict[str, dict[str, str]]] = {
         "MATH221": {
             "primary": "#0066cc",  # Blue
             "primary_light": "#3399ff",
@@ -92,7 +94,7 @@ class StyleSystem:
             - course_css_path: Path to course CSS (if linking)
             - font_imports: Font import HTML
         """
-        context = {
+        context: dict[str, Any] = {
             "style_mode": "embedded" if self.config.should_embed() else "linked",
             "font_imports": self._get_font_imports(),
         }
