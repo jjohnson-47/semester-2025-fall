@@ -1,0 +1,11 @@
+deps
+events
+now_queue
+scores
+sqlite_sequence
+tasks
+tasks_fts
+tasks_fts_config
+tasks_fts_data
+tasks_fts_docsize
+tasks_fts_idx

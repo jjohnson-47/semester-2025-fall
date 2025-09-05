@@ -1,0 +1,1976 @@
+{
+  "timestamp": "2025-09-05T08:45:22.878578",
+  "probe_version": "V3",
+  "probes": {
+    "api_routes": {
+      "routes": [
+        {
+          "file": "dashboard/api/courses.py",
+          "routes": [
+            {
+              "path": "/courses",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/courses/<course_code>",
+              "methods": [
+                "GET"
+              ]
+            }
+          ],
+          "htmx_tags_present": false
+        },
+        {
+          "file": "dashboard/api/deploy.py",
+          "routes": [
+            {
+              "path": "/trigger",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/status",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/logs",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/verify",
+              "methods": [
+                "GET"
+              ]
+            }
+          ],
+          "htmx_tags_present": false
+        },
+        {
+          "file": "dashboard/api/export.py",
+          "routes": [
+            {
+              "path": "/export/csv",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/export/json",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/export/ics",
+              "methods": [
+                "GET"
+              ]
+            }
+          ],
+          "htmx_tags_present": false
+        },
+        {
+          "file": "dashboard/api/stats.py",
+          "routes": [
+            {
+              "path": "/stats",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/stats/courses/<course_code>",
+              "methods": [
+                "GET"
+              ]
+            }
+          ],
+          "htmx_tags_present": false
+        },
+        {
+          "file": "dashboard/api/tasks.py",
+          "routes": [
+            {
+              "path": "/tasks",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/tasks/<task_id>",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/tasks",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/tasks/<task_id>",
+              "methods": [
+                "PUT"
+              ]
+            },
+            {
+              "path": "/tasks/<task_id>",
+              "methods": [
+                "DELETE"
+              ]
+            },
+            {
+              "path": "/tasks/<task_id>/status",
+              "methods": [
+                "PATCH"
+              ]
+            },
+            {
+              "path": "/tasks/bulk",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/tasks/reset",
+              "methods": [
+                "POST"
+              ]
+            }
+          ],
+          "htmx_tags_present": false
+        },
+        {
+          "file": "dashboard/api/tasks_htmx.py",
+          "routes": [
+            {
+              "path": "/tasks/<task_id>/status",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/tasks/<task_id>/complete",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/tasks/<task_id>/children",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/tasks/list",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/tasks/kanban",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/tasks/<task_id>/dependencies",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/tasks/quick-add",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/tasks/filtered",
+              "methods": [
+                "GET"
+              ]
+            }
+          ],
+          "htmx_tags_present": false
+        },
+        {
+          "file": "dashboard/app.py",
+          "routes": [
+            {
+              "path": "/healthz/live",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/healthz/startup",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/tasks",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/tasks",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/api/tasks/<task_id>",
+              "methods": [
+                "PUT"
+              ]
+            },
+            {
+              "path": "/api/stats",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/tasks/bulk-update",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/api/export",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/task/<task_id>",
+              "methods": [
+                "GET",
+                "POST"
+              ]
+            },
+            {
+              "path": "/api/tasks/bulk",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/view/<view_name>",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/preview",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/syllabi",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/schedules",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/schedule/<course_code>",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/schedule/build/<course_code>",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/api/syllabus/pdf/<course_code>",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/syllabus/pdf/<course_code>_with_calendar",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/css/<path:filename>",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/schedules/<course_code>",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/syllabi/<course_code>",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/embed/syllabus/<course_code>",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/embed/schedule/<course_code>",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/embed/generator",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/syllabus/download/<course_code>.<format>",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/schedule/download/<course_code>.<format>",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/export/docx",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/site/preview/start",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/api/reprioritize",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/api/orchestrate",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/api/agent/register",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/api/agent/assign",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/api/health",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/phase",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/explain/<task_id>",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/now_queue/refresh",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/api/analytics/summary",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/retro/weekly",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/quick_add",
+              "methods": [
+                "POST"
+              ]
+            }
+          ],
+          "htmx_tags_present": false
+        },
+        {
+          "file": "dashboard/views/main.py",
+          "routes": [
+            {
+              "path": "/",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/tasks",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/courses",
+              "methods": [
+                "GET"
+              ]
+            }
+          ],
+          "htmx_tags_present": false
+        },
+        {
+          "file": "docs/update-plan-09052025/monitor_orchestration.py",
+          "routes": [
+            {
+              "path": "/",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/status",
+              "methods": [
+                "GET"
+              ]
+            }
+          ],
+          "htmx_tags_present": false
+        },
+        {
+          "file": "monitor_orchestration.py",
+          "routes": [
+            {
+              "path": "/",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/api/status",
+              "methods": [
+                "GET"
+              ]
+            }
+          ],
+          "htmx_tags_present": false
+        },
+        {
+          "file": "tests/test_decorators.py",
+          "routes": [
+            {
+              "path": "/ok",
+              "methods": [
+                "POST"
+              ]
+            }
+          ],
+          "htmx_tags_present": false
+        },
+        {
+          "file": "tests/test_utils_decorators.py",
+          "routes": [
+            {
+              "path": "/decorators/echo",
+              "methods": [
+                "POST"
+              ]
+            },
+            {
+              "path": "/decorators/page",
+              "methods": [
+                "GET"
+              ]
+            },
+            {
+              "path": "/decorators/secure",
+              "methods": [
+                "GET"
+              ]
+            }
+          ],
+          "htmx_tags_present": false
+        }
+      ]
+    },
+    "deploy_surface": {
+      "endpoints": [
+        "/trigger",
+        "/status",
+        "/logs",
+        "/verify"
+      ],
+      "method_count": 4,
+      "has_auth": false,
+      "has_validation": false
+    },
+    "db_introspection": {
+      "tables": {
+        "tasks": {
+          "row_count": 55,
+          "columns": [
+            "id",
+            "course",
+            "title",
+            "status",
+            "due_at",
+            "est_minutes",
+            "weight",
+            "category",
+            "anchor",
+            "notes",
+            "created_at",
+            "updated_at",
+            "checklist",
+            "parent_id"
+          ]
+        },
+        "deps": {
+          "row_count": 30,
+          "columns": [
+            "task_id",
+            "blocks_id"
+          ]
+        },
+        "events": {
+          "row_count": 0,
+          "columns": [
+            "id",
+            "at",
+            "task_id",
+            "field",
+            "from_val",
+            "to_val"
+          ]
+        },
+        "sqlite_sequence": {
+          "row_count": 0,
+          "columns": [
+            "name",
+            "seq"
+          ]
+        },
+        "scores": {
+          "row_count": 0,
+          "columns": [
+            "task_id",
+            "score",
+            "factors",
+            "computed_at"
+          ]
+        },
+        "now_queue": {
+          "row_count": 0,
+          "columns": [
+            "pos",
+            "task_id"
+          ]
+        },
+        "tasks_fts": {
+          "row_count": 55,
+          "columns": [
+            "title",
+            "notes"
+          ]
+        },
+        "tasks_fts_data": {
+          "row_count": 2,
+          "columns": [
+            "id",
+            "block"
+          ]
+        },
+        "tasks_fts_idx": {
+          "row_count": 0,
+          "columns": [
+            "segid",
+            "term",
+            "pgno"
+          ]
+        },
+        "tasks_fts_docsize": {
+          "row_count": 0,
+          "columns": [
+            "id",
+            "sz"
+          ]
+        },
+        "tasks_fts_config": {
+          "row_count": 1,
+          "columns": [
+            "k",
+            "v"
+          ]
+        }
+      }
+    },
+    "task_graph": {
+      "nodes": [
+        {
+          "id": "X-1",
+          "label": "A",
+          "status": "todo",
+          "course": "MATH221"
+        },
+        {
+          "id": "X-2",
+          "label": "B",
+          "status": "doing",
+          "course": "MATH251"
+        },
+        {
+          "id": "X-3",
+          "label": "C",
+          "status": "done",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH221-20250905061537",
+          "label": "New Quick Task",
+          "status": "todo",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH221-BB-UPDATE-DATES",
+          "label": "Update all Blackboard dates an...",
+          "status": "blocked",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH251-BB-UPDATE-DATES",
+          "label": "Update all Blackboard dates an...",
+          "status": "blocked",
+          "course": "MATH251"
+        },
+        {
+          "id": "STAT253-BB-UPDATE-DATES",
+          "label": "Update all Blackboard dates an...",
+          "status": "blocked",
+          "course": "STAT253"
+        },
+        {
+          "id": "MATH221-SYLL-UPDATE-CONTENT",
+          "label": "Update course content JSON fil...",
+          "status": "done",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH221-SYLL-UPDATE-DATES",
+          "label": "Update syllabus dates and sche...",
+          "status": "blocked",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH221-SYLL-GENERATE",
+          "label": "Generate syllabus from templat...",
+          "status": "blocked",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH221-SYLL-UPLOAD-BB",
+          "label": "Upload syllabus to Blackboard",
+          "status": "blocked",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH221-SYLL-SCHEDULE",
+          "label": "Generate and post course sched...",
+          "status": "blocked",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH251-SYLL-UPDATE-CONTENT",
+          "label": "Update course content JSON fil...",
+          "status": "todo",
+          "course": "MATH251"
+        },
+        {
+          "id": "MATH251-SYLL-UPDATE-DATES",
+          "label": "Update syllabus dates and sche...",
+          "status": "blocked",
+          "course": "MATH251"
+        },
+        {
+          "id": "MATH251-SYLL-GENERATE",
+          "label": "Generate syllabus from templat...",
+          "status": "blocked",
+          "course": "MATH251"
+        },
+        {
+          "id": "MATH251-SYLL-UPLOAD-BB",
+          "label": "Upload syllabus to Blackboard",
+          "status": "blocked",
+          "course": "MATH251"
+        },
+        {
+          "id": "MATH251-SYLL-SCHEDULE",
+          "label": "Generate and post course sched...",
+          "status": "blocked",
+          "course": "MATH251"
+        },
+        {
+          "id": "STAT253-SYLL-UPDATE-CONTENT",
+          "label": "Update course content JSON fil...",
+          "status": "todo",
+          "course": "STAT253"
+        },
+        {
+          "id": "STAT253-SYLL-UPDATE-DATES",
+          "label": "Update syllabus dates and sche...",
+          "status": "blocked",
+          "course": "STAT253"
+        },
+        {
+          "id": "STAT253-SYLL-GENERATE",
+          "label": "Generate syllabus from templat...",
+          "status": "blocked",
+          "course": "STAT253"
+        },
+        {
+          "id": "STAT253-SYLL-UPLOAD-BB",
+          "label": "Upload syllabus to Blackboard",
+          "status": "blocked",
+          "course": "STAT253"
+        },
+        {
+          "id": "STAT253-SYLL-SCHEDULE",
+          "label": "Generate and post course sched...",
+          "status": "blocked",
+          "course": "STAT253"
+        },
+        {
+          "id": "MATH221-MIDTERM-PREP",
+          "label": "Midterm Exam Preparation",
+          "status": "todo",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH221-FINAL-PREP",
+          "label": "Final Exam Preparation",
+          "status": "todo",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH251-MIDTERM-PREP",
+          "label": "Midterm Exam Preparation",
+          "status": "todo",
+          "course": "MATH251"
+        },
+        {
+          "id": "MATH251-FINAL-PREP",
+          "label": "Final Exam Preparation",
+          "status": "todo",
+          "course": "MATH251"
+        },
+        {
+          "id": "STAT253-MIDTERM-PREP",
+          "label": "Midterm Exam Preparation",
+          "status": "todo",
+          "course": "STAT253"
+        },
+        {
+          "id": "STAT253-FINAL-PREP",
+          "label": "Final Exam Preparation",
+          "status": "todo",
+          "course": "STAT253"
+        },
+        {
+          "id": "MATH221-BB-REQUEST-SHELL",
+          "label": "Request Blackboard Ultra shell...",
+          "status": "done",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH221-BB-COPY-CONTENT",
+          "label": "Copy content from previous sem...",
+          "status": "blocked",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH221-BB-GRADE-CENTER",
+          "label": "Configure Grade Center categor...",
+          "status": "blocked",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH221-BB-WELCOME",
+          "label": "Create welcome announcement an...",
+          "status": "blocked",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH251-BB-REQUEST-SHELL",
+          "label": "Request Blackboard Ultra shell...",
+          "status": "done",
+          "course": "MATH251"
+        },
+        {
+          "id": "MATH251-BB-COPY-CONTENT",
+          "label": "Copy content from previous sem...",
+          "status": "blocked",
+          "course": "MATH251"
+        },
+        {
+          "id": "MATH251-BB-GRADE-CENTER",
+          "label": "Configure Grade Center categor...",
+          "status": "blocked",
+          "course": "MATH251"
+        },
+        {
+          "id": "MATH251-BB-WELCOME",
+          "label": "Create welcome announcement an...",
+          "status": "blocked",
+          "course": "MATH251"
+        },
+        {
+          "id": "STAT253-BB-REQUEST-SHELL",
+          "label": "Request Blackboard Ultra shell...",
+          "status": "done",
+          "course": "STAT253"
+        },
+        {
+          "id": "STAT253-BB-COPY-CONTENT",
+          "label": "Copy content from previous sem...",
+          "status": "blocked",
+          "course": "STAT253"
+        },
+        {
+          "id": "STAT253-BB-GRADE-CENTER",
+          "label": "Configure Grade Center categor...",
+          "status": "blocked",
+          "course": "STAT253"
+        },
+        {
+          "id": "STAT253-BB-WELCOME",
+          "label": "Create welcome announcement an...",
+          "status": "blocked",
+          "course": "STAT253"
+        },
+        {
+          "id": "MATH221-WEEK-01-PREP",
+          "label": "Week 1: Introduction & Course ...",
+          "status": "todo",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH221-WEEK-01-INTRO-DISC",
+          "label": "Week 1: Set up introduction di...",
+          "status": "blocked",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH221-WEEK-02-PREP",
+          "label": "Week 2: First Content Module",
+          "status": "todo",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH221-WEEK-03-PREP",
+          "label": "Week 3: Content Module",
+          "status": "todo",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH221-WEEK-04-PREP",
+          "label": "Week 4: Content Module",
+          "status": "todo",
+          "course": "MATH221"
+        },
+        {
+          "id": "MATH251-WEEK-01-PREP",
+          "label": "Week 1: Introduction & Course ...",
+          "status": "todo",
+          "course": "MATH251"
+        },
+        {
+          "id": "MATH251-WEEK-01-INTRO-DISC",
+          "label": "Week 1: Set up introduction di...",
+          "status": "blocked",
+          "course": "MATH251"
+        },
+        {
+          "id": "MATH251-WEEK-02-PREP",
+          "label": "Week 2: First Content Module",
+          "status": "todo",
+          "course": "MATH251"
+        },
+        {
+          "id": "MATH251-WEEK-03-PREP",
+          "label": "Week 3: Content Module",
+          "status": "todo",
+          "course": "MATH251"
+        },
+        {
+          "id": "MATH251-WEEK-04-PREP",
+          "label": "Week 4: Content Module",
+          "status": "todo",
+          "course": "MATH251"
+        },
+        {
+          "id": "STAT253-WEEK-01-PREP",
+          "label": "Week 1: Introduction & Course ...",
+          "status": "todo",
+          "course": "STAT253"
+        },
+        {
+          "id": "STAT253-WEEK-01-INTRO-DISC",
+          "label": "Week 1: Set up introduction di...",
+          "status": "blocked",
+          "course": "STAT253"
+        },
+        {
+          "id": "STAT253-WEEK-02-PREP",
+          "label": "Week 2: First Content Module",
+          "status": "todo",
+          "course": "STAT253"
+        },
+        {
+          "id": "STAT253-WEEK-03-PREP",
+          "label": "Week 3: Content Module",
+          "status": "todo",
+          "course": "STAT253"
+        },
+        {
+          "id": "STAT253-WEEK-04-PREP",
+          "label": "Week 4: Content Module",
+          "status": "todo",
+          "course": "STAT253"
+        }
+      ],
+      "edges": [],
+      "stats": {
+        "total_tasks": 55,
+        "total_relationships": 0,
+        "by_course": {
+          "MATH221": 20,
+          "MATH251": 18,
+          "STAT253": 17
+        },
+        "by_status": {
+          "done": 5,
+          "doing": 1,
+          "blocked": 27,
+          "todo": 22
+        }
+      }
+    },
+    "template_modularity": {
+      "templates": [
+        {
+          "path": "syllabus.md.j2",
+          "size": 7267,
+          "has_includes": false,
+          "has_extends": false,
+          "has_blocks": false
+        },
+        {
+          "path": "course_schedule.html.j2",
+          "size": 5336,
+          "has_includes": true,
+          "has_extends": false,
+          "has_blocks": true
+        },
+        {
+          "path": "syllabus.html.j2",
+          "size": 14723,
+          "has_includes": true,
+          "has_extends": false,
+          "has_blocks": false
+        },
+        {
+          "path": "site/base.html.j2",
+          "size": 1114,
+          "has_includes": false,
+          "has_extends": false,
+          "has_blocks": true
+        },
+        {
+          "path": "site/syllabus_full.html.j2",
+          "size": 1672,
+          "has_includes": false,
+          "has_extends": true,
+          "has_blocks": true
+        },
+        {
+          "path": "site/syllabus_embed.html.j2",
+          "size": 1033,
+          "has_includes": false,
+          "has_extends": true,
+          "has_blocks": true
+        },
+        {
+          "path": "site/schedule_full.html.j2",
+          "size": 1226,
+          "has_includes": false,
+          "has_extends": true,
+          "has_blocks": true
+        },
+        {
+          "path": "site/schedule_embed.html.j2",
+          "size": 1017,
+          "has_includes": false,
+          "has_extends": true,
+          "has_blocks": true
+        },
+        {
+          "path": "site/generator.html.j2",
+          "size": 2544,
+          "has_includes": false,
+          "has_extends": false,
+          "has_blocks": true
+        },
+        {
+          "path": "site/index.html.j2",
+          "size": 7323,
+          "has_includes": false,
+          "has_extends": false,
+          "has_blocks": true
+        },
+        {
+          "path": "includes/styles.html.j2",
+          "size": 1178,
+          "has_includes": true,
+          "has_extends": false,
+          "has_blocks": false
+        }
+      ],
+      "includes": [
+        "course_schedule.html.j2",
+        "syllabus.html.j2",
+        "includes/styles.html.j2"
+      ],
+      "base_templates": [
+        "site/syllabus_full.html.j2",
+        "site/syllabus_embed.html.j2",
+        "site/schedule_full.html.j2",
+        "site/schedule_embed.html.j2"
+      ],
+      "stats": {
+        "total_templates": 11,
+        "with_includes": 3,
+        "with_extends": 4
+      }
+    },
+    "course_semantics": {
+      "courses": {
+        "MATH221": {
+          "files": [
+            {
+              "name": "course_description.json",
+              "keys": [
+                "text"
+              ],
+              "size": 206
+            },
+            {
+              "name": "grading_policy.json",
+              "keys": [
+                "points_total",
+                "scale"
+              ],
+              "size": 285
+            },
+            {
+              "name": "course_meta.json",
+              "keys": [
+                "course_crn",
+                "course_credits",
+                "section",
+                "format"
+              ],
+              "size": 95
+            },
+            {
+              "name": "course_prerequisites.json",
+              "keys": [
+                "text"
+              ],
+              "size": 659
+            },
+            {
+              "name": "instructional_goals.json",
+              "keys": [
+                "goals"
+              ],
+              "size": 204
+            },
+            {
+              "name": "student_outcomes.json",
+              "keys": [
+                "outcomes"
+              ],
+              "size": 316
+            },
+            {
+              "name": "required_textbook.json",
+              "keys": [
+                "title",
+                "author",
+                "edition",
+                "isbn",
+                "notes"
+              ],
+              "size": 206
+            },
+            {
+              "name": "calculators_and_technology.json",
+              "keys": [
+                "requirements"
+              ],
+              "size": 388
+            },
+            {
+              "name": "class_policies.json",
+              "keys": [
+                "late_work"
+              ],
+              "size": 263
+            },
+            {
+              "name": "platform_access.json",
+              "keys": [
+                "text"
+              ],
+              "size": 632
+            },
+            {
+              "name": "evaluation_tools.json",
+              "keys": [
+                "categories"
+              ],
+              "size": 275
+            },
+            {
+              "name": "schedule.json",
+              "keys": [
+                "weeks",
+                "finals"
+              ],
+              "size": 3984
+            },
+            {
+              "name": "due_dates.json",
+              "keys": [
+                "description",
+                "source",
+                "last_updated",
+                "dates"
+              ],
+              "size": 1966
+            },
+            {
+              "name": "rsi.json",
+              "keys": [
+                "course_description",
+                "student_learning_outcomes",
+                "required_materials",
+                "evaluation_grading",
+                "course_policies"
+              ],
+              "size": 1683
+            }
+          ],
+          "content_types": [
+            "schedule"
+          ]
+        },
+        "MATH251": {
+          "files": [
+            {
+              "name": "course_description.json",
+              "keys": [
+                "text"
+              ],
+              "size": 279
+            },
+            {
+              "name": "evaluation_tools.json",
+              "keys": [
+                "categories"
+              ],
+              "size": 330
+            },
+            {
+              "name": "grading_policy.json",
+              "keys": [
+                "points_total",
+                "scale"
+              ],
+              "size": 285
+            },
+            {
+              "name": "course_meta.json",
+              "keys": [
+                "course_crn",
+                "course_credits",
+                "section",
+                "format"
+              ],
+              "size": 95
+            },
+            {
+              "name": "course_prerequisites.json",
+              "keys": [
+                "text"
+              ],
+              "size": 739
+            },
+            {
+              "name": "instructional_goals.json",
+              "keys": [
+                "goals"
+              ],
+              "size": 311
+            },
+            {
+              "name": "student_outcomes.json",
+              "keys": [
+                "outcomes"
+              ],
+              "size": 457
+            },
+            {
+              "name": "required_textbook.json",
+              "keys": [
+                "title",
+                "author",
+                "edition",
+                "isbn",
+                "notes"
+              ],
+              "size": 224
+            },
+            {
+              "name": "calculators_and_technology.json",
+              "keys": [
+                "requirements"
+              ],
+              "size": 293
+            },
+            {
+              "name": "class_policies.json",
+              "keys": [
+                "late_work"
+              ],
+              "size": 207
+            },
+            {
+              "name": "platform_access.json",
+              "keys": [
+                "text"
+              ],
+              "size": 597
+            },
+            {
+              "name": "schedule.json",
+              "keys": [
+                "weeks",
+                "finals"
+              ],
+              "size": 4170
+            },
+            {
+              "name": "due_dates.json",
+              "keys": [
+                "description",
+                "source",
+                "last_updated",
+                "dates"
+              ],
+              "size": 2506
+            },
+            {
+              "name": "rsi.json",
+              "keys": [
+                "course_description",
+                "student_learning_outcomes",
+                "required_materials",
+                "evaluation_grading",
+                "course_policies"
+              ],
+              "size": 1786
+            }
+          ],
+          "content_types": [
+            "schedule"
+          ]
+        },
+        "STAT253": {
+          "files": [
+            {
+              "name": "course_description.json",
+              "keys": [
+                "text"
+              ],
+              "size": 395
+            },
+            {
+              "name": "evaluation_tools.json",
+              "keys": [
+                "categories"
+              ],
+              "size": 252
+            },
+            {
+              "name": "grading_policy.json",
+              "keys": [
+                "points_total",
+                "scale"
+              ],
+              "size": 285
+            },
+            {
+              "name": "course_meta.json",
+              "keys": [
+                "course_crn",
+                "course_credits",
+                "section",
+                "format"
+              ],
+              "size": 95
+            },
+            {
+              "name": "course_prerequisites.json",
+              "keys": [
+                "text"
+              ],
+              "size": 750
+            },
+            {
+              "name": "instructional_goals.json",
+              "keys": [
+                "goals"
+              ],
+              "size": 314
+            },
+            {
+              "name": "student_outcomes.json",
+              "keys": [
+                "outcomes"
+              ],
+              "size": 598
+            },
+            {
+              "name": "required_textbook.json",
+              "keys": [
+                "title",
+                "author",
+                "edition",
+                "isbn",
+                "notes"
+              ],
+              "size": 156
+            },
+            {
+              "name": "calculators_and_technology.json",
+              "keys": [
+                "requirements"
+              ],
+              "size": 315
+            },
+            {
+              "name": "class_policies.json",
+              "keys": [
+                "late_work"
+              ],
+              "size": 130
+            },
+            {
+              "name": "platform_access.json",
+              "keys": [
+                "text"
+              ],
+              "size": 540
+            },
+            {
+              "name": "due_dates.json",
+              "keys": [
+                "description",
+                "source",
+                "last_updated",
+                "dates"
+              ],
+              "size": 1623
+            },
+            {
+              "name": "schedule.json",
+              "keys": [
+                "weeks",
+                "finals"
+              ],
+              "size": 3354
+            },
+            {
+              "name": "rsi.json",
+              "keys": [
+                "course_description",
+                "student_learning_outcomes",
+                "required_materials",
+                "evaluation_grading",
+                "course_policies"
+              ],
+              "size": 2094
+            }
+          ],
+          "content_types": [
+            "schedule"
+          ]
+        }
+      },
+      "patterns": {
+        "has_rubrics": false,
+        "has_outcomes": true,
+        "has_prerequisites": true,
+        "has_modules": false
+      }
+    },
+    "env_vars": {
+      "BUILD_MODE": "not set",
+      "DASH_PORT": "not set",
+      "FLASK_ENV": "not set",
+      "FLASK_APP": "not set",
+      "PYTHONPATH": "not set",
+      "UV_PYTHON": "not set",
+      "UV_VENV": "not set",
+      "CI": "not set",
+      "GITHUB_ACTIONS": "not set",
+      "HOME": "/home/verlyn13"
+    },
+    "tests_inventory": {
+      "unit": [
+        {
+          "path": "unit/test_dashboard_filters.py",
+          "test_count": 2,
+          "has_fixtures": true,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "unit/test_views_main.py",
+          "test_count": 31,
+          "has_fixtures": true,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "unit/test_queue_select.py",
+          "test_count": 46,
+          "has_fixtures": false,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "unit/test_db_repo_comprehensive.py",
+          "test_count": 44,
+          "has_fixtures": true,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "unit/test_prioritization_service.py",
+          "test_count": 13,
+          "has_fixtures": true,
+          "has_mocks": true,
+          "has_hypothesis": true
+        },
+        {
+          "path": "unit/test_advanced_orchestrator.py",
+          "test_count": 25,
+          "has_fixtures": false,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "unit/test_deploy_api.py",
+          "test_count": 29,
+          "has_fixtures": true,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "unit/test_tasks_htmx.py",
+          "test_count": 24,
+          "has_fixtures": true,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "unit/test_db_repo_track_e.py",
+          "test_count": 8,
+          "has_fixtures": false,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "unit/test_orchestration_agent_simple.py",
+          "test_count": 10,
+          "has_fixtures": false,
+          "has_mocks": true,
+          "has_hypothesis": false
+        }
+      ],
+      "integration": [
+        {
+          "path": "integration/test_full_pipeline.py",
+          "test_count": 10,
+          "has_fixtures": true,
+          "has_mocks": false,
+          "has_hypothesis": false
+        }
+      ],
+      "property": [
+        {
+          "path": "property/test_date_rules_properties.py",
+          "test_count": 1,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": true
+        }
+      ],
+      "contracts": [
+        {
+          "path": "contracts/test_dates_contracts.py",
+          "test_count": 1,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "contracts/test_no_weekend_dues_projection.py",
+          "test_count": 1,
+          "has_fixtures": false,
+          "has_mocks": true,
+          "has_hypothesis": false
+        }
+      ],
+      "other": [
+        {
+          "path": "test_schedule_builder_alignment.py",
+          "test_count": 1,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_validate_json_basics.py",
+          "test_count": 3,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_validate_json_schema_and_project.py",
+          "test_count": 3,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_phase_detection.py",
+          "test_count": 1,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_utils_decorators.py",
+          "test_count": 3,
+          "has_fixtures": true,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_reprioritize_unit.py",
+          "test_count": 2,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_generate_tasks_yaml_flow.py",
+          "test_count": 1,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_helpers_more.py",
+          "test_count": 2,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_validate_module.py",
+          "test_count": 2,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_type_aliases.py",
+          "test_count": 1,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_views.py",
+          "test_count": 1,
+          "has_fixtures": true,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_config.py",
+          "test_count": 2,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_export_more.py",
+          "test_count": 1,
+          "has_fixtures": true,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_stats.py",
+          "test_count": 1,
+          "has_fixtures": true,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_api_endpoints.py",
+          "test_count": 4,
+          "has_fixtures": true,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_api_export_stats_db.py",
+          "test_count": 1,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_course_service_projection.py",
+          "test_count": 1,
+          "has_fixtures": false,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_dag_tools.py",
+          "test_count": 2,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_dashboard_app.py",
+          "test_count": 15,
+          "has_fixtures": true,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_dashboard_tools.py",
+          "test_count": 16,
+          "has_fixtures": true,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_date_rules_enforcement.py",
+          "test_count": 4,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_db_repo.py",
+          "test_count": 1,
+          "has_fixtures": true,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_decorators.py",
+          "test_count": 3,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_dependency_service.py",
+          "test_count": 16,
+          "has_fixtures": true,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_golden_fixtures.py",
+          "test_count": 7,
+          "has_fixtures": true,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_golden_validation.py",
+          "test_count": 9,
+          "has_fixtures": true,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_htmx_endpoints.py",
+          "test_count": 9,
+          "has_fixtures": true,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_models.py",
+          "test_count": 17,
+          "has_fixtures": true,
+          "has_mocks": false,
+          "has_hypothesis": true
+        },
+        {
+          "path": "test_phase_and_contracts.py",
+          "test_count": 4,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_scoring_tools.py",
+          "test_count": 3,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_stable_id_migration.py",
+          "test_count": 3,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_validation_gateway.py",
+          "test_count": 1,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_validation_gateway_schema_v110.py",
+          "test_count": 2,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_date_rules_ported.py",
+          "test_count": 6,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_date_rules.py",
+          "test_count": 13,
+          "has_fixtures": true,
+          "has_mocks": false,
+          "has_hypothesis": false
+        },
+        {
+          "path": "test_infrastructure_validation.py",
+          "test_count": 16,
+          "has_fixtures": true,
+          "has_mocks": true,
+          "has_hypothesis": false
+        },
+        {
+          "path": "golden/test_projection_golden_math221.py",
+          "test_count": 1,
+          "has_fixtures": false,
+          "has_mocks": false,
+          "has_hypothesis": false
+        }
+      ],
+      "stats": {
+        "total_files": 51,
+        "total_tests": 423,
+        "categories": {
+          "unit": 10,
+          "integration": 1,
+          "property": 1,
+          "contracts": 2,
+          "other": 37
+        }
+      }
+    },
+    "make_targets": {
+      "targets": [
+        "docs",
+        "fmt",
+        "lint",
+        "typecheck",
+        "test",
+        "test-unit",
+        "test-integration",
+        "test-property",
+        "test-solver",
+        "test-fast",
+        "test-all",
+        "cov",
+        "cov-xml",
+        "ratchet",
+        "build",
+        "audit",
+        "docs-flask",
+        "docs-api",
+        "docs-coverage",
+        "help",
+        "init",
+        "validate",
+        "calendar",
+        "syllabi",
+        "schedules",
+        "weekly",
+        "packages",
+        "course",
+        "all",
+        "pipeline",
+        "orchestrate",
+        "pipeline-run",
+        "tests-run",
+        "validate-v110",
+        "ids-dry-run",
+        "generate-stable-ids",
+        "migrate-to-v110",
+        "v2-preview",
+        "v2-cutover-dry-run",
+        "clean",
+        "dev-server",
+        "serve-interactive",
+        "lint",
+        "format",
+        "test",
+        "smoke",
+        "smoke-local",
+        "sync-guides",
+        "preview",
+        "scaffold",
+        "check-deps",
+        "dash-init",
+        "dash-gen",
+        "dash-prioritize",
+        "dash-validate",
+        "dash",
+        "dash-open",
+        "dash-export",
+        "dash-snapshot",
+        "dash-reset",
+        "ci-setup",
+        "ci-validate",
+        "ci-build",
+        "ci-test",
+        "ci-lint",
+        "pre-commit-install",
+        "pre-commit-run",
+        "dev-setup",
+        "build-site",
+        "serve-site",
+        "compare-site",
+        "pages-list",
+        "pages-project",
+        "pages-verify-token",
+        "pages-deployments",
+        "pages-deploy",
+        "pages-load-context",
+        "pages-create",
+        "pages-attach-domain",
+        "pages-status",
+        "pages-env",
+        "dns-list",
+        "dns-add-cname",
+        "dns-verify",
+        "pages-setup",
+        "vendor-katex",
+        "dev-serve",
+        "test-e2e",
+        "sprint-katex"
+      ],
+      "count": 89
+    }
+  },
+  "summary": {
+    "total_probes": 9,
+    "successful_probes": 9,
+    "api_endpoints": 0,
+    "task_count": 55,
+    "test_count": 423,
+    "course_count": 3
+  }
+}

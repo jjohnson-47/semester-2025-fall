@@ -1,0 +1,55 @@
+{
+  "timestamp": "2025-09-05T08:46:34.701972",
+  "phase": 2,
+  "gaps_identified": 7,
+  "lanes": {
+    "db-migrations": {
+      "priority": 1,
+      "tasks": [
+        "Create and populate course_projection tables",
+        "Create course_registry for course metadata"
+      ],
+      "gap_count": 2,
+      "estimated_effort": "low"
+    },
+    "course-manifests": {
+      "priority": 2,
+      "tasks": [
+        "Generate manifest.json for MATH221",
+        "Generate manifest.json for MATH251",
+        "Generate manifest.json for STAT253"
+      ],
+      "gap_count": 3,
+      "estimated_effort": "medium"
+    },
+    "task-deps": {
+      "priority": 3,
+      "tasks": [
+        "Analyze and define task dependencies"
+      ],
+      "gap_count": 1,
+      "estimated_effort": "low"
+    },
+    "test-coverage": {
+      "priority": 4,
+      "tasks": [
+        "Add integration tests for key workflows"
+      ],
+      "gap_count": 1,
+      "estimated_effort": "low"
+    }
+  },
+  "priority_order": [
+    "db-migrations",
+    "course-manifests",
+    "task-deps",
+    "test-coverage"
+  ],
+  "summary": {
+    "total_gaps": 7,
+    "total_lanes": 4,
+    "high_priority": 1,
+    "medium_priority": 5,
+    "low_priority": 1
+  }
+}

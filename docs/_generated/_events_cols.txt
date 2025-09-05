@@ -1,0 +1,6 @@
+0|id|INTEGER|0||1
+1|at|TEXT|1||0
+2|task_id|TEXT|1||0
+3|field|TEXT|1||0
+4|from_val|TEXT|0||0
+5|to_val|TEXT|0||0

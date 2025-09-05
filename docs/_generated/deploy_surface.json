@@ -1,0 +1,11 @@
+{
+  "endpoints": [
+    "/trigger",
+    "/status",
+    "/logs",
+    "/verify"
+  ],
+  "method_count": 4,
+  "has_auth": false,
+  "has_validation": false
+}

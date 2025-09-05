@@ -1,0 +1,97 @@
+{
+  "templates": [
+    {
+      "path": "syllabus.md.j2",
+      "size": 7267,
+      "has_includes": false,
+      "has_extends": false,
+      "has_blocks": false
+    },
+    {
+      "path": "course_schedule.html.j2",
+      "size": 5336,
+      "has_includes": true,
+      "has_extends": false,
+      "has_blocks": true
+    },
+    {
+      "path": "syllabus.html.j2",
+      "size": 14723,
+      "has_includes": true,
+      "has_extends": false,
+      "has_blocks": false
+    },
+    {
+      "path": "site/base.html.j2",
+      "size": 1114,
+      "has_includes": false,
+      "has_extends": false,
+      "has_blocks": true
+    },
+    {
+      "path": "site/syllabus_full.html.j2",
+      "size": 1672,
+      "has_includes": false,
+      "has_extends": true,
+      "has_blocks": true
+    },
+    {
+      "path": "site/syllabus_embed.html.j2",
+      "size": 1033,
+      "has_includes": false,
+      "has_extends": true,
+      "has_blocks": true
+    },
+    {
+      "path": "site/schedule_full.html.j2",
+      "size": 1226,
+      "has_includes": false,
+      "has_extends": true,
+      "has_blocks": true
+    },
+    {
+      "path": "site/schedule_embed.html.j2",
+      "size": 1017,
+      "has_includes": false,
+      "has_extends": true,
+      "has_blocks": true
+    },
+    {
+      "path": "site/generator.html.j2",
+      "size": 2544,
+      "has_includes": false,
+      "has_extends": false,
+      "has_blocks": true
+    },
+    {
+      "path": "site/index.html.j2",
+      "size": 7323,
+      "has_includes": false,
+      "has_extends": false,
+      "has_blocks": true
+    },
+    {
+      "path": "includes/styles.html.j2",
+      "size": 1178,
+      "has_includes": true,
+      "has_extends": false,
+      "has_blocks": false
+    }
+  ],
+  "includes": [
+    "course_schedule.html.j2",
+    "syllabus.html.j2",
+    "includes/styles.html.j2"
+  ],
+  "base_templates": [
+    "site/syllabus_full.html.j2",
+    "site/syllabus_embed.html.j2",
+    "site/schedule_full.html.j2",
+    "site/schedule_embed.html.j2"
+  ],
+  "stats": {
+    "total_templates": 11,
+    "with_includes": 3,
+    "with_extends": 4
+  }
+}

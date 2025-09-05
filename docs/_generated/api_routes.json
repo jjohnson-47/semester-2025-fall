@@ -1,0 +1,545 @@
+{
+  "routes": [
+    {
+      "file": "dashboard/api/courses.py",
+      "routes": [
+        {
+          "path": "/courses",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/courses/<course_code>",
+          "methods": [
+            "GET"
+          ]
+        }
+      ],
+      "htmx_tags_present": false
+    },
+    {
+      "file": "dashboard/api/deploy.py",
+      "routes": [
+        {
+          "path": "/trigger",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/status",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/logs",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/verify",
+          "methods": [
+            "GET"
+          ]
+        }
+      ],
+      "htmx_tags_present": false
+    },
+    {
+      "file": "dashboard/api/export.py",
+      "routes": [
+        {
+          "path": "/export/csv",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/export/json",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/export/ics",
+          "methods": [
+            "GET"
+          ]
+        }
+      ],
+      "htmx_tags_present": false
+    },
+    {
+      "file": "dashboard/api/stats.py",
+      "routes": [
+        {
+          "path": "/stats",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/stats/courses/<course_code>",
+          "methods": [
+            "GET"
+          ]
+        }
+      ],
+      "htmx_tags_present": false
+    },
+    {
+      "file": "dashboard/api/tasks.py",
+      "routes": [
+        {
+          "path": "/tasks",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/tasks/<task_id>",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/tasks",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/tasks/<task_id>",
+          "methods": [
+            "PUT"
+          ]
+        },
+        {
+          "path": "/tasks/<task_id>",
+          "methods": [
+            "DELETE"
+          ]
+        },
+        {
+          "path": "/tasks/<task_id>/status",
+          "methods": [
+            "PATCH"
+          ]
+        },
+        {
+          "path": "/tasks/bulk",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/tasks/reset",
+          "methods": [
+            "POST"
+          ]
+        }
+      ],
+      "htmx_tags_present": false
+    },
+    {
+      "file": "dashboard/api/tasks_htmx.py",
+      "routes": [
+        {
+          "path": "/tasks/<task_id>/status",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/tasks/<task_id>/complete",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/tasks/<task_id>/children",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/tasks/list",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/tasks/kanban",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/tasks/<task_id>/dependencies",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/tasks/quick-add",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/tasks/filtered",
+          "methods": [
+            "GET"
+          ]
+        }
+      ],
+      "htmx_tags_present": false
+    },
+    {
+      "file": "dashboard/app.py",
+      "routes": [
+        {
+          "path": "/healthz/live",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/healthz/startup",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/tasks",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/tasks",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/api/tasks/<task_id>",
+          "methods": [
+            "PUT"
+          ]
+        },
+        {
+          "path": "/api/stats",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/tasks/bulk-update",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/api/export",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/task/<task_id>",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/api/tasks/bulk",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/view/<view_name>",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/preview",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/syllabi",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/schedules",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/schedule/<course_code>",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/schedule/build/<course_code>",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/api/syllabus/pdf/<course_code>",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/syllabus/pdf/<course_code>_with_calendar",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/css/<path:filename>",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/schedules/<course_code>",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/syllabi/<course_code>",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/embed/syllabus/<course_code>",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/embed/schedule/<course_code>",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/embed/generator",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/syllabus/download/<course_code>.<format>",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/schedule/download/<course_code>.<format>",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/export/docx",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/site/preview/start",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/api/reprioritize",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/api/orchestrate",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/api/agent/register",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/api/agent/assign",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/api/health",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/phase",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/explain/<task_id>",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/now_queue/refresh",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/api/analytics/summary",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/retro/weekly",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/quick_add",
+          "methods": [
+            "POST"
+          ]
+        }
+      ],
+      "htmx_tags_present": false
+    },
+    {
+      "file": "dashboard/views/main.py",
+      "routes": [
+        {
+          "path": "/",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/tasks",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/courses",
+          "methods": [
+            "GET"
+          ]
+        }
+      ],
+      "htmx_tags_present": false
+    },
+    {
+      "file": "docs/update-plan-09052025/monitor_orchestration.py",
+      "routes": [
+        {
+          "path": "/",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/status",
+          "methods": [
+            "GET"
+          ]
+        }
+      ],
+      "htmx_tags_present": false
+    },
+    {
+      "file": "monitor_orchestration.py",
+      "routes": [
+        {
+          "path": "/",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/status",
+          "methods": [
+            "GET"
+          ]
+        }
+      ],
+      "htmx_tags_present": false
+    },
+    {
+      "file": "tests/test_decorators.py",
+      "routes": [
+        {
+          "path": "/ok",
+          "methods": [
+            "POST"
+          ]
+        }
+      ],
+      "htmx_tags_present": false
+    },
+    {
+      "file": "tests/test_utils_decorators.py",
+      "routes": [
+        {
+          "path": "/decorators/echo",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/decorators/page",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/decorators/secure",
+          "methods": [
+            "GET"
+          ]
+        }
+      ],
+      "htmx_tags_present": false
+    }
+  ]
+}

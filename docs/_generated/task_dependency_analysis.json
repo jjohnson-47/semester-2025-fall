@@ -1,0 +1,42 @@
+{
+  "timestamp": "2025-09-05T08:53:25.718809",
+  "total_tasks": 55,
+  "courses": {
+    "MATH221": {
+      "task_count": 20,
+      "categories": {
+        "setup": 2,
+        "Weekly Content": 7,
+        "Blackboard Setup": 5,
+        "Syllabus & Documentation": 5,
+        "assessment": 1
+      },
+      "potential_dependencies": [
+        "Exams could depend on completion of related assignments"
+      ]
+    },
+    "MATH251": {
+      "task_count": 18,
+      "categories": {
+        "content": 1,
+        "Weekly Content": 7,
+        "Blackboard Setup": 5,
+        "Syllabus & Documentation": 5
+      },
+      "potential_dependencies": [
+        "Exams could depend on completion of related assignments"
+      ]
+    },
+    "STAT253": {
+      "task_count": 17,
+      "categories": {
+        "Weekly Content": 7,
+        "Blackboard Setup": 5,
+        "Syllabus & Documentation": 5
+      },
+      "potential_dependencies": [
+        "Exams could depend on completion of related assignments"
+      ]
+    }
+  }
+}

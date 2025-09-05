@@ -1,0 +1,350 @@
+{
+  "nodes": [
+    {
+      "id": "X-1",
+      "label": "A",
+      "status": "todo",
+      "course": "MATH221"
+    },
+    {
+      "id": "X-2",
+      "label": "B",
+      "status": "doing",
+      "course": "MATH251"
+    },
+    {
+      "id": "X-3",
+      "label": "C",
+      "status": "done",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH221-20250905061537",
+      "label": "New Quick Task",
+      "status": "todo",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH221-BB-UPDATE-DATES",
+      "label": "Update all Blackboard dates an...",
+      "status": "blocked",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH251-BB-UPDATE-DATES",
+      "label": "Update all Blackboard dates an...",
+      "status": "blocked",
+      "course": "MATH251"
+    },
+    {
+      "id": "STAT253-BB-UPDATE-DATES",
+      "label": "Update all Blackboard dates an...",
+      "status": "blocked",
+      "course": "STAT253"
+    },
+    {
+      "id": "MATH221-SYLL-UPDATE-CONTENT",
+      "label": "Update course content JSON fil...",
+      "status": "done",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH221-SYLL-UPDATE-DATES",
+      "label": "Update syllabus dates and sche...",
+      "status": "blocked",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH221-SYLL-GENERATE",
+      "label": "Generate syllabus from templat...",
+      "status": "blocked",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH221-SYLL-UPLOAD-BB",
+      "label": "Upload syllabus to Blackboard",
+      "status": "blocked",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH221-SYLL-SCHEDULE",
+      "label": "Generate and post course sched...",
+      "status": "blocked",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH251-SYLL-UPDATE-CONTENT",
+      "label": "Update course content JSON fil...",
+      "status": "todo",
+      "course": "MATH251"
+    },
+    {
+      "id": "MATH251-SYLL-UPDATE-DATES",
+      "label": "Update syllabus dates and sche...",
+      "status": "blocked",
+      "course": "MATH251"
+    },
+    {
+      "id": "MATH251-SYLL-GENERATE",
+      "label": "Generate syllabus from templat...",
+      "status": "blocked",
+      "course": "MATH251"
+    },
+    {
+      "id": "MATH251-SYLL-UPLOAD-BB",
+      "label": "Upload syllabus to Blackboard",
+      "status": "blocked",
+      "course": "MATH251"
+    },
+    {
+      "id": "MATH251-SYLL-SCHEDULE",
+      "label": "Generate and post course sched...",
+      "status": "blocked",
+      "course": "MATH251"
+    },
+    {
+      "id": "STAT253-SYLL-UPDATE-CONTENT",
+      "label": "Update course content JSON fil...",
+      "status": "todo",
+      "course": "STAT253"
+    },
+    {
+      "id": "STAT253-SYLL-UPDATE-DATES",
+      "label": "Update syllabus dates and sche...",
+      "status": "blocked",
+      "course": "STAT253"
+    },
+    {
+      "id": "STAT253-SYLL-GENERATE",
+      "label": "Generate syllabus from templat...",
+      "status": "blocked",
+      "course": "STAT253"
+    },
+    {
+      "id": "STAT253-SYLL-UPLOAD-BB",
+      "label": "Upload syllabus to Blackboard",
+      "status": "blocked",
+      "course": "STAT253"
+    },
+    {
+      "id": "STAT253-SYLL-SCHEDULE",
+      "label": "Generate and post course sched...",
+      "status": "blocked",
+      "course": "STAT253"
+    },
+    {
+      "id": "MATH221-MIDTERM-PREP",
+      "label": "Midterm Exam Preparation",
+      "status": "todo",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH221-FINAL-PREP",
+      "label": "Final Exam Preparation",
+      "status": "todo",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH251-MIDTERM-PREP",
+      "label": "Midterm Exam Preparation",
+      "status": "todo",
+      "course": "MATH251"
+    },
+    {
+      "id": "MATH251-FINAL-PREP",
+      "label": "Final Exam Preparation",
+      "status": "todo",
+      "course": "MATH251"
+    },
+    {
+      "id": "STAT253-MIDTERM-PREP",
+      "label": "Midterm Exam Preparation",
+      "status": "todo",
+      "course": "STAT253"
+    },
+    {
+      "id": "STAT253-FINAL-PREP",
+      "label": "Final Exam Preparation",
+      "status": "todo",
+      "course": "STAT253"
+    },
+    {
+      "id": "MATH221-BB-REQUEST-SHELL",
+      "label": "Request Blackboard Ultra shell...",
+      "status": "done",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH221-BB-COPY-CONTENT",
+      "label": "Copy content from previous sem...",
+      "status": "blocked",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH221-BB-GRADE-CENTER",
+      "label": "Configure Grade Center categor...",
+      "status": "blocked",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH221-BB-WELCOME",
+      "label": "Create welcome announcement an...",
+      "status": "blocked",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH251-BB-REQUEST-SHELL",
+      "label": "Request Blackboard Ultra shell...",
+      "status": "done",
+      "course": "MATH251"
+    },
+    {
+      "id": "MATH251-BB-COPY-CONTENT",
+      "label": "Copy content from previous sem...",
+      "status": "blocked",
+      "course": "MATH251"
+    },
+    {
+      "id": "MATH251-BB-GRADE-CENTER",
+      "label": "Configure Grade Center categor...",
+      "status": "blocked",
+      "course": "MATH251"
+    },
+    {
+      "id": "MATH251-BB-WELCOME",
+      "label": "Create welcome announcement an...",
+      "status": "blocked",
+      "course": "MATH251"
+    },
+    {
+      "id": "STAT253-BB-REQUEST-SHELL",
+      "label": "Request Blackboard Ultra shell...",
+      "status": "done",
+      "course": "STAT253"
+    },
+    {
+      "id": "STAT253-BB-COPY-CONTENT",
+      "label": "Copy content from previous sem...",
+      "status": "blocked",
+      "course": "STAT253"
+    },
+    {
+      "id": "STAT253-BB-GRADE-CENTER",
+      "label": "Configure Grade Center categor...",
+      "status": "blocked",
+      "course": "STAT253"
+    },
+    {
+      "id": "STAT253-BB-WELCOME",
+      "label": "Create welcome announcement an...",
+      "status": "blocked",
+      "course": "STAT253"
+    },
+    {
+      "id": "MATH221-WEEK-01-PREP",
+      "label": "Week 1: Introduction & Course ...",
+      "status": "todo",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH221-WEEK-01-INTRO-DISC",
+      "label": "Week 1: Set up introduction di...",
+      "status": "blocked",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH221-WEEK-02-PREP",
+      "label": "Week 2: First Content Module",
+      "status": "todo",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH221-WEEK-03-PREP",
+      "label": "Week 3: Content Module",
+      "status": "todo",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH221-WEEK-04-PREP",
+      "label": "Week 4: Content Module",
+      "status": "todo",
+      "course": "MATH221"
+    },
+    {
+      "id": "MATH251-WEEK-01-PREP",
+      "label": "Week 1: Introduction & Course ...",
+      "status": "todo",
+      "course": "MATH251"
+    },
+    {
+      "id": "MATH251-WEEK-01-INTRO-DISC",
+      "label": "Week 1: Set up introduction di...",
+      "status": "blocked",
+      "course": "MATH251"
+    },
+    {
+      "id": "MATH251-WEEK-02-PREP",
+      "label": "Week 2: First Content Module",
+      "status": "todo",
+      "course": "MATH251"
+    },
+    {
+      "id": "MATH251-WEEK-03-PREP",
+      "label": "Week 3: Content Module",
+      "status": "todo",
+      "course": "MATH251"
+    },
+    {
+      "id": "MATH251-WEEK-04-PREP",
+      "label": "Week 4: Content Module",
+      "status": "todo",
+      "course": "MATH251"
+    },
+    {
+      "id": "STAT253-WEEK-01-PREP",
+      "label": "Week 1: Introduction & Course ...",
+      "status": "todo",
+      "course": "STAT253"
+    },
+    {
+      "id": "STAT253-WEEK-01-INTRO-DISC",
+      "label": "Week 1: Set up introduction di...",
+      "status": "blocked",
+      "course": "STAT253"
+    },
+    {
+      "id": "STAT253-WEEK-02-PREP",
+      "label": "Week 2: First Content Module",
+      "status": "todo",
+      "course": "STAT253"
+    },
+    {
+      "id": "STAT253-WEEK-03-PREP",
+      "label": "Week 3: Content Module",
+      "status": "todo",
+      "course": "STAT253"
+    },
+    {
+      "id": "STAT253-WEEK-04-PREP",
+      "label": "Week 4: Content Module",
+      "status": "todo",
+      "course": "STAT253"
+    }
+  ],
+  "edges": [],
+  "stats": {
+    "total_tasks": 55,
+    "total_relationships": 0,
+    "by_course": {
+      "MATH221": 20,
+      "MATH251": 18,
+      "STAT253": 17
+    },
+    "by_status": {
+      "done": 5,
+      "doing": 1,
+      "blocked": 27,
+      "todo": 22
+    }
+  }
+}

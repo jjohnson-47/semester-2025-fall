@@ -1,0 +1,380 @@
+{
+  "unit": [
+    {
+      "path": "unit/test_dashboard_filters.py",
+      "test_count": 2,
+      "has_fixtures": true,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "unit/test_views_main.py",
+      "test_count": 31,
+      "has_fixtures": true,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "unit/test_queue_select.py",
+      "test_count": 46,
+      "has_fixtures": false,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "unit/test_db_repo_comprehensive.py",
+      "test_count": 44,
+      "has_fixtures": true,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "unit/test_prioritization_service.py",
+      "test_count": 13,
+      "has_fixtures": true,
+      "has_mocks": true,
+      "has_hypothesis": true
+    },
+    {
+      "path": "unit/test_advanced_orchestrator.py",
+      "test_count": 25,
+      "has_fixtures": false,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "unit/test_deploy_api.py",
+      "test_count": 29,
+      "has_fixtures": true,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "unit/test_tasks_htmx.py",
+      "test_count": 24,
+      "has_fixtures": true,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "unit/test_db_repo_track_e.py",
+      "test_count": 8,
+      "has_fixtures": false,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "unit/test_orchestration_agent_simple.py",
+      "test_count": 10,
+      "has_fixtures": false,
+      "has_mocks": true,
+      "has_hypothesis": false
+    }
+  ],
+  "integration": [
+    {
+      "path": "integration/test_full_pipeline.py",
+      "test_count": 10,
+      "has_fixtures": true,
+      "has_mocks": false,
+      "has_hypothesis": false
+    }
+  ],
+  "property": [
+    {
+      "path": "property/test_date_rules_properties.py",
+      "test_count": 1,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": true
+    }
+  ],
+  "contracts": [
+    {
+      "path": "contracts/test_dates_contracts.py",
+      "test_count": 1,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "contracts/test_no_weekend_dues_projection.py",
+      "test_count": 1,
+      "has_fixtures": false,
+      "has_mocks": true,
+      "has_hypothesis": false
+    }
+  ],
+  "other": [
+    {
+      "path": "test_schedule_builder_alignment.py",
+      "test_count": 1,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_validate_json_basics.py",
+      "test_count": 3,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_validate_json_schema_and_project.py",
+      "test_count": 3,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_phase_detection.py",
+      "test_count": 1,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_utils_decorators.py",
+      "test_count": 3,
+      "has_fixtures": true,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_reprioritize_unit.py",
+      "test_count": 2,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_generate_tasks_yaml_flow.py",
+      "test_count": 1,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_helpers_more.py",
+      "test_count": 2,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_validate_module.py",
+      "test_count": 2,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_type_aliases.py",
+      "test_count": 1,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_views.py",
+      "test_count": 1,
+      "has_fixtures": true,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_config.py",
+      "test_count": 2,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_export_more.py",
+      "test_count": 1,
+      "has_fixtures": true,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_stats.py",
+      "test_count": 1,
+      "has_fixtures": true,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_api_endpoints.py",
+      "test_count": 4,
+      "has_fixtures": true,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_api_export_stats_db.py",
+      "test_count": 1,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_course_service_projection.py",
+      "test_count": 1,
+      "has_fixtures": false,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_dag_tools.py",
+      "test_count": 2,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_dashboard_app.py",
+      "test_count": 15,
+      "has_fixtures": true,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_dashboard_tools.py",
+      "test_count": 16,
+      "has_fixtures": true,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_date_rules_enforcement.py",
+      "test_count": 4,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_db_repo.py",
+      "test_count": 1,
+      "has_fixtures": true,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_decorators.py",
+      "test_count": 3,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_dependency_service.py",
+      "test_count": 16,
+      "has_fixtures": true,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_golden_fixtures.py",
+      "test_count": 7,
+      "has_fixtures": true,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_golden_validation.py",
+      "test_count": 9,
+      "has_fixtures": true,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_htmx_endpoints.py",
+      "test_count": 9,
+      "has_fixtures": true,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_models.py",
+      "test_count": 17,
+      "has_fixtures": true,
+      "has_mocks": false,
+      "has_hypothesis": true
+    },
+    {
+      "path": "test_phase_and_contracts.py",
+      "test_count": 4,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_scoring_tools.py",
+      "test_count": 3,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_stable_id_migration.py",
+      "test_count": 3,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_validation_gateway.py",
+      "test_count": 1,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_validation_gateway_schema_v110.py",
+      "test_count": 2,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_date_rules_ported.py",
+      "test_count": 6,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_date_rules.py",
+      "test_count": 13,
+      "has_fixtures": true,
+      "has_mocks": false,
+      "has_hypothesis": false
+    },
+    {
+      "path": "test_infrastructure_validation.py",
+      "test_count": 16,
+      "has_fixtures": true,
+      "has_mocks": true,
+      "has_hypothesis": false
+    },
+    {
+      "path": "golden/test_projection_golden_math221.py",
+      "test_count": 1,
+      "has_fixtures": false,
+      "has_mocks": false,
+      "has_hypothesis": false
+    }
+  ],
+  "stats": {
+    "total_files": 51,
+    "total_tests": 423,
+    "categories": {
+      "unit": 10,
+      "integration": 1,
+      "property": 1,
+      "contracts": 2,
+      "other": 37
+    }
+  }
+}

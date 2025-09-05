@@ -61,6 +61,7 @@ def down(conn: sqlite3.Connection):
     """Remove origin tracking columns from tasks table"""
     # SQLite doesn't support dropping columns directly
     # Would need to recreate table without these columns
+    _ = conn  # Unused but required for interface
     print("⚠ SQLite doesn't support dropping columns. Manual intervention required.")
 
 

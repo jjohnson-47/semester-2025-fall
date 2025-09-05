@@ -1,0 +1,141 @@
+{
+  "metadata": {
+    "created_at": "2025-09-05",
+    "source_directory": "docs/_generated",
+    "project": "semester-2025-fall",
+    "description": "Complete diagnostic and state data package for web agent consumption",
+    "file_count": 10,
+    "total_files_size_bytes": 2403
+  },
+  "repository_state": {
+    "git": {
+      "head": "2cc10ee6013aeafd12da54f34a49dba2fea7fb10",
+      "branch": "main",
+      "recent_commits": [
+        "8eb0e92 feat: Add comprehensive repository state probe (V2)",
+        "2cc10ee Remove outdated orchestration agent tests with API mismatches",
+        "57d1092 Merge Track C: Prioritization Service development branch"
+      ]
+    },
+    "workflows": [
+      ".github/workflows/ci.yml",
+      ".github/workflows/coverage-summary.yml",
+      ".github/workflows/pages.yml",
+      ".github/workflows/release.yml",
+      ".github/workflows/scheduled.yml",
+      ".github/workflows/smoke.yml",
+      ".github/workflows/test.yml"
+    ],
+    "configuration": {
+      "pyproject_present": true,
+      "mypy_ini": true,
+      "ruff_toml": false,
+      "makefile": true,
+      "pre_commit": true
+    }
+  },
+  "course_structure": {
+    "courses_directory_exists": true,
+    "total_courses": 3,
+    "course_details": [
+      {
+        "course_code": "MATH221",
+        "json_file_count": 14,
+        "has_manifest": false,
+        "schema_version": null
+      },
+      {
+        "course_code": "MATH251", 
+        "json_file_count": 14,
+        "has_manifest": false,
+        "schema_version": null
+      },
+      {
+        "course_code": "STAT253",
+        "json_file_count": 14,
+        "has_manifest": false,
+        "schema_version": null
+      }
+    ]
+  },
+  "database_schema": {
+    "database_present": true,
+    "tables": [
+      "deps",
+      "events",
+      "now_queue",
+      "scores",
+      "sqlite_sequence",
+      "tasks",
+      "tasks_fts",
+      "tasks_fts_config",
+      "tasks_fts_data",
+      "tasks_fts_docsize",
+      "tasks_fts_idx"
+    ],
+    "task_count": 55,
+    "now_queue_count": 0,
+    "events_table_columns": [
+      {"name": "id", "type": "INTEGER", "primary_key": true},
+      {"name": "at", "type": "TEXT", "not_null": true},
+      {"name": "task_id", "type": "TEXT", "not_null": true},
+      {"name": "field", "type": "TEXT", "not_null": true},
+      {"name": "from_val", "type": "TEXT"},
+      {"name": "to_val", "type": "TEXT"}
+    ],
+    "tasks_table_columns": [
+      {"name": "id", "type": "TEXT", "primary_key": true},
+      {"name": "course", "type": "TEXT"},
+      {"name": "title", "type": "TEXT", "not_null": true},
+      {"name": "status", "type": "TEXT", "not_null": true},
+      {"name": "due_at", "type": "TEXT"},
+      {"name": "est_minutes", "type": "INTEGER"},
+      {"name": "weight", "type": "REAL", "default": 1.0},
+      {"name": "category", "type": "TEXT"},
+      {"name": "anchor", "type": "INTEGER", "default": 0},
+      {"name": "notes", "type": "TEXT"},
+      {"name": "created_at", "type": "TEXT", "not_null": true},
+      {"name": "updated_at", "type": "TEXT", "not_null": true},
+      {"name": "checklist", "type": "TEXT"},
+      {"name": "parent_id", "type": "TEXT"}
+    ],
+    "feature_flags": {
+      "has_course_registry": false,
+      "has_course_projection": false,
+      "has_events": true,
+      "tasks_has_origin_triplet": false
+    }
+  },
+  "test_configuration": {
+    "pytest_markers": [],
+    "test_collection_status": "empty"
+  },
+  "raw_files": {
+    "_events_cols.txt": "0|id|INTEGER|0||1\n1|at|TEXT|1||0\n2|task_id|TEXT|1||0\n3|field|TEXT|1||0\n4|from_val|TEXT|0||0\n5|to_val|TEXT|0||0",
+    "_nowq_count.txt": "0",
+    "_origin_cols.txt": "0",
+    "_proj_cols.txt": "",
+    "_pytest_collect.txt": "",
+    "_pytest_markers.txt": "",
+    "_registry_cols.txt": "",
+    "_tables.txt": "deps\nevents\nnow_queue\nscores\nsqlite_sequence\ntasks\ntasks_fts\ntasks_fts_config\ntasks_fts_data\ntasks_fts_docsize\ntasks_fts_idx",
+    "_tasks_cols.txt": "0|id|TEXT|0||1\n1|course|TEXT|0||0\n2|title|TEXT|1||0\n3|status|TEXT|1||0\n4|due_at|TEXT|0||0\n5|est_minutes|INTEGER|0||0\n6|weight|REAL|0|1.0|0\n7|category|TEXT|0||0\n8|anchor|INTEGER|0|0|0\n9|notes|TEXT|0||0\n10|created_at|TEXT|1||0\n11|updated_at|TEXT|1||0\n12|checklist|TEXT|0||0\n13|parent_id|TEXT|0||0",
+    "_tasks_count.txt": "55",
+    "workflows_list.txt": ".github/workflows/ci.yml\n.github/workflows/coverage-summary.yml\n.github/workflows/pages.yml\n.github/workflows/release.yml\n.github/workflows/scheduled.yml\n.github/workflows/smoke.yml\n.github/workflows/test.yml"
+  },
+  "summary": {
+    "project_type": "Course Management System",
+    "semester": "Fall 2025",
+    "courses": ["MATH221", "MATH251", "STAT253"],
+    "database_tasks": 55,
+    "workflow_count": 7,
+    "key_features": [
+      "V2 Projection-based architecture",
+      "Dashboard with Flask",
+      "GitHub Actions deployment",
+      "Cloudflare Pages hosting",
+      "Comprehensive test coverage",
+      "Task management system"
+    ]
+  }
+}

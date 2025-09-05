@@ -1,0 +1,24 @@
+{
+  "courses_dir_exists": true,
+  "course_count": 3,
+  "courses": [
+    {
+      "course_code": "MATH221",
+      "json_files": 14,
+      "has_manifest": false,
+      "schema_version": null
+    },
+    {
+      "course_code": "MATH251",
+      "json_files": 14,
+      "has_manifest": false,
+      "schema_version": null
+    },
+    {
+      "course_code": "STAT253",
+      "json_files": 14,
+      "has_manifest": false,
+      "schema_version": null
+    }
+  ]
+}

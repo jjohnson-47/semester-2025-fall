@@ -146,7 +146,7 @@ class TestOrchestrationCompleteness:
                 
                 assert 'features' in manifest
                 assert 'validation' in manifest
-                assert manifest['validation']['schema_compliant'] == True
+                assert manifest['validation']['schema_compliant'] is True
     
     def test_migration_scripts_exist(self):
         """Verify migration scripts were created"""

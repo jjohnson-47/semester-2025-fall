@@ -1,0 +1,373 @@
+{
+  "courses": {
+    "MATH221": {
+      "files": [
+        {
+          "name": "course_description.json",
+          "keys": [
+            "text"
+          ],
+          "size": 206
+        },
+        {
+          "name": "grading_policy.json",
+          "keys": [
+            "points_total",
+            "scale"
+          ],
+          "size": 285
+        },
+        {
+          "name": "course_meta.json",
+          "keys": [
+            "course_crn",
+            "course_credits",
+            "section",
+            "format"
+          ],
+          "size": 95
+        },
+        {
+          "name": "course_prerequisites.json",
+          "keys": [
+            "text"
+          ],
+          "size": 659
+        },
+        {
+          "name": "instructional_goals.json",
+          "keys": [
+            "goals"
+          ],
+          "size": 204
+        },
+        {
+          "name": "student_outcomes.json",
+          "keys": [
+            "outcomes"
+          ],
+          "size": 316
+        },
+        {
+          "name": "required_textbook.json",
+          "keys": [
+            "title",
+            "author",
+            "edition",
+            "isbn",
+            "notes"
+          ],
+          "size": 206
+        },
+        {
+          "name": "calculators_and_technology.json",
+          "keys": [
+            "requirements"
+          ],
+          "size": 388
+        },
+        {
+          "name": "class_policies.json",
+          "keys": [
+            "late_work"
+          ],
+          "size": 263
+        },
+        {
+          "name": "platform_access.json",
+          "keys": [
+            "text"
+          ],
+          "size": 632
+        },
+        {
+          "name": "evaluation_tools.json",
+          "keys": [
+            "categories"
+          ],
+          "size": 275
+        },
+        {
+          "name": "schedule.json",
+          "keys": [
+            "weeks",
+            "finals"
+          ],
+          "size": 3984
+        },
+        {
+          "name": "due_dates.json",
+          "keys": [
+            "description",
+            "source",
+            "last_updated",
+            "dates"
+          ],
+          "size": 1966
+        },
+        {
+          "name": "rsi.json",
+          "keys": [
+            "course_description",
+            "student_learning_outcomes",
+            "required_materials",
+            "evaluation_grading",
+            "course_policies"
+          ],
+          "size": 1683
+        }
+      ],
+      "content_types": [
+        "schedule"
+      ]
+    },
+    "MATH251": {
+      "files": [
+        {
+          "name": "course_description.json",
+          "keys": [
+            "text"
+          ],
+          "size": 279
+        },
+        {
+          "name": "evaluation_tools.json",
+          "keys": [
+            "categories"
+          ],
+          "size": 330
+        },
+        {
+          "name": "grading_policy.json",
+          "keys": [
+            "points_total",
+            "scale"
+          ],
+          "size": 285
+        },
+        {
+          "name": "course_meta.json",
+          "keys": [
+            "course_crn",
+            "course_credits",
+            "section",
+            "format"
+          ],
+          "size": 95
+        },
+        {
+          "name": "course_prerequisites.json",
+          "keys": [
+            "text"
+          ],
+          "size": 739
+        },
+        {
+          "name": "instructional_goals.json",
+          "keys": [
+            "goals"
+          ],
+          "size": 311
+        },
+        {
+          "name": "student_outcomes.json",
+          "keys": [
+            "outcomes"
+          ],
+          "size": 457
+        },
+        {
+          "name": "required_textbook.json",
+          "keys": [
+            "title",
+            "author",
+            "edition",
+            "isbn",
+            "notes"
+          ],
+          "size": 224
+        },
+        {
+          "name": "calculators_and_technology.json",
+          "keys": [
+            "requirements"
+          ],
+          "size": 293
+        },
+        {
+          "name": "class_policies.json",
+          "keys": [
+            "late_work"
+          ],
+          "size": 207
+        },
+        {
+          "name": "platform_access.json",
+          "keys": [
+            "text"
+          ],
+          "size": 597
+        },
+        {
+          "name": "schedule.json",
+          "keys": [
+            "weeks",
+            "finals"
+          ],
+          "size": 4170
+        },
+        {
+          "name": "due_dates.json",
+          "keys": [
+            "description",
+            "source",
+            "last_updated",
+            "dates"
+          ],
+          "size": 2506
+        },
+        {
+          "name": "rsi.json",
+          "keys": [
+            "course_description",
+            "student_learning_outcomes",
+            "required_materials",
+            "evaluation_grading",
+            "course_policies"
+          ],
+          "size": 1786
+        }
+      ],
+      "content_types": [
+        "schedule"
+      ]
+    },
+    "STAT253": {
+      "files": [
+        {
+          "name": "course_description.json",
+          "keys": [
+            "text"
+          ],
+          "size": 395
+        },
+        {
+          "name": "evaluation_tools.json",
+          "keys": [
+            "categories"
+          ],
+          "size": 252
+        },
+        {
+          "name": "grading_policy.json",
+          "keys": [
+            "points_total",
+            "scale"
+          ],
+          "size": 285
+        },
+        {
+          "name": "course_meta.json",
+          "keys": [
+            "course_crn",
+            "course_credits",
+            "section",
+            "format"
+          ],
+          "size": 95
+        },
+        {
+          "name": "course_prerequisites.json",
+          "keys": [
+            "text"
+          ],
+          "size": 750
+        },
+        {
+          "name": "instructional_goals.json",
+          "keys": [
+            "goals"
+          ],
+          "size": 314
+        },
+        {
+          "name": "student_outcomes.json",
+          "keys": [
+            "outcomes"
+          ],
+          "size": 598
+        },
+        {
+          "name": "required_textbook.json",
+          "keys": [
+            "title",
+            "author",
+            "edition",
+            "isbn",
+            "notes"
+          ],
+          "size": 156
+        },
+        {
+          "name": "calculators_and_technology.json",
+          "keys": [
+            "requirements"
+          ],
+          "size": 315
+        },
+        {
+          "name": "class_policies.json",
+          "keys": [
+            "late_work"
+          ],
+          "size": 130
+        },
+        {
+          "name": "platform_access.json",
+          "keys": [
+            "text"
+          ],
+          "size": 540
+        },
+        {
+          "name": "due_dates.json",
+          "keys": [
+            "description",
+            "source",
+            "last_updated",
+            "dates"
+          ],
+          "size": 1623
+        },
+        {
+          "name": "schedule.json",
+          "keys": [
+            "weeks",
+            "finals"
+          ],
+          "size": 3354
+        },
+        {
+          "name": "rsi.json",
+          "keys": [
+            "course_description",
+            "student_learning_outcomes",
+            "required_materials",
+            "evaluation_grading",
+            "course_policies"
+          ],
+          "size": 2094
+        }
+      ],
+      "content_types": [
+        "schedule"
+      ]
+    }
+  },
+  "patterns": {
+    "has_rubrics": false,
+    "has_outcomes": true,
+    "has_prerequisites": true,
+    "has_modules": false
+  }
+}

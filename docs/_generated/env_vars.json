@@ -1,0 +1,12 @@
+{
+  "BUILD_MODE": "not set",
+  "DASH_PORT": "not set",
+  "FLASK_ENV": "not set",
+  "FLASK_APP": "not set",
+  "PYTHONPATH": "not set",
+  "UV_PYTHON": "not set",
+  "UV_VENV": "not set",
+  "CI": "not set",
+  "GITHUB_ACTIONS": "not set",
+  "HOME": "/home/verlyn13"
+}

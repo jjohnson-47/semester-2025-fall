@@ -1,0 +1,14 @@
+0|id|TEXT|0||1
+1|course|TEXT|0||0
+2|title|TEXT|1||0
+3|status|TEXT|1||0
+4|due_at|TEXT|0||0
+5|est_minutes|INTEGER|0||0
+6|weight|REAL|0|1.0|0
+7|category|TEXT|0||0
+8|anchor|INTEGER|0|0|0
+9|notes|TEXT|0||0
+10|created_at|TEXT|1||0
+11|updated_at|TEXT|1||0
+12|checklist|TEXT|0||0
+13|parent_id|TEXT|0||0

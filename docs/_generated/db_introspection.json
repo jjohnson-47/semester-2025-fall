@@ -1,0 +1,100 @@
+{
+  "tables": {
+    "tasks": {
+      "row_count": 55,
+      "columns": [
+        "id",
+        "course",
+        "title",
+        "status",
+        "due_at",
+        "est_minutes",
+        "weight",
+        "category",
+        "anchor",
+        "notes",
+        "created_at",
+        "updated_at",
+        "checklist",
+        "parent_id"
+      ]
+    },
+    "deps": {
+      "row_count": 30,
+      "columns": [
+        "task_id",
+        "blocks_id"
+      ]
+    },
+    "events": {
+      "row_count": 0,
+      "columns": [
+        "id",
+        "at",
+        "task_id",
+        "field",
+        "from_val",
+        "to_val"
+      ]
+    },
+    "sqlite_sequence": {
+      "row_count": 0,
+      "columns": [
+        "name",
+        "seq"
+      ]
+    },
+    "scores": {
+      "row_count": 0,
+      "columns": [
+        "task_id",
+        "score",
+        "factors",
+        "computed_at"
+      ]
+    },
+    "now_queue": {
+      "row_count": 0,
+      "columns": [
+        "pos",
+        "task_id"
+      ]
+    },
+    "tasks_fts": {
+      "row_count": 55,
+      "columns": [
+        "title",
+        "notes"
+      ]
+    },
+    "tasks_fts_data": {
+      "row_count": 2,
+      "columns": [
+        "id",
+        "block"
+      ]
+    },
+    "tasks_fts_idx": {
+      "row_count": 0,
+      "columns": [
+        "segid",
+        "term",
+        "pgno"
+      ]
+    },
+    "tasks_fts_docsize": {
+      "row_count": 0,
+      "columns": [
+        "id",
+        "sz"
+      ]
+    },
+    "tasks_fts_config": {
+      "row_count": 1,
+      "columns": [
+        "k",
+        "v"
+      ]
+    }
+  }
+}
