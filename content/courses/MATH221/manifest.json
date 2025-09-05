@@ -1,0 +1,53 @@
+{
+  "_meta": {
+    "version": "1.1.0",
+    "generated_at": "2025-09-05T08:51:00.637145",
+    "course_code": "MATH221",
+    "schema_version": "v1.1.0"
+  },
+  "course": {
+    "code": "MATH221",
+    "title": "MATH221 Course",
+    "credits": 3,
+    "term": "Fall 2025",
+    "start_date": "2025-08-25",
+    "end_date": "2025-12-13"
+  },
+  "instructor": {},
+  "schedule": {
+    "meeting_times": [],
+    "location": "TBD",
+    "format": "Online Asynchronous"
+  },
+  "files": {
+    "json_files": [
+      "calculators_and_technology.json",
+      "class_policies.json",
+      "course_description.json",
+      "course_meta.json",
+      "course_prerequisites.json",
+      "due_dates.json",
+      "evaluation_tools.json",
+      "grading_policy.json",
+      "instructional_goals.json",
+      "platform_access.json",
+      "required_textbook.json",
+      "rsi.json",
+      "schedule.json",
+      "student_outcomes.json"
+    ],
+    "count": 14
+  },
+  "features": {
+    "has_syllabus": false,
+    "has_schedule": true,
+    "has_blackboard": false,
+    "has_grading": false,
+    "has_policies": true
+  },
+  "validation": {
+    "schema_compliant": true,
+    "no_weekend_dues": true,
+    "dates_validated": true
+  }
+}

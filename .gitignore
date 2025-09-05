@@ -110,3 +110,5 @@ scratch/
 
 # UV
 uv.lock.local
+.worktrees/
+.orchestration/
