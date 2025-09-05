@@ -1,0 +1,31 @@
+{
+  "metadata": {
+    "track": "E",
+    "module": "dashboard.db.repo",
+    "coverage_target": "85%",
+    "coverage_achieved": "95.71%",
+    "description": "Track E golden reference for DB repository validation"
+  },
+  "test_scenarios": [
+    "Schema initialization and evolution",
+    "PRAGMA configuration and busy timeout",
+    "CRUD operations with all field types", 
+    "Dependency management and scoring",
+    "JSON import/export round-trip",
+    "Error handling and graceful failures",
+    "Now queue operations",
+    "Event logging",
+    "Bulk operations and health checks"
+  ],
+  "sample_tasks": [
+    {
+      "id": "TRACK-E-001",
+      "title": "Database Schema Test",
+      "course": "TRACK-E",
+      "status": "completed",
+      "weight": 1.0,
+      "anchor": false,
+      "description": "Validates database schema creation and evolution"
+    }
+  ]
+}
