@@ -64,6 +64,25 @@ test:
 		$(UV) run pytest -q --cov=dashboard --cov=scripts --cov-branch ; \
 	fi
 
+# Test targets for specific markers
+test-unit: ## Run unit tests only
+	$(UV) run pytest -m unit -v
+
+test-integration: ## Run integration tests only  
+	$(UV) run pytest -m integration -v
+
+test-property: ## Run property-based tests only
+	$(UV) run pytest -m property -v
+
+test-solver: ## Run CP-SAT solver tests only
+	$(UV) run pytest -m solver -v
+
+test-fast: ## Run all tests except slow ones
+	$(UV) run pytest -m "not slow" -v
+
+test-all: ## Run all tests with coverage
+	$(UV) run pytest --cov=dashboard --cov=scripts --cov-branch -v
+
 cov:
 	$(UV) run coverage report -m
 
