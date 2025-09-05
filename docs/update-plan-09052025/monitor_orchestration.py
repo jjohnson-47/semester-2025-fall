@@ -6,19 +6,18 @@ Save as: monitor_orchestration.py
 Usage: python3 monitor_orchestration.py [--web]
 """
 
+import argparse
 import json
-import time
 import os
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
-import argparse
-import threading
-from typing import Dict, Any, Optional
+from typing import Any
 
 # Try to import optional dependencies
 try:
-    from flask import Flask, render_template_string, jsonify
+    from flask import Flask, jsonify, render_template_string
     HAS_FLASK = True
 except ImportError:
     HAS_FLASK = False
@@ -31,13 +30,13 @@ class OrchestrationMonitor:
         self.last_update = None
         self.data = {}
         
-    def read_tracker(self) -> Dict[str, Any]:
+    def read_tracker(self) -> dict[str, Any]:
         """Read the tracker file safely."""
         try:
             if self.tracker_file.exists():
-                with open(self.tracker_file, 'r') as f:
+                with open(self.tracker_file) as f:
                     return json.load(f)
-        except (json.JSONDecodeError, IOError) as e:
+        except (OSError, json.JSONDecodeError) as e:
             print(f"Error reading tracker: {e}")
         return {}
     
@@ -68,7 +67,7 @@ class OrchestrationMonitor:
         try:
             dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
             return dt.strftime("%H:%M:%S")
-        except:
+        except (ValueError, AttributeError):
             return timestamp
     
     def print_status(self):
@@ -95,7 +94,7 @@ class OrchestrationMonitor:
         # Progress bar for phases
         phases = ['Init', 'Probes', 'Planning', 'Execution', 'Complete']
         progress = "["
-        for i, p in enumerate(phases):
+        for i, _ in enumerate(phases):
             if i < phase:
                 progress += "■"
             elif i == phase:
@@ -134,11 +133,11 @@ class OrchestrationMonitor:
                 
                 # Color coding for priority
                 if priority == 'high':
-                    priority_str = f"HIGH"
+                    priority_str = "HIGH"
                 elif priority == 'medium':
-                    priority_str = f"MED"
+                    priority_str = "MED"
                 else:
-                    priority_str = f"LOW"
+                    priority_str = "LOW"
                     
                 print(f"{icon} {lane_id[:18]:<18} {lane['status']:<12} {priority_str:<10} {results_count:<10} {progress:<30}")
                 
@@ -157,9 +156,9 @@ class OrchestrationMonitor:
         failed_agents = sum(1 for a in agents.values() if a['status'] == 'failed')
         
         total_lanes = len(lanes)
-        completed_lanes = sum(1 for l in lanes.values() if l['status'] == 'completed')
-        failed_lanes = sum(1 for l in lanes.values() if l['status'] == 'failed')
-        running_lanes = sum(1 for l in lanes.values() if l['status'] == 'running')
+        completed_lanes = sum(1 for lane in lanes.values() if lane['status'] == 'completed')
+        failed_lanes = sum(1 for lane in lanes.values() if lane['status'] == 'failed')
+        running_lanes = sum(1 for lane in lanes.values() if lane['status'] == 'running')
         
         print(f"Agents:  Total: {total_agents} | Active: {active_agents} | Done: {completed_agents} | Failed: {failed_agents}")
         print(f"Lanes:   Total: {total_lanes} | Running: {running_lanes} | Done: {completed_lanes} | Failed: {failed_lanes}")
@@ -177,7 +176,7 @@ class OrchestrationMonitor:
         
         # Warnings or errors
         if failed_agents > 0 or failed_lanes > 0:
-            print(f"\n⚠️  WARNINGS:")
+            print("\n⚠️  WARNINGS:")
             if failed_agents > 0:
                 print(f"   - {failed_agents} agent(s) failed")
             if failed_lanes > 0:
@@ -219,9 +218,9 @@ class OrchestrationMonitor:
             'agents_completed': sum(1 for a in agents.values() if a['status'] == 'completed'),
             'agents_failed': sum(1 for a in agents.values() if a['status'] == 'failed'),
             'lanes_total': len(lanes),
-            'lanes_running': sum(1 for l in lanes.values() if l['status'] == 'running'),
-            'lanes_completed': sum(1 for l in lanes.values() if l['status'] == 'completed'),
-            'lanes_failed': sum(1 for l in lanes.values() if l['status'] == 'failed'),
+            'lanes_running': sum(1 for lane in lanes.values() if lane['status'] == 'running'),
+            'lanes_completed': sum(1 for lane in lanes.values() if lane['status'] == 'completed'),
+            'lanes_failed': sum(1 for lane in lanes.values() if lane['status'] == 'failed'),
             'completion_percentage': 0
         }
         

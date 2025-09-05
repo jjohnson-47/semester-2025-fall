@@ -4,10 +4,10 @@ Migration 001: Create course projection tables
 Creates course_registry and course_projection tables for V2 architecture
 """
 
-import sqlite3
 import json
-from pathlib import Path
+import sqlite3
 from datetime import datetime
+from pathlib import Path
 
 
 def up(conn: sqlite3.Connection):
@@ -193,7 +193,7 @@ def main():
         cursor.execute("SELECT COUNT(*) FROM course_projection")
         proj_count = cursor.fetchone()[0]
         
-        print(f"\nMigration complete:")
+        print("\nMigration complete:")
         print(f"  - course_registry: {reg_count} records")
         print(f"  - course_projection: {proj_count} records")
         

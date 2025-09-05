@@ -6,7 +6,6 @@ Adds origin_ref, origin_kind, and origin_version columns for tracking task origi
 
 import sqlite3
 from pathlib import Path
-from datetime import datetime
 
 
 def up(conn: sqlite3.Connection):

@@ -6,7 +6,6 @@ Creates indexes on frequently queried columns for optimal performance
 
 import sqlite3
 from pathlib import Path
-from datetime import datetime
 
 
 def up(conn: sqlite3.Connection):
@@ -124,7 +123,7 @@ def main():
         total_indexes = cursor.fetchone()[0]
         
         print("\n" + "=" * 50)
-        print(f"✓ Migration complete")
+        print("✓ Migration complete")
         print(f"  Indexes created: {created}")
         print(f"  Total indexes on tasks table: {total_indexes}")
         

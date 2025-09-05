@@ -6,8 +6,8 @@ Currently tasks have no dependencies - this is a placeholder for future work
 
 import json
 import sqlite3
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 
 def analyze_task_dependencies():
@@ -108,7 +108,7 @@ def main():
         print(f"  Tasks: {data['task_count']}")
         print(f"  Categories: {', '.join(data['categories'].keys())}")
         if data['potential_dependencies']:
-            print(f"  Potential dependencies identified:")
+            print("  Potential dependencies identified:")
             for dep in data['potential_dependencies']:
                 print(f"    - {dep}")
     

@@ -57,7 +57,7 @@ class CSSHandler:
 
         if course_codes is None:
             # Copy all CSS files in courses directory
-            css_files = courses_dir.glob("*.css")
+            css_files = list(courses_dir.glob("*.css"))
         else:
             # Copy only specified course CSS files
             css_files = [courses_dir / f"{code}.css" for code in course_codes]

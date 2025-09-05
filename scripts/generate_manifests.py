@@ -5,8 +5,8 @@ Manifests provide metadata and schema version information
 """
 
 import json
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 
 def generate_manifest(course_code: str, course_dir: Path) -> dict:

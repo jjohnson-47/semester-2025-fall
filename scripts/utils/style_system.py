@@ -46,7 +46,7 @@ class StyleSystem:
 
     # Course-specific color themes (Blackboard-compatible)
     from typing import ClassVar
-
+    
     COURSE_COLORS: ClassVar[dict[str, dict[str, str]]] = {
         "MATH221": {
             "primary": "#0066cc",  # Blue

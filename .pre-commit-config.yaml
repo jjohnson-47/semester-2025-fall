@@ -1,20 +1,58 @@
+# Pre-commit hooks for code quality and consistency
+# https://pre-commit.com/
+
 repos:
+  # Format pyproject.toml
   - repo: https://github.com/tox-dev/pyproject-fmt
     rev: 2.5.0
     hooks:
       - id: pyproject-fmt
+
+  # Ruff - Fast Python linter and formatter
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.5.7
+    rev: v0.8.6
     hooks:
       - id: ruff
-        args: ["--fix"]
+        args: [--fix]
       - id: ruff-format
+
+  # Type checking with mypy
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.14.1
+    hooks:
+      - id: mypy
+        name: mypy (comprehensive)
+        files: ^(scripts|dashboard)/.*\.py$
+        args: [--ignore-missing-imports, --no-strict-optional]
+        additional_dependencies: [types-requests, types-PyYAML]
+
+  # Standard pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-json
+        exclude: ^content/courses/.*/bb_content\.json$
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+      - id: debug-statements
+
+  # Prettier for markdown/yaml/json formatting
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
         args: ["--prose-wrap", "always"]
         additional_dependencies: ["prettier@3.3.3"]
+        types_or: [markdown, yaml, json]
+
+  # Local custom hooks
   - repo: local
     hooks:
       - id: forbid-suppress
@@ -22,20 +60,37 @@ repos:
         entry: bash scripts/ci/forbid_suppress.sh
         language: system
         files: \.py$
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.0
-    hooks:
-      - id: mypy
-        name: mypy (focused)
-        additional_dependencies: []
-        args:
-          - scripts/rules
-          - scripts/build_pipeline.py
-          - dashboard/api
-          - --ignore-missing-imports
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
-    hooks:
-      - id: check-yaml
-      - id: end-of-file-fixer
-      - id: trailing-whitespace
+      
+      - id: validate-json-schemas
+        name: validate JSON schemas
+        entry: make validate
+        language: system
+        pass_filenames: false
+        files: ^content/courses/.*\.json$
+
+# Configuration
+default_language_version:
+  python: python3.13
+
+# Files to exclude globally
+exclude: |
+  (?x)^(
+    \.git/|
+    \.venv/|
+    __pycache__/|
+    build/|
+    dist/|
+    site/|
+    \.pytest_cache/|
+    \.mypy_cache/|
+    \.ruff_cache/|
+    node_modules/|
+    docs/update-plan-09052025/|
+    .*\.min\.(js|css)$
+  )
+
+# Fail fast on first error (set to true for CI)
+fail_fast: false
+
+# Show diff on failure
+verbose: true

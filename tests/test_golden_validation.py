@@ -84,14 +84,6 @@ class TestGoldenValidation:
         import pytest
 
         pytest.skip("Provenance tracking is not exposed via unified CourseService")
-        assert course.instructor.name.provenance is not None
-        assert course.instructor.name.provenance.confidence >= 0.0
-
-        # Check schedule week provenance
-        if course.schedule_weeks:
-            week = course.schedule_weeks[0]
-            assert week.topic.provenance is not None
-            assert week.topic.field_name == "topic"
 
     @pytest.mark.parametrize("course_id", ["MATH221", "MATH251", "STAT253"])
     def test_projection_checksums(self, course_service, course_id):
