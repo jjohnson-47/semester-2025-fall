@@ -1,0 +1,7 @@
+.github/workflows/ci.yml
+.github/workflows/coverage-summary.yml
+.github/workflows/pages.yml
+.github/workflows/release.yml
+.github/workflows/scheduled.yml
+.github/workflows/smoke.yml
+.github/workflows/test.yml

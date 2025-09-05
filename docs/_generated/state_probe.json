@@ -1,0 +1,60 @@
+{
+  "git": {
+    "head": "2cc10ee6013aeafd12da54f34a49dba2fea7fb10",
+    "branch": "main"
+  },
+  "workflows": [
+    ".github/workflows/ci.yml",
+    ".github/workflows/coverage-summary.yml",
+    ".github/workflows/pages.yml",
+    ".github/workflows/release.yml",
+    ".github/workflows/scheduled.yml",
+    ".github/workflows/smoke.yml",
+    ".github/workflows/test.yml"
+  ],
+  "config": {
+    "pyproject_present": true,
+    "mypy_ini": true,
+    "ruff_toml": false,
+    "makefile": true,
+    "pre_commit": true
+  },
+  "courses": {
+    "courses_dir_exists": true,
+    "course_count": 3,
+    "courses": [
+      {
+        "course_code": "MATH221",
+        "json_files": 14,
+        "has_manifest": false,
+        "schema_version": null
+      },
+      {
+        "course_code": "MATH251",
+        "json_files": 14,
+        "has_manifest": false,
+        "schema_version": null
+      },
+      {
+        "course_code": "STAT253",
+        "json_files": 14,
+        "has_manifest": false,
+        "schema_version": null
+      }
+    ]
+  },
+  "db": {
+    "present": true,
+    "has_course_registry": false,
+    "has_course_projection": false,
+    "has_events": true,
+    "tasks_has_origin_triplet": false
+  },
+  "tests": {
+    "markers": [],
+    "collect_excerpt": ""
+  },
+  "templates": {
+    "large": []
+  }
+}
