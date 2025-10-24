@@ -298,12 +298,38 @@ class CourseService:
 
     def _project_schedule(self, course: NormalizedCourse) -> CourseProjection:
         """Project course data for schedule view."""
+        from datetime import datetime as _dt
         from scripts.rules.dates import DateRules
         from scripts.utils.semester_calendar import SemesterCalendar
 
         dr = DateRules()
         cal = SemesterCalendar()
         cal_weeks = cal.get_weeks()
+
+        # Load custom due dates if available
+        custom_due_dates: dict[str, str] = {}
+        course_code = course.identity.code.value
+        due_dates_file = self.content_dir / "courses" / course_code / "due_dates.json"
+        if due_dates_file.exists():
+            with open(due_dates_file) as f:
+                data = json.load(f)
+                custom_due_dates = data.get("dates", {})
+
+        def format_custom_due_date(date_str: str) -> str:
+            """Format a custom due date with weekend adjustment."""
+            from datetime import timedelta
+            due_date = _dt.strptime(date_str, "%Y-%m-%d")
+
+            # Apply weekend adjustment rules
+            weekday = due_date.weekday()
+            if weekday == 5:  # Saturday -> Friday
+                due_date = due_date - timedelta(days=1)
+            elif weekday == 6:  # Sunday -> Monday
+                due_date = due_date + timedelta(days=1)
+
+            day_names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+            day_label = day_names[due_date.weekday()]
+            return f"(due {day_label} {due_date.strftime('%m/%d')})"
 
         weeks: list[dict[str, Any]] = []
         for week in course.schedule_weeks:
@@ -331,8 +357,6 @@ class CourseService:
             date_range = None
             try:
                 if start and end:
-                    from datetime import datetime as _dt
-
                     sdt = _dt.fromisoformat(str(start)) if isinstance(start, str) else None
                     edt = _dt.fromisoformat(str(end)) if isinstance(end, str) else None
                     if sdt and edt:
@@ -350,11 +374,18 @@ class CourseService:
                 out: list[str] = []
                 for label in items or []:
                     try:
-                        if isinstance(label, str) and start:
-                            due = dr.apply_rules(
-                                label, str(start), holidays, is_assessment=is_assessment
-                            )
-                            out.append(f"{label} {due}")
+                        if isinstance(label, str):
+                            # Check for custom due date first
+                            if label in custom_due_dates:
+                                due = format_custom_due_date(custom_due_dates[label])
+                                out.append(f"{label} {due}")
+                            elif start:
+                                due = dr.apply_rules(
+                                    label, str(start), holidays, is_assessment=is_assessment
+                                )
+                                out.append(f"{label} {due}")
+                            else:
+                                out.append(label)
                         else:
                             out.append(label)
                     except Exception:

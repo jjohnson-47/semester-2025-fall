@@ -243,42 +243,57 @@ class ScheduleBuilder:
                     holidays_str = f" ({', '.join(holidays)})" if holidays else ""
 
                     # Process assignments with due dates
-                    assignments_with_dates = []
-                    html_assignments = []
-                    for item in pw.get("assignments", []):
-                        if item in custom_due_dates:
-                            due = self._format_custom_due_date(custom_due_dates[item])
-                            assignments_with_dates.append(f"{item} {due}")
-                            html_assignments.append(f"{item} {due}")
-                        elif cal_week:
-                            # Use automatic date calculation
-                            wd = self._choose_due_weekday(item, is_assessment=False)
-                            wd, add = self._apply_holiday_shift(wd, holidays, item, False)
-                            due = self._format_due(cal_week["start"], wd, add)
-                            assignments_with_dates.append(f"{item} {due}")
-                            html_assignments.append(f"{item} {due}")
-                        else:
-                            assignments_with_dates.append(item)
-                            html_assignments.append(item)
+                    # V2 projection already includes due dates, so use them as-is
+                    assignments_with_dates = list(pw.get("assignments", []))
+                    html_assignments = list(pw.get("assignments", []))
 
                     # Process assessments with due dates
-                    assessments_with_dates = []
-                    html_assessments = []
-                    for item in pw.get("assessments", []):
-                        if item in custom_due_dates:
-                            due = self._format_custom_due_date(custom_due_dates[item])
-                            assessments_with_dates.append(f"{item} {due}")
-                            html_assessments.append(f"{item} {due}")
-                        elif cal_week:
-                            # Use automatic date calculation
-                            wd = self._choose_due_weekday(item, is_assessment=True)
-                            wd, add = self._apply_holiday_shift(wd, holidays, item, True)
-                            due = self._format_due(cal_week["start"], wd, add)
-                            assessments_with_dates.append(f"{item} {due}")
-                            html_assessments.append(f"{item} {due}")
-                        else:
-                            assessments_with_dates.append(item)
-                            html_assessments.append(item)
+                    # V2 projection already includes due dates, so use them as-is
+                    assessments_with_dates = list(pw.get("assessments", []))
+                    html_assessments = list(pw.get("assessments", []))
+
+                    # Legacy compatibility: if dates not present, add them
+                    # Check if first item has a date pattern - if not, add dates
+                    needs_dates = False
+                    if assignments_with_dates and not "(due " in str(assignments_with_dates[0]):
+                        needs_dates = True
+
+                    if needs_dates:
+                        assignments_with_dates = []
+                        html_assignments = []
+                        for item in pw.get("assignments", []):
+                            if item in custom_due_dates:
+                                due = self._format_custom_due_date(custom_due_dates[item])
+                                assignments_with_dates.append(f"{item} {due}")
+                                html_assignments.append(f"{item} {due}")
+                            elif cal_week:
+                                # Use automatic date calculation
+                                wd = self._choose_due_weekday(item, is_assessment=False)
+                                wd, add = self._apply_holiday_shift(wd, holidays, item, False)
+                                due = self._format_due(cal_week["start"], wd, add)
+                                assignments_with_dates.append(f"{item} {due}")
+                                html_assignments.append(f"{item} {due}")
+                            else:
+                                assignments_with_dates.append(item)
+                                html_assignments.append(item)
+
+                        assessments_with_dates = []
+                        html_assessments = []
+                        for item in pw.get("assessments", []):
+                            if item in custom_due_dates:
+                                due = self._format_custom_due_date(custom_due_dates[item])
+                                assessments_with_dates.append(f"{item} {due}")
+                                html_assessments.append(f"{item} {due}")
+                            elif cal_week:
+                                # Use automatic date calculation
+                                wd = self._choose_due_weekday(item, is_assessment=True)
+                                wd, add = self._apply_holiday_shift(wd, holidays, item, True)
+                                due = self._format_due(cal_week["start"], wd, add)
+                                assessments_with_dates.append(f"{item} {due}")
+                                html_assessments.append(f"{item} {due}")
+                            else:
+                                assessments_with_dates.append(item)
+                                html_assessments.append(item)
 
                     rows.append(
                         f"| {idx} | {date_range}{holidays_str} | {pw.get('topic', '')} | {', '.join(assignments_with_dates)} | {', '.join(assessments_with_dates)} |"
