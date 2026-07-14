@@ -2,6 +2,11 @@
 **Date**: August 25, 2025  
 **Phase**: Full Implementation Complete
 
+> **Historical completion report.** This file records the August 2025 system.
+> As of 2026-07-14, the repository is a retained public archive and publication
+> automation is retired. Current authority is `README.md` and
+> [`adr/0005-retained-public-archive.md`](adr/0005-retained-public-archive.md).
+
 ## Executive Summary
 
 The multi-agent refactor has been fully implemented with all critical components operational. The system now provides a complete, production-ready architecture with v1.1.0 schema support, date rules enforcement, projection-based data flow, and comprehensive testing.

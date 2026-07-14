@@ -1,5 +1,12 @@
 # Cloudflare Pages Implementation Guide
 
+> **Historical implementation record; do not execute as a runbook.** Automatic
+> Pages publication and routine Cloudflare mutation were retired on 2026-07-14.
+> The setup commands below describe the Fall 2025 design. Current local build
+> guidance and the reactivation gate are in
+> [`SITE_BUILDER.md`](SITE_BUILDER.md) and
+> [`adr/0005-retained-public-archive.md`](adr/0005-retained-public-archive.md).
+
 ## Course Content System with Private Dashboard & Blackboard Integration
 
 ---

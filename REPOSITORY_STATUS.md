@@ -1,7 +1,16 @@
-# Repository Status Report
+# Repository Status Report (Historical Snapshot)
 Generated: September 5, 2025
 
-## 🎯 Current State
+> **Superseded on 2026-07-14.** The branch, commit, CI, deployment, worktree,
+> dependency, and next-step statements below describe the repository only at
+> the September 2025 generation date. The Fall 2025 course is now complete and
+> this repository is a retained public archive. Automatic Pages publication,
+> scheduled maintenance, the dashboard deployment API, and historical
+> orchestration-state tests are retired. See `README.md`, `project.yaml`, and
+> [`docs/adr/0005-retained-public-archive.md`](docs/adr/0005-retained-public-archive.md)
+> for current authority. Reactivation requires a new owner decision.
+
+## 🎯 Historical State at Generation
 
 ### Git Status
 - **Branch**: main (up to date with origin/main)
@@ -62,7 +71,7 @@ semester-2025-fall/
 
 ## 🔧 Build & Test Status
 
-### CI/CD Pipeline
+### Historical CI/CD Pipeline
 - **Smoke Tests**: ✅ Passing
 - **Cloudflare Deploy**: ✅ Successful
 - **Unit Tests**: ⚠️ Some failures (database timeout assertions)
@@ -119,7 +128,7 @@ semester-2025-fall/
 - Dashboard: ~40% coverage
 - Overall: 42% (needs improvement)
 
-## 🎯 Next Steps
+## 🎯 Historical Next Steps (Superseded)
 
 ### Immediate Priorities
 1. Fix failing unit tests (database timeout values)

@@ -5,6 +5,11 @@
 **Project:** semester-2025-fall  
 **Purpose:** Comprehensive documentation of project architecture, file organization, and system design
 
+> **Historical architecture snapshot.** Current status is a retained public
+> archive with publication automation retired as of 2026-07-14. Deployment and
+> active-semester claims below describe the August 2025 design; see `README.md`
+> and [`adr/0005-retained-public-archive.md`](adr/0005-retained-public-archive.md).
+
 ---
 
 ## Executive Summary

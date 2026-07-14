@@ -1,5 +1,10 @@
 # Repository Architecture and Project Structure (Fall 2025)
 
+> **Historical Fall 2025 snapshot.** Current status is a retained public
+> archive with publication automation retired as of 2026-07-14. Treat the
+> deployment descriptions below as design history; see `README.md` and
+> [`adr/0005-retained-public-archive.md`](adr/0005-retained-public-archive.md).
+
 This report documents the full architecture, data flow, and build/deployment structure of the Fall 2025 semester project. It is written independently and does not rely on any other architecture report in this repository.
 
 ## 1) Executive Summary
@@ -176,4 +181,3 @@ All JSON is validated by `scripts/validate_json.py` against schemas in `scripts/
 ---
 
 This overview reflects the current repository as of Fall 2025, detailing how inputs flow through validation and templating into reproducible, deployable artifacts, while the dashboard and site builder provide operational visibility and distribution.
-

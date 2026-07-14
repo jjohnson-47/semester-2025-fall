@@ -1,14 +1,21 @@
 # Course Management System - Fall 2025 Semester
-## Claude Code CLI Configuration (September 2025)
+## Claude Code CLI Configuration (July 2026)
 
 This document provides comprehensive context and instructions for Claude Code CLI v3.0+ working on the KPC Fall 2025 semester course management system.
 
+> **Current posture (2026-07-14): Retained public archive.** The Fall 2025
+> teaching period is complete. Automatic Pages deployment, scheduled
+> maintenance, and dashboard deployment controls are retired. Local
+> `BUILD_MODE=v2` validation and archive builds remain supported. Publication
+> reactivation requires a new explicit owner decision and
+> `docs/adr/0005-retained-public-archive.md`.
+
 ## 🎯 Project Overview
 
-**Purpose**: Automated course material generation and management for Kenai Peninsula College Fall 2025  
-**Architecture**: V2 Projection-based system with rule enforcement  
-**Courses**: MATH 221 (Intermediate Algebra), MATH 251 (Calculus I), STAT 253 (Statistics I)  
-**Deployment**: Cloudflare Pages (https://courses.jeffsthings.com)
+- **Purpose**: Preserve reproducible course material generation for Kenai Peninsula College Fall 2025
+- **Architecture**: V2 Projection-based system with rule enforcement
+- **Courses**: MATH 221 (Intermediate Algebra), MATH 251 (Calculus I), STAT 253 (Statistics I)
+- **Publication**: Retained public archive (<https://courses.jeffsthings.com>); automation retired
 
 ## 🏗️ Technical Stack
 
@@ -17,7 +24,7 @@ This document provides comprehensive context and instructions for Claude Code CL
 - **Templates**: Jinja2 with projection system
 - **Dashboard**: Flask on port 5055
 - **Testing**: Pytest with property-based tests via Hypothesis
-- **Deployment**: GitHub Actions → Cloudflare Pages
+- **Publication**: Existing Cloudflare Pages output retained; repository automation retired
 
 ## 📁 Project Structure
 
@@ -46,7 +53,7 @@ semester-2025-fall/
 │   ├── syllabi/        
 │   ├── schedules/      
 │   └── blackboard/     
-└── site/               # Static site for deployment
+└── site/               # Static archive output
 ```
 
 ## ⚡ Critical Commands
@@ -65,8 +72,10 @@ BUILD_MODE=v2 make dash-gen              # Generate tasks
 # Course-specific builds
 BUILD_MODE=v2 make course COURSE=MATH221  # Single course
 
-# Deployment
-BUILD_MODE=v2 make deploy       # Deploy to production
+# Retained archive verification (local only)
+BUILD_MODE=v2 make build-site
+test -f site/manifest.json
+test -f site/_headers
 ```
 
 ## 🎨 V2 Architecture Components
@@ -92,7 +101,7 @@ BUILD_MODE=v2 make deploy       # Deploy to production
 
 4. **Dashboard** (http://localhost:5055)
    - Task management and tracking
-   - One-click deployment
+   - Local archive inspection; publication controls are retired
    - DOCX export capabilities
    - Build statistics and monitoring
 
@@ -120,14 +129,16 @@ When encountering complex multi-step tasks, use the Task tool to spawn specializ
 - **orchestrator**: Master coordinator for complex workflows
 - **qa-validator**: JSON validation, schema compliance, date consistency
 - **course-content**: Syllabus/schedule generation, material creation
-- **deploy-manager**: Site building, Cloudflare deployment
 - **calendar-sync**: Date propagation and conflict resolution
+
+Historical records may refer to a `deploy-manager`, but it is not an authorized
+current publication path.
 
 ### Workflow Patterns
 ```bash
-# Complex semester preparation
-Task(subagent_type="orchestrator", 
-     prompt="Prepare Fall 2025 semester for production launch")
+# Complex archive verification
+Task(subagent_type="orchestrator",
+     prompt="Verify the retained Fall 2025 archive without publishing")
 
 # Validation and fixes
 Task(subagent_type="qa-validator",
@@ -199,24 +210,22 @@ uv sync --extra dashboard
 uv run python scripts/build_syllabi.py
 ```
 
-## 🚀 Deployment Process
+## 🗄️ Archive Verification
 
-### Recommended: Dashboard Deploy
-1. Start dashboard: `BUILD_MODE=v2 make dash`
-2. Navigate to http://localhost:5055
-3. Click **Deploy** → **Deploy to Production**
-4. System automatically handles:
-   - V2 build generation
-   - Git operations
-   - Cloudflare deployment
-   - Iframe verification
+The current supported workflow rebuilds and validates archive output locally:
 
-### Manual Deployment
 ```bash
-BUILD_MODE=v2 make build-site
-git add -A && git commit -m "Deploy: Update course materials"
-git push origin main  # Triggers GitHub Actions
+BUILD_MODE=v2 make validate
+BUILD_MODE=v2 make test
+BUILD_MODE=v2 make build-site ENV=preview
+test -f site/manifest.json
+test -f site/_headers
 ```
+
+These commands do not publish. Pushing to `main` does not deploy the site. Do
+not create, rotate, retrieve, or install Cloudflare credentials merely to
+publish repository changes. Reactivation requires a new explicit owner decision
+and the requirements in `docs/adr/0005-retained-public-archive.md`.
 
 ## 📝 Task Management with TodoWrite
 
@@ -228,8 +237,8 @@ todos = [
     {"content": "Validate all course JSON", "status": "pending"},
     {"content": "Generate syllabi with V2", "status": "pending"},
     {"content": "Run integration tests", "status": "pending"},
-    {"content": "Deploy to staging", "status": "pending"},
-    {"content": "Verify iframe embedding", "status": "pending"}
+    {"content": "Build preview archive locally", "status": "pending"},
+    {"content": "Verify archive output", "status": "pending"}
 ]
 ```
 
@@ -245,7 +254,7 @@ todos = [
 ### Restricted Operations
 - Direct pip/venv usage (use UV instead)
 - System package installation
-- Production deployment without validation
+- Any publication or publication reactivation without a new explicit owner decision
 - Manual uv.lock editing
 - Legacy BUILD_MODE usage
 
@@ -263,8 +272,9 @@ Essential project docs for deep dives:
 
 - `docs/IMPLEMENTATION_STATUS.md` - V2 implementation progress
 - `docs/adr/` - Architecture Decision Records
+- `docs/adr/0005-retained-public-archive.md` - Current publication decision and reactivation gate
 - `dashboard/API_DOCUMENTATION.md` - Dashboard API reference
-- `docs/V2_DEPLOYMENT_GUIDE.md` - Deployment procedures
+- `docs/V2_DEPLOYMENT_GUIDE.md` - Historical deployment procedures only
 - `README.md` - Project overview and setup
 
 ## 🎯 Quick Decision Guide
@@ -275,9 +285,9 @@ Essential project docs for deep dives:
 | Start dashboard | `BUILD_MODE=v2 make dash` |
 | Validate changes | `make validate` |
 | Run tests | `BUILD_MODE=v2 make test` |
-| Deploy to production | Use dashboard Deploy button |
+| Publish or reactivate | Not authorized; requires a new owner decision and ADR 0005 |
 | Debug issues | Check `scripts/logs/` and `dashboard/logs/` |
-| Add new course | Copy template, update JSON, add theme |
+| Add new course | Outside retained-archive scope; obtain owner direction first |
 | Complex task | Use Task tool with orchestrator agent |
 
 ## ⚠️ Critical Rules
@@ -285,7 +295,7 @@ Essential project docs for deep dives:
 1. **NEVER use legacy mode** - Always BUILD_MODE=v2
 2. **No weekend due dates** - Automatically enforced
 3. **Validate before building** - Run `make validate`
-4. **Test before deploying** - Run `BUILD_MODE=v2 make test`
+4. **Do not publish** - Reactivation requires a new explicit owner decision and ADR 0005
 5. **Use stable IDs** - Maintain `_meta.id` fields
 6. **Document decisions** - Update ADRs for architecture changes
 
@@ -301,7 +311,7 @@ When encountering legacy code:
 
 - Use BUILD_MODE=v1 or legacy mode
 - Edit generated HTML directly
-- Deploy without validation
+- Publish or restore publication without a new explicit owner decision
 - Bypass the rules engine
 - Create weekend due dates
 - Use hardcoded absolute paths
@@ -310,6 +320,6 @@ When encountering legacy code:
 
 ---
 
-*Last updated: September 1, 2025 - Claude Code CLI v3.0+ configuration*
+*Last updated: July 14, 2026 - retained public archive configuration*
 *Architecture: V2 Projection-based with MCP integration*
 *Python: 3.13+ | UV: 0.8.14 | Make: 4.4.1*

@@ -265,17 +265,6 @@ def mock_dependency_service():
     return service
 
 
-@pytest.fixture
-def mock_deploy_api():
-    """Mock deployment API."""
-    api = MagicMock()
-    api.run_command = AsyncMock(return_value=(0, "Success", ""))
-    api.build_site = AsyncMock(return_value=True)
-    api.deploy_worker = AsyncMock(return_value=True)
-    api.verify_deployment = AsyncMock(return_value=True)
-    return api
-
-
 # Flask app fixture
 @pytest.fixture
 def app():

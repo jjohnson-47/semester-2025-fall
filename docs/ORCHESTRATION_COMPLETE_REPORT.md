@@ -1,6 +1,16 @@
 # Orchestration Completion Report
 ## September 5, 2025
 
+> **Historical snapshot; not current operational authority.** This report is
+> preserved as evidence of the September 2025 orchestration run. As of
+> 2026-07-14, the semester repository is a retained public archive. The former
+> deployment API and `test_orchestration_complete.py` named below have been
+> retired with their environment-specific state. Use `README.md`,
+> `project.yaml`, and
+> [`adr/0005-retained-public-archive.md`](adr/0005-retained-public-archive.md)
+> for current posture. Commands and future-work statements in this report are
+> historical and must not be treated as reactivation instructions.
+
 ## Executive Summary
 
 The multiagent orchestration plan has been **SUCCESSFULLY COMPLETED** with all core requirements met and tested. The system now has a fully functional V2 projection-based architecture with comprehensive database enhancements, course manifests, and performance optimizations.
@@ -116,7 +126,7 @@ All probe outputs successfully generated and validated:
 
 ### Tests
 - tests/integration/test_course_projections.py
-- tests/integration/test_orchestration_complete.py
+- tests/integration/test_orchestration_complete.py *(historical; retired 2026-07-14)*
 
 ### Documentation
 - docs/_generated/state_probe.md (620 lines)
@@ -164,7 +174,7 @@ All probe outputs successfully generated and validated:
 
 ### Future Enhancements (Not Required)
 1. Implement actual task dependencies (currently analyzed only)
-2. Add validate_deployment function to deploy API
+2. Add validate_deployment function to deploy API *(superseded; API retired)*
 3. Expand test coverage beyond current 15 tests
 4. Add more sophisticated error recovery
 
@@ -173,9 +183,11 @@ All probe outputs successfully generated and validated:
 2. Deploy API lacks dry-run capability
 3. Some queries show as "COVERING INDEX" in EXPLAIN (still efficient)
 
-## Verification Commands
+## Historical Verification Commands (No Longer Current)
 
-To verify the orchestration is complete:
+These commands record how the 2025 stateful orchestration was checked. The
+comprehensive test named here has since been retired and this block is not a
+current verification procedure:
 
 ```bash
 # Run comprehensive test

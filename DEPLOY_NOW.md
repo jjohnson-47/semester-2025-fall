@@ -1,58 +1,28 @@
-# 🚀 Deploy Now - Quick Steps
+# Publication Is Retired
 
-## 1. Configure GitHub Secrets (Required)
+As of 2026-07-14, this repository is a retained public archive. The published
+Fall 2025 course site remains available, but automatic Pages deployment,
+scheduled maintenance, and dashboard deployment controls are retired.
 
-Go to: <https://github.com/jjohnson-47/semester-2025-fall/settings/secrets/actions>
+Do not create, rotate, retrieve, or install Cloudflare credentials merely to
+publish repository changes. A push to `main` no longer deploys the site.
 
-### Add these SECRETS
-
-**CLOUDFLARE_API_TOKEN**
-
-```bash
-gopass show -o cloudflare/tokens/projects/semester-2025-fall/pages
-```
-
-**CLOUDFLARE_ACCOUNT_ID**
+## Safe Archive Verification
 
 ```bash
-gopass show -o cloudflare/account/id
-# Should be: 13eb584192d9cefb730fde0cfd271328
+BUILD_MODE=v2 make validate
+BUILD_MODE=v2 make build-site ENV=preview
+test -f site/manifest.json
+test -f site/_headers
 ```
 
-### Add this VARIABLE (not secret)
+These commands rebuild and validate local output only. They do not mutate
+Cloudflare or DNS.
 
-Go to: Variables tab
+## Reactivation Requires a New Decision
 
-**CF_PROJECT** = `jeffsthings-courses`
-
-## 2. Trigger Deployment
-
-1. Go to: <https://github.com/jjohnson-47/semester-2025-fall/actions>
-2. Click "Cloudflare Pages Deploy" workflow
-3. Click "Run workflow" button
-4. Select:
-   - Branch: `main`
-   - Environment: `preview`
-5. Click green "Run workflow" button
-
-## 3. Monitor
-
-Watch the Actions tab for the workflow to complete.
-
-## 4. Verify
-
-Once deployed, check:
-
-```bash
-curl https://jeffsthings-courses.pages.dev/manifest.json
-```
-
-Should return the empty manifest with all three courses.
-
----
-
-**Status**:
-
-- ✅ Workflow pushed and active
-- ⏳ Awaiting secrets configuration
-- ⏳ Ready to deploy empty structure
+Publication may be restored only after the owner explicitly reopens it and the
+requirements in
+[`docs/adr/0005-retained-public-archive.md`](docs/adr/0005-retained-public-archive.md)
+are satisfied. Repository Cloudflare mutation targets additionally require the
+one-shot environment flag `ARCHIVE_REACTIVATION_APPROVED=1`.

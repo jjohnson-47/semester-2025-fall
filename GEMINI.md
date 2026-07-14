@@ -2,13 +2,20 @@
 
 This document provides context for the Gemini Code Assistant to understand the "Fall 2025 Semester Course Management System" project.
 
+> **Current posture (2026-07-14): retained public archive.** The semester is
+> complete. Local V2 validation and archive builds remain supported, while
+> automatic Pages publication, scheduled maintenance, and dashboard deployment
+> controls are retired. Pushing to `main` does not publish. Reactivation
+> requires a new owner decision and
+> `docs/adr/0005-retained-public-archive.md`.
+
 ## Project Overview
 
 This project is a comprehensive course management system for the Fall 2025 semester at Kenai Peninsula College. It automates the generation of syllabi, schedules, and other course materials for three courses: MATH 221, MATH 251, and STAT 253.
 
 The system is built on a "V2 Architecture" which utilizes a projection-based rendering system. Course data is stored in JSON files and then processed by a series of Python scripts to generate the final HTML and other output files.
 
-The project also includes a sophisticated Flask-based dashboard for task management, deployment, and viewing generated content. The dashboard provides a rich API for interacting with the system.
+The project also includes a Flask-based dashboard for local task management and viewing generated content. Historical deployment controls are not an authorized current publication path.
 
 ### Key Technologies
 
@@ -19,14 +26,14 @@ The project also includes a sophisticated Flask-based dashboard for task managem
 *   **Dependencies:**
     *   Python: `jinja2`, `pyyaml`, `jsonschema`, `flask`, `pytest`, `ruff`, `mypy`
     *   Node.js: `katex` (for mathematical notation)
-*   **Deployment:** Cloudflare Pages, with `cf-go` for API interactions.
+*   **Publication:** Existing Cloudflare Pages output is retained; repository-driven publication is retired.
 
 ### Architecture
 
 *   **Data:** Course data is stored in JSON files within the `content/courses` directory. Task data is stored in an SQLite database at `dashboard/state/tasks.db`.
 *   **Build:** The `Makefile` orchestrates the entire build process. Python scripts in the `scripts` directory handle the logic for generating syllabi, schedules, and other materials.
-*   **Dashboard:** The `dashboard` directory contains a Flask application that provides a web-based interface for managing the system. It includes a task management system with intelligent prioritization, a viewer for generated content, and deployment tools.
-*   **Output:** The `build` directory contains the generated files, and the `site` directory contains the final static site for deployment.
+*   **Dashboard:** The `dashboard` directory contains a Flask application for local task management, intelligent prioritization, and generated-content viewing.
+*   **Output:** The `build` directory contains generated files, and the `site` directory contains retained static archive output.
 
 ## Task Management System
 

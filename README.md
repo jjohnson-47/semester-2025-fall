@@ -1,10 +1,17 @@
 # Fall 2025 Semester Course Management System (V2 Architecture)
 
-> Automated course management with projection-based rendering, systematic rule enforcement, and one-click deployment
+> Retained Fall 2025 course archive with projection-based rendering and systematic rule enforcement
 
 ## 📚 Overview
 
-This repository provides a complete course management system for Fall 2025 online courses at Kenai Peninsula College using the **V2 Architecture**. It features projection-based rendering, embedded CSS styling, systematic rule enforcement (no weekend due dates), and integrated deployment to Cloudflare Pages.
+This repository preserves the completed Fall 2025 course management system for Kenai Peninsula College using the **V2 Architecture**. It supports projection-based rendering, embedded CSS styling, systematic rule enforcement (no weekend due dates), and reproducible local archive builds.
+
+> **Status of record (2026-07-14): Retained public archive.** The Fall 2025
+> teaching period is complete. The public course site is retained, while
+> automatic Cloudflare Pages deployment, scheduled maintenance, and dashboard
+> deployment controls are retired. Pushing to `main` does not publish changes.
+> Reactivation requires a new explicit owner decision and the controls in
+> [`docs/adr/0005-retained-public-archive.md`](docs/adr/0005-retained-public-archive.md).
 
 **⚡ IMPORTANT: Always use `BUILD_MODE=v2` for all operations. Legacy mode is deprecated.**
 
@@ -15,7 +22,7 @@ The Fall 2025 semester preparation was successfully completed using Claude Code'
 - **qa-validator agent**: Validated all 44 JSON configuration files (100% pass rate)
 - **course-content agent**: Generated all syllabi, schedules, and course materials
 - **calendar-sync agent**: Synchronized due dates and resolved conflicts across courses
-- **deploy-manager agent**: Prepared production deployment with iframe support
+- **deploy-manager agent**: Historically prepared the Fall 2025 publication with iframe support
 
 **Status**: ✅ **Fall 2025 Semester Preparation Complete** (All 167 tasks completed successfully)
 
@@ -27,12 +34,12 @@ The Fall 2025 semester preparation was successfully completed using Claude Code'
 - Build automation scripts
 - Task management dashboard
 
-**Content Delivery** ([jeffsthings-courses](https://github.com/jjohnson-47/jeffsthings-courses)):
-- Static site generation from factory output
-- Production deployment at https://courses.jeffsthings.com/
-- Blackboard Ultra iframe integration
+**Retained Public Archive**:
+- Reproducible static site generation from repository content
+- Archived public site at <https://courses.jeffsthings.com/>
+- Historical Blackboard Ultra iframe integration
 
-### Courses Managed
+### Courses Preserved
 
 | Course | Title | CRN | Credits |
 |--------|-------|-----|---------|
@@ -56,8 +63,8 @@ BUILD_MODE=v2 make all
 # 4. Start task dashboard with V2 mode
 BUILD_MODE=v2 make dash
 
-# 5. Access dashboard at http://localhost:5055
-# Click "Deploy" → "Deploy to Production" for one-click deployment
+# 5. Access the local-only dashboard at http://localhost:5055
+# Publication controls are retired; do not use the dashboard to deploy.
 ```
 
 ## 📁 Repository Structure
@@ -119,7 +126,7 @@ The V2 architecture is the **primary and recommended mode** for all operations. 
 - **Rules Engine**: Systematic enforcement of "no weekend due dates" policy
 - **Style System**: Context-aware CSS management for standalone and embedded viewing
 - **Schema v1.1.0**: Enhanced JSON with stable IDs and metadata tracking
-- **One-Click Deployment**: Dashboard button deploys directly to Cloudflare Pages
+- **Reproducible Archive Build**: Static archive output can be rebuilt and verified locally
 
 ### V2 Build Mode
 
@@ -196,7 +203,7 @@ python tests/semantic/test_html_diff_v2.py
   - `scripts/rules/dates_full.py` → use `scripts/rules/dates.py`
   - `scripts/schema/migrator.py` → use `scripts.migrations.add_stable_ids`
   - `scripts/utils/schema/versions/v1_1_0.py` (module file) → import from the package path
-- These emit `DeprecationWarning` and will be removed after Fall 2025. See `docs/DEPRECATIONS.md`.
+- These emit `DeprecationWarning` and remain for historical compatibility. See `docs/DEPRECATIONS.md`.
 
 ## Health Checks
 
@@ -204,43 +211,23 @@ python tests/semantic/test_html_diff_v2.py
 - `GET /healthz/startup`: Readiness probe. Returns 200 `{ "ready": true }` after startup completes; returns 503 `{ "ready": false }` while dependencies are still initializing.
 - Implementation: see `dashboard/startup.py` and wiring in `dashboard/app.py`.
 
-### Migration Path
+### V2 Cutover and Archive Verification
 
-**Phase 1: Validation & Testing** (Current)
+The V2 cutover was completed during Fall 2025. The supported current workflow
+is local validation and archive reconstruction:
+
 ```bash
-# Test v2 mode locally
-BUILD_MODE=v2 make all
+# Validate repository data and run the test suite
+BUILD_MODE=v2 make validate
+BUILD_MODE=v2 make test
 
-# Validate output
-make validate-v110
-
-# Run comprehensive tests  
-make test
+# Rebuild retained archive output locally
+BUILD_MODE=v2 make build-site ENV=preview
+test -f site/manifest.json
+test -f site/_headers
 ```
 
-**Phase 2: Gradual Adoption**
-```bash
-# Use v2 for specific courses
-BUILD_MODE=v2 make course COURSE=MATH221
-
-# Compare outputs
-diff -r build/schedules/ build/v2/
-
-# Deploy to staging
-BUILD_MODE=v2 make deploy-staging
-```
-
-**Phase 3: Full Cutover**
-```bash
-# Enable v2 globally
-export BUILD_MODE=v2
-
-# Update configuration
-echo 'BUILD_MODE=v2' >> .env
-
-# Full production build
-make clean all deploy
-```
+These commands do not publish to Cloudflare Pages.
 
 ### V2 Architecture Benefits
 
@@ -250,42 +237,23 @@ make clean all deploy
 - **Maintainability**: Projection-based architecture simplifies templates
 - **Reliability**: No weekend due dates systematically enforced
 
-## 🚀 Deployment to Production
+## 🗄️ Retained Public Archive
 
-### Recommended: Dashboard One-Click Deploy
+The owner selected a lower-cost archive posture after completion of the Fall
+2025 semester. The existing public site is retained at:
 
-1. Start dashboard with V2 mode:
-```bash
-BUILD_MODE=v2 make dash
-```
+- Primary: <https://courses.jeffsthings.com/>
+- Pages alias: <https://production.jeffsthings-courses.pages.dev/>
 
-2. Navigate to http://localhost:5055
+Repository changes do not automatically update either site. The Pages PR gate,
+scheduled maintenance workflow, dashboard deployment API, and dashboard
+deployment control have been retired. Local validation and static-site builds
+remain supported through the commands above.
 
-3. Click **Deploy** button in top navigation
-
-4. Select **Deploy to Production**
-
-The system automatically:
-- Builds with V2 architecture
-- Syncs to deployment repository  
-- Deploys to Cloudflare Pages
-- Verifies iframe functionality
-
-**Production URLs:**
-- Primary: https://courses.jeffsthings.com/
-- Fallback: https://production.jeffsthings-courses.pages.dev/
-
-### Manual Deployment
-
-```bash
-# Build static site with V2
-BUILD_MODE=v2 make build-site
-
-# Commit and push (triggers GitHub Actions)
-git add -A
-git commit -m "Deploy updates"
-git push origin main
-```
+Do not create, rotate, retrieve, or install Cloudflare credentials merely to
+publish repository changes. Publication may be restored only after a new
+explicit owner decision and completion of the requirements in
+[`docs/adr/0005-retained-public-archive.md`](docs/adr/0005-retained-public-archive.md).
 
 ### Dashboard Commands
 
@@ -347,7 +315,7 @@ blocked → todo → in_progress → done
 
 ## 📝 Course Configuration
 
-### Adding/Updating Course Content
+### Course Content Layout
 
 Course data is stored in JSON files under `content/courses/[COURSE_CODE]/`:
 
@@ -439,7 +407,7 @@ The repository includes interactive HTML tools for mathematics education:
 
 ### MATH 251 - A δ for your ε
 **Location:** `site/interactive/math251/epsilon-delta.html`
-**Production URL:** https://courses.jeffsthings.com/interactive/math251/epsilon-delta.html
+**Archived public URL:** <https://courses.jeffsthings.com/interactive/math251/epsilon-delta.html>
 
 Interactive visualization tool for teaching the rigorous epsilon–delta definition of limits:
 - **Learn Mode:** Step-by-step guided instruction
@@ -491,4 +459,4 @@ This project is for educational use at Kenai Peninsula College / University of A
 
 ---
 
-*Generated for Fall 2025 Semester (August 25 - December 13, 2025)*
+*Generated for Fall 2025 Semester (August 25 - December 13, 2025); retained as a public archive as of 2026-07-14.*

@@ -127,7 +127,7 @@ help: ## Show this help message
 	@echo "$(BLUE)Quick Start:$(NC)"
 	@echo "  make all         # Build everything with V2 architecture"
 	@echo "  make dash        # Start dashboard with V2 mode"
-	@echo "  make deploy      # Deploy to production"
+	@echo "  make build-site  # Rebuild the retained archive locally"
 	@echo ""
 	@echo "$(GREEN)Course-specific builds:$(NC)"
 	@echo "  $(YELLOW)make course COURSE=MATH221$(NC)  Build specific course materials"
@@ -492,16 +492,16 @@ dev-setup: init pre-commit-install ## Complete development environment setup
 	@echo "$(GREEN)✓ Development environment ready$(NC)"
 
 # ---------------------------------------------
-# Cloudflare Pages (public site) targets
+# Cloudflare Pages retained-archive targets
 # ---------------------------------------------
 
-.PHONY: build-site serve-site compare-site pages-list pages-project pages-deployments pages-deploy
+.PHONY: build-site serve-site compare-site archive-reactivation-guard pages-list pages-project pages-deployments pages-deploy
 
 ENV ?= preview
 ACADEMIC_TERM ?= fall-2025
 SITE_DIR := site
 
-build-site: validate ## Build public site into site/
+build-site: validate ## Rebuild the retained public archive into site/
 	@echo "$(BLUE)Building public site (ENV=$(ENV), ACADEMIC_TERM=$(ACADEMIC_TERM))...$(NC)"
 	@$(PYTHON) scripts/site_build.py --out $(SITE_DIR) --env $(ENV) --term $(ACADEMIC_TERM) --include-docs syllabus schedule
 	@test -f $(SITE_DIR)/manifest.json || (echo "$(RED)❌ Manifest missing$(NC)" && exit 1)
@@ -517,7 +517,12 @@ compare-site: ## Compare legacy build/ with site/
 	@echo "$(BLUE)Comparing build/ and site/ (expect differences)...$(NC)"
 	@diff -qr build $(SITE_DIR) || true
 
-# Cloudflare Pages management via cf-go (see docs/cloudflare-pages-cf-go.md)
+# Read-only Cloudflare Pages inspection via cf-go remains available. Mutating
+# targets require a new owner decision and an explicit one-shot approval flag.
+archive-reactivation-guard:
+	@test "$(ARCHIVE_REACTIVATION_APPROVED)" = "1" || \
+		(echo "$(RED)Archive publication is retired. Set ARCHIVE_REACTIVATION_APPROVED=1 only after a new owner decision.$(NC)" && exit 1)
+
 pages-list: ## List Cloudflare Pages projects
 	@test -n "$(CLOUDFLARE_ACCOUNT_ID)" || (echo "CLOUDFLARE_ACCOUNT_ID required" && exit 1)
 	@test -n "$(CLOUDFLARE_API_TOKEN)" || (echo "CLOUDFLARE_API_TOKEN required" && exit 1)
@@ -542,7 +547,7 @@ pages-deployments: ## List deployments for a project (use PROJECT=<name>)
 	@test -n "$(PROJECT)" || (echo "PROJECT required" && exit 1)
 	@cf-go api GET accounts/$(CLOUDFLARE_ACCOUNT_ID)/pages/projects/$(PROJECT)/deployments
 
-pages-deploy: ## Trigger deployment from BRANCH (use PROJECT=<name> BRANCH=main)
+pages-deploy: archive-reactivation-guard ## Owner-gated recovery deployment (use PROJECT=<name> BRANCH=main)
 	@test -n "$(CLOUDFLARE_ACCOUNT_ID)" || (echo "CLOUDFLARE_ACCOUNT_ID required" && exit 1)
 	@test -n "$(CLOUDFLARE_API_TOKEN)" || (echo "CLOUDFLARE_API_TOKEN required" && exit 1)
 	@test -n "$(PROJECT)" || (echo "PROJECT required" && exit 1)
@@ -560,7 +565,7 @@ pages-load-context: ## Load project context from .cloudflare and gopass
 	 export CLOUDFLARE_ACCOUNT_ID=$$(gopass show -o cloudflare/account/id 2>/dev/null) && \
 	 echo "$(GREEN)✓ Context loaded$(NC)" || (echo "$(RED)Failed to load credentials from gopass$(NC)" && exit 1)
 
-pages-create: pages-load-context ## Create Pages project (reads from .cloudflare)
+pages-create: archive-reactivation-guard ## Owner-gated project recovery (reads from .cloudflare)
 	@echo "$(BLUE)Creating Pages project...$(NC)"
 	@source .cloudflare && \
 	 export CLOUDFLARE_API_TOKEN=$$(gopass show -o $$TOKEN_PATH) && \
@@ -570,7 +575,7 @@ pages-create: pages-load-context ## Create Pages project (reads from .cloudflare
 	 echo "$(GREEN)✓ Pages project '$$PAGES_PROJECT' created$(NC)" || \
 	 echo "$(YELLOW)Project may already exist or creation failed$(NC)"
 
-pages-attach-domain: pages-load-context ## Attach custom domain to Pages project
+pages-attach-domain: archive-reactivation-guard ## Owner-gated custom-domain recovery
 	@echo "$(BLUE)Attaching custom domain...$(NC)"
 	@source .cloudflare && \
 	 export CLOUDFLARE_API_TOKEN=$$(gopass show -o $$TOKEN_PATH) && \
@@ -613,7 +618,7 @@ dns-list: pages-load-context ## List DNS records for the zone
 	 export CLOUDFLARE_ACCOUNT_ID=$$(gopass show -o $$ACCOUNT_PATH) && \
 	 cf-go dns list $$ZONE
 
-dns-add-cname: pages-load-context ## Add CNAME for Pages subdomain
+dns-add-cname: archive-reactivation-guard ## Owner-gated Pages CNAME recovery
 	@echo "$(BLUE)Adding CNAME record...$(NC)"
 	@source .cloudflare && \
 	 export CLOUDFLARE_API_TOKEN=$$(gopass show -o $$TOKEN_PATH) && \
@@ -636,7 +641,7 @@ dns-verify: pages-load-context ## Verify DNS and nameservers
 # Complete Pages setup workflow
 .PHONY: pages-setup
 
-pages-setup: ## Complete Pages setup (create project, attach domain, configure DNS)
+pages-setup: archive-reactivation-guard ## Owner-gated Pages recovery (project, domain, DNS)
 	@echo "$(BLUE)════════════════════════════════════$(NC)"
 	@echo "$(BLUE)   Cloudflare Pages Setup Wizard    $(NC)"
 	@echo "$(BLUE)════════════════════════════════════$(NC)"
@@ -647,7 +652,7 @@ pages-setup: ## Complete Pages setup (create project, attach domain, configure D
 	@echo ""
 	@echo "$(YELLOW)Step 2: Build and deploy site$(NC)"
 	@$(MAKE) build-site ENV=preview --no-print-directory
-	@echo "Now trigger deployment via GitHub Actions or wrangler"
+	@echo "Publication still requires a separately reviewed, owner-approved recovery method"
 	@echo ""
 	@echo "$(YELLOW)Step 3: Attach custom domain$(NC)"
 	@$(MAKE) pages-attach-domain --no-print-directory || true
