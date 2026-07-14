@@ -1,0 +1,21 @@
+# Meta-inventory interop header; contract:
+#   meta-inventory/docs/decisions/0002-project-intelligence-spec.md section D3
+spec_version: 0.1
+project:
+  id: semester-2025-fall
+  display_name: KPC/UAA Mathematics & Statistics Course Series
+  owner_entity: jjohnson-47
+role: canonical
+peers: []
+status:
+  posture: course-taught
+  local_phase: "Fall 2025 semester preparation complete; retained as the 2017-2025 course-series aggregation host"
+  as_of: "2026-07-14"
+authority:
+  status_of_record: README.md
+# Public boundary: link only public member repositories; do not surface private
+# member repository identities.
+presentation:
+  visibility: public-promoted
+  public_alias: null
+  link_policy: link-ok
