@@ -1,260 +1,96 @@
-# Cloudflare Pages Deployment Guide
+# Cloudflare Pages Deployment (Historical Reference)
 
-## Prerequisites
+> **Retired on 2026-07-14.** This document records the publication surface
+> used during the Fall 2025 semester. It is not an active deployment runbook.
+> The existing Pages site is retained as a public archive; repository changes
+> do not publish automatically. See
+> [`adr/0005-retained-public-archive.md`](adr/0005-retained-public-archive.md).
 
-1. **Cloudflare Account**: Active account with Pages access
-2. **gopass**: Installed and configured for secret management
-3. **cf-go**: For programmatic setup (`go install github.com/cloudflare/cf-go/cmd/cf-go@latest`)
+## Current Archive Boundary
 
-## Setup Process
+The repository continues to preserve:
 
-### Quick Setup with cf-go (Recommended)
+- the V2 source and local site builder;
+- the checked-in `site/` archive output and Cloudflare configuration;
+- the public archive at <https://courses.jeffsthings.com/>; and
+- read-only project and deployment inspection targets.
+
+The following Fall 2025 operations are retired:
+
+- pull-request and `main`-branch Pages deployment;
+- manual or dashboard-triggered publication;
+- credential creation, rotation, retrieval, or installation for this project;
+- Pages project, domain, or DNS mutation; and
+- recurring semester maintenance.
+
+Do not run the historical token-setup scripts, recreate GitHub deployment
+secrets, or invoke Cloudflare mutation targets merely to publish repository
+changes. The Makefile fails closed on mutation targets unless a new owner
+decision is accompanied by `ARCHIVE_REACTIVATION_APPROVED=1`.
+
+## Supported Local Archive Build
+
+Local generation remains current and does not mutate Cloudflare:
 
 ```bash
-# 1. Configure token and credentials
-./scripts/setup-cloudflare-token.sh
-
-# 2. Run complete Pages setup
-./scripts/setup-pages-cf-go.sh
-
-# 3. Or use the Make wizard
-make pages-setup
+BUILD_MODE=v2 make validate
+BUILD_MODE=v2 make build-site ENV=preview
+test -f site/manifest.json
+test -f site/_headers
 ```
 
-### Manual Setup Steps
-
-#### 1. Configure Cloudflare Token
-
-Run the automated setup script:
+For a local browser preview, use the repository's local serving target after a
+successful build:
 
 ```bash
-./scripts/setup-cloudflare-token.sh
+BUILD_MODE=v2 make serve-site
 ```
 
-This script will:
+A successful local build demonstrates reproducibility only. It is not evidence
+that a new version was deployed.
 
-- Store your Cloudflare Account ID in gopass
-- Guide you through creating an API token
-- Store the token securely in gopass
-- Verify token access with cf-go
+## Read-Only Archive Inspection
 
-### 2. Manual Token Creation (Alternative)
-
-If you prefer manual setup:
-
-1. Go to [Cloudflare Dashboard → API Tokens](https://dash.cloudflare.com/profile/api-tokens)
-2. Create a custom token with:
-   - **Name**: `semester-2025-fall-pages`
-   - **Permissions**: Account → Cloudflare Pages:Edit
-   - **Resources**: Your account ID
-   - **IP Filtering**: Leave empty (for CI/CD)
-
-3. Store in gopass:
+When already-authorized local credentials exist, these targets inspect the
+retained Pages resource without changing it:
 
 ```bash
-# Store token
-gopass insert cloudflare/tokens/projects/semester-2025-fall/pages
-
-# Store account ID
-gopass insert cloudflare/account/id
-```
-
-### 3. Verify Token Access
-
-```bash
-# Export credentials
-export CLOUDFLARE_ACCOUNT_ID=$(gopass show -o cloudflare/account/id)
-export CLOUDFLARE_API_TOKEN=$(gopass show -o cloudflare/tokens/projects/semester-2025-fall/pages)
-
-# Verify with Make
-make pages-verify-token
-
-# Or verify with cf-go directly
-cf-go api GET accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects
-```
-
-### 4. Configure GitHub Repository
-
-Add these secrets in GitHub (Settings → Secrets and variables → Actions):
-
-| Type | Name | Value | How to Get |
-|------|------|-------|------------|
-| Secret | `CLOUDFLARE_API_TOKEN` | Your API token | `gopass show -o cloudflare/tokens/projects/semester-2025-fall/pages` |
-| Secret | `CLOUDFLARE_ACCOUNT_ID` | Your account ID | `gopass show -o cloudflare/account/id` |
-| Variable | `CF_PROJECT` | `jeffsthings-courses` | Fixed value |
-
-### 5. Create Cloudflare Pages Project
-
-1. Go to [Cloudflare Dashboard → Pages](https://dash.cloudflare.com/?to=/:account/pages)
-2. Create a new project named `jeffsthings-courses`
-3. Skip the GitHub integration (we use direct upload)
-4. Note the project URL for verification
-
-## Deployment Workflow
-
-### Local Testing
-
-```bash
-# Build site locally
-make build-site ENV=preview
-
-# Verify structure
-ls -la site/
-cat site/manifest.json
-
-# Test with local server
-make serve-site
-# Visit http://localhost:8000
-```
-
-### Manual Deployment (GitHub Actions)
-
-1. Go to Actions → "Cloudflare Pages Deploy"
-2. Click "Run workflow"
-3. Select environment:
-   - `preview` for testing
-   - `prod` for production
-4. Click "Run workflow"
-
-### Automatic Deployment
-
-- **Pull Requests**: Deploy to preview branch automatically
-- **Main branch**: Deploy to production automatically (if configured)
-
-## Deployment Phases
-
-### Phase 0: Empty Structure (Current)
-
-```bash
-# Deploys only manifest and headers
-make build-site ENV=preview
-```
-
-### Phase 1: Syllabus Only
-
-```bash
-# Include syllabus pages
-$(PYTHON) scripts/site_build.py --include-docs syllabus
-```
-
-### Phase 2: Full Content
-
-```bash
-# Include both syllabus and schedule
-$(PYTHON) scripts/site_build.py --include-docs syllabus schedule
-```
-
-## Verification Steps
-
-### 1. Check Deployment Status
-
-```bash
-# List all deployments
-make pages-deployments PROJECT=jeffsthings-courses
-
-# Check project details
+make pages-status PROJECT=jeffsthings-courses
 make pages-project PROJECT=jeffsthings-courses
+make pages-deployments PROJECT=jeffsthings-courses
 ```
 
-### 2. Verify Security Headers
+Public behavior can also be checked without Cloudflare credentials:
 
 ```bash
-# Check CSP headers
-curl -I https://jeffsthings-courses.pages.dev | grep -i content-security
-
-# Should see: frame-ancestors 'none'
+curl -fsSI https://courses.jeffsthings.com/
+curl -fsS https://courses.jeffsthings.com/manifest.json | jq .
 ```
 
-### 3. Verify Manifest
+These observations describe the live retained resource. They do not authorize
+changes to it.
 
-```bash
-curl https://jeffsthings-courses.pages.dev/manifest.json | jq .
-```
+## Historical Fall 2025 Design
 
-## Troubleshooting
+During active teaching, the repository was designed around a Cloudflare Pages
+project named `jeffsthings-courses`, with the custom public domain above and a
+Pages fallback domain. The former runbook supported direct uploads, GitHub
+Actions triggers, a dashboard deployment control, and a narrowly scoped
+Pages-edit token stored outside the repository. It also described gradual
+publication phases for the manifest, syllabi, and schedules.
 
-### Token Issues
+Those details are preserved here to explain the checked-in configuration and
+historical reports. They are not current operating instructions. In particular:
 
-```bash
-# Re-verify token
-make pages-verify-token
+- no Cloudflare API token is required for local validation or site generation;
+- no GitHub Actions deployment secrets should be added or refreshed;
+- pushes and pull requests no longer trigger Pages publication; and
+- the old dashboard deployment API has been removed.
 
-# Check token metadata
-gopass show cloudflare/tokens/projects/semester-2025-fall/pages/meta
-```
+## Reactivation Gate
 
-### Build Issues
-
-```bash
-# Clean and rebuild
-make clean
-make build-site ENV=preview
-
-# Check for validation errors
-make validate
-```
-
-### Deployment Failures
-
-1. Check GitHub Actions logs
-2. Verify secrets are set correctly
-3. Ensure CF_PROJECT variable is set
-4. Check Cloudflare Pages dashboard for errors
-
-## Security Notes
-
-- Token has minimal scope (Pages:Edit only)
-- No IP restrictions for CI/CD compatibility
-- CSP headers prevent iframe embedding
-- Default excludes all content (explicit include required)
-
-## Make Targets Reference
-
-### Site Building
-
-| Target | Description |
-|--------|-------------|
-| `make build-site` | Build public site (empty by default) |
-| `make serve-site` | Local preview server |
-
-### cf-go Pages Operations
-
-| Target | Description |
-|--------|-------------|
-| `make pages-setup` | Complete setup wizard (create project, domain, DNS) |
-| `make pages-env` | Show current Cloudflare environment |
-| `make pages-create` | Create Pages project programmatically |
-| `make pages-attach-domain` | Attach custom domain to project |
-| `make pages-status` | Show project status and domains |
-| `make pages-verify-token` | Verify API token |
-| `make pages-list` | List all Pages projects |
-| `make pages-project PROJECT=name` | Show project details |
-| `make pages-deployments PROJECT=name` | List deployments |
-| `make pages-deploy PROJECT=name BRANCH=main` | Trigger deployment |
-
-### DNS Management
-
-| Target | Description |
-|--------|-------------|
-| `make dns-list` | List all DNS records for zone |
-| `make dns-add-cname` | Add CNAME for Pages subdomain |
-| `make dns-verify` | Verify DNS and nameservers |
-
-## Environment Variables
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `CLOUDFLARE_API_TOKEN` | Pages API token | Yes |
-| `CLOUDFLARE_ACCOUNT_ID` | Account identifier | Yes |
-| `CF_PROJECT` | Pages project name | Yes (in GitHub) |
-| `ENV` | Environment (preview/prod) | No (default: preview) |
-| `ACADEMIC_TERM` | Term for URLs | No (default: fall-2025) |
-
-## Next Steps
-
-1. Run `./scripts/setup-cloudflare-token.sh`
-2. Configure GitHub secrets
-3. Create Pages project in Cloudflare
-4. Trigger first deployment (empty structure)
-5. Verify headers and manifest
-6. Gradually enable content as needed
+Publication may be restored only after the repository owner explicitly reopens
+it and all requirements in ADR 0005 are satisfied. A reactivation review must
+confirm the intended Cloudflare account, Pages project, production branch,
+domain behavior, off-repository credential custody, safe workflow triggers, and
+a clean-checkout build before any external mutation occurs.

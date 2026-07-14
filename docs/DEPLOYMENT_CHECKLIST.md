@@ -1,5 +1,11 @@
 # Deployment Checklist - Empty Structure
 
+> **Historical Fall 2025 checklist; publication retired 2026-07-14.** Do not
+> follow the credential or deployment steps below. Use
+> [`SITE_BUILDER.md`](SITE_BUILDER.md) for local archive verification. Any
+> publication reactivation requires a new owner decision and
+> [`adr/0005-retained-public-archive.md`](adr/0005-retained-public-archive.md).
+
 ## Pre-Deployment Verification ✅
 
 ### 1. Local Build Validation

@@ -1,8 +1,13 @@
 # Site Builder Documentation
 
+> **Current archive tool.** The builder remains supported for reproducing the
+> retained Fall 2025 public archive locally. External publication is retired as
+> of 2026-07-14; a successful build does not deploy anything. See
+> [`adr/0005-retained-public-archive.md`](adr/0005-retained-public-archive.md).
+
 ## Overview
 
-The site builder creates a public-facing, security-hardened version of selected course materials for deployment to Cloudflare Pages under `site/`.
+The site builder creates a public-facing, security-hardened version of selected course materials under `site/`. The output is retained archive material and can be inspected locally without Cloudflare credentials.
 
 ## Architecture Principles
 
@@ -16,13 +21,13 @@ The site builder creates a public-facing, security-hardened version of selected 
 ### Basic build (empty structure)
 
 ```bash
-make build-site ENV=preview
+BUILD_MODE=v2 make build-site ENV=preview
 ```
 
 ### Include Syllabus
 
 ```bash
-$(PYTHON) scripts/site_build.py \
+uv run python scripts/site_build.py \
   --out site --env preview --term fall-2025 \
   --include-docs syllabus
 ```
@@ -30,7 +35,7 @@ $(PYTHON) scripts/site_build.py \
 ### Include Schedule
 
 ```bash
-$(PYTHON) scripts/site_build.py \
+uv run python scripts/site_build.py \
   --out site --env preview --term fall-2025 \
   --include-docs schedule
 ```
@@ -48,15 +53,19 @@ $(PYTHON) scripts/site_build.py \
 - No dashboard URLs or internal APIs are referenced in public templates.
 - No task system or admin features are included.
 
-## Deployment Workflow
+## Archive Verification Workflow
 
-1. Local validation: `make build-site ENV=preview`
-2. Manual trigger: Actions → “Cloudflare Pages Deploy” → Run workflow (choose environment)
-3. Verify headers: `curl -I <url> | grep "frame-ancestors"`
-4. Check manifest: `curl <url>/manifest.json | jq .`
+1. Validate sources: `BUILD_MODE=v2 make validate`.
+2. Rebuild locally: `BUILD_MODE=v2 make build-site ENV=preview`.
+3. Confirm `site/manifest.json` and `site/_headers` exist.
+4. Optionally serve `site/` locally with `BUILD_MODE=v2 make serve-site`.
+
+These steps do not mutate or redeploy the retained Cloudflare Pages site.
+Automatic and manually triggered publication are retired. Any reactivation
+requires a new owner decision and the gate in ADR 0005.
 
 ## Notes
 
 - The public site renders from data and templates; it does not copy HTML from `build/`.
 - Course assets are copied minimally (`/assets/css/course.css`, `/assets/courses/<COURSE>.css`) if present.
-- Schedules support will be added behind the same include/exclude controls once quality gates are met.
+- Syllabi and schedules remain subject to the same explicit include/exclude controls.

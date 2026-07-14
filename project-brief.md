@@ -1,17 +1,23 @@
 # Fall 2025 Semester Course Management System - Project Brief
 
+> **Current posture (2026-07-14): retained public archive.** The Fall 2025
+> teaching term is complete. Local validation and archive generation remain
+> supported, but automatic publication, scheduled maintenance, and dashboard
+> deployment controls are retired. See
+> [`docs/adr/0005-retained-public-archive.md`](docs/adr/0005-retained-public-archive.md).
+
 ## Executive Summary
 
 **Project Name:** Fall 2025 Semester Course Management System  
 **Organization:** Kenai Peninsula College / University of Alaska Anchorage  
-**Primary Purpose:** Automated generation and management of course materials for online mathematics and statistics courses  
-**Architecture:** V2 Projection-based system with rule enforcement and CI/CD automation  
-**Status:** Production-ready with successful Fall 2025 semester preparation completed  
+**Primary Purpose:** Preserve the source and reproducible generation of Fall 2025 mathematics and statistics course materials
+**Architecture:** V2 projection-based system with rule enforcement and CI validation
+**Status:** Course taught; retained public archive with publication operations retired
 
 ## Project Overview
 
 ### Mission Statement
-Provide a comprehensive, automated course management system that streamlines the creation, validation, and deployment of course materials while ensuring consistency, accessibility, and compliance with academic policies.
+Preserve the completed Fall 2025 course system, its source materials, and a reproducible local build while retaining the published site as a public teaching archive.
 
 ### Key Objectives
 - **Automation:** Eliminate manual course material generation through template-based systems
@@ -28,9 +34,9 @@ Provide a comprehensive, automated course management system that streamlines the
 - **Build System:** GNU Make 4.4.1 with BUILD_MODE=v2
 - **Web Framework:** Flask 3.1.2+ with Jinja2 templating
 - **Testing:** Pytest 7.4.0+ with property-based testing via Hypothesis
-- **CI/CD:** GitHub Actions with automated validation and deployment
-- **Deployment:** Cloudflare Pages (https://courses.jeffsthings.com)
-- **Version Control:** Git with structured branch protection
+- **CI:** GitHub Actions for validation; automatic publication is retired
+- **Public Archive:** Cloudflare Pages at https://courses.jeffsthings.com
+- **Version Control:** Git with a PR-based working convention; `main` was not protected at the 2026-07-14 audit
 
 ### V2 Architecture Components
 
@@ -62,10 +68,10 @@ Provide a comprehensive, automated course management system that streamlines the
 - **URL:** http://localhost:5055
 - **Features:**
   - AI-driven task prioritization
-  - One-click deployment to production
   - Real-time build monitoring
   - DOCX export capabilities
   - Git snapshot integration
+- **Archive Boundary:** Local management and inspection only; deployment controls are retired
 
 ## Course Portfolio
 
@@ -97,7 +103,6 @@ Provide a comprehensive, automated course management system that streamlines the
   - `qa-validator`: JSON validation and schema compliance
   - `course-content`: Material generation and formatting
   - `calendar-sync`: Date propagation and conflict resolution
-  - `deploy-manager`: Production deployment and verification
 - **Build Pipeline:** Make-based with dependency tracking
 - **Validation:** Multi-layer validation (JSON schema, date rules, HTML structure)
 
@@ -108,26 +113,25 @@ Provide a comprehensive, automated course management system that streamlines the
   - Property-based testing for edge cases
   - Contract testing for date rules
   - Golden file testing for regression prevention
-- **CI/CD Pipeline:**
+- **CI Pipeline:**
   - Automated validation on every commit
   - Type checking with mypy --strict
   - Code formatting with Black and Ruff
   - Security scanning with Bandit
 
-## Infrastructure & Deployment
+## Archive Infrastructure
 
 ### Development Environment
 - **Prerequisites:** Python 3.13+, Git, Make, Pandoc (optional)
 - **Setup:** `make init` for automatic environment configuration
 - **Local Testing:** Flask development server with hot-reload
 
-### Production Deployment
+### Retained Public Archive
 - **Primary URL:** https://courses.jeffsthings.com/
 - **Fallback URL:** https://production.jeffsthings-courses.pages.dev/
-- **Deployment Method:** 
-  1. Dashboard one-click deploy (recommended)
-  2. GitHub Actions on main branch push
-  3. Manual wrangler deployment
+- **Publication State:** The existing site may remain available, but repository changes do not publish automatically
+- **Local Rebuild:** `BUILD_MODE=v2 make build-site ENV=preview`
+- **Reactivation:** Requires a new owner decision and the controls in ADR 0005
 - **CDN:** Cloudflare Pages with global distribution
 - **SSL/TLS:** Automatic certificate management
 
@@ -161,8 +165,8 @@ semester-2025-fall/
 │   ├── integration/     # End-to-end testing
 │   ├── property/        # Hypothesis-based testing
 │   └── golden/          # Regression testing
-├── .github/workflows/   # CI/CD pipelines (6 workflows)
-├── site/               # Static site output for deployment
+├── .github/workflows/   # Validation and release workflows
+├── site/               # Retained static archive output
 └── build/              # Generated artifacts (gitignored)
 ```
 
@@ -172,13 +176,12 @@ semester-2025-fall/
 - ✅ **100% Validation Rate:** All 44 JSON configuration files pass schema validation
 - ✅ **167 Tasks Completed:** Full semester preparation via agent orchestration
 - ✅ **Zero Weekend Due Dates:** Systematic enforcement across all courses
-- ✅ **Production Deployment:** Live at courses.jeffsthings.com
+- ✅ **Public Archive:** Completed teaching output retained at courses.jeffsthings.com
 - ✅ **LMS Integration:** Blackboard Ultra iframe compatibility verified
 
 ### Performance Metrics
 - **Build Time:** < 5 seconds for full site generation
 - **Test Suite:** < 30 seconds for complete test run
-- **Deployment:** < 2 minutes from commit to production
 - **Dashboard Load:** < 200ms response time
 - **Validation:** Real-time with < 100ms feedback
 
@@ -203,7 +206,11 @@ semester-2025-fall/
 - **Template Simplification:** Clean separation of data and presentation
 - **Provenance Tracking:** Complete audit trail for all changes
 
-## Future Roadmap
+## Historical Roadmap
+
+The items below were planning ideas during active development. They are not
+current commitments for this retired semester repository; any reactivation or
+new-semester work requires a separate owner decision.
 
 ### Near-term (Q1 2026)
 - [ ] Spring 2026 semester preparation
@@ -220,8 +227,7 @@ semester-2025-fall/
 
 ## Success Metrics
 
-### Quantitative
-- **Uptime:** 99.9% availability target
+### Quantitative (Active-Semester Targets)
 - **Error Rate:** < 0.1% build failures
 - **Coverage:** 85%+ test coverage maintained
 - **Validation:** 100% schema compliance
@@ -257,9 +263,10 @@ BUILD_MODE=v2 make validate     # Validate JSON schemas
 BUILD_MODE=v2 make test         # Run test suite
 BUILD_MODE=v2 make dash         # Start dashboard
 
-# Deployment
-make deploy                     # Deploy to production
-make deploy-staging            # Deploy to staging environment
+# Retained archive verification (local only)
+BUILD_MODE=v2 make build-site ENV=preview
+test -f site/manifest.json
+test -f site/_headers
 
 # Development
 make init                      # Initialize environment
@@ -271,11 +278,11 @@ make docs                      # Download documentation
 
 **Usage:** Educational use at Kenai Peninsula College / University of Alaska Anchorage  
 **Repository:** https://github.com/jjohnson-47/semester-2025-fall  
-**Deployment:** https://github.com/jjohnson-47/jeffsthings-courses (production)  
+**Public Archive:** https://courses.jeffsthings.com/
 **Compliance:** FERPA compliant, ADA accessible, UAA IT policies  
 
 ---
 
-*Last Updated: September 1, 2025*  
+*Last Updated: July 14, 2026*
 *Version: 2.0.0 (V2 Architecture)*  
-*Status: Production Active*
+*Status: Retained Public Archive; Publication Retired*

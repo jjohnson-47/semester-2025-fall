@@ -1,258 +1,124 @@
-# V2 Architecture Deployment Guide
+# V2 Architecture Archive Guide
 
-## Overview
-
-This guide documents the complete deployment process for the V2 architecture, which features projection-based rendering, embedded CSS, and systematic rule enforcement.
+> **Deployment guidance retired on 2026-07-14.** This guide now documents how
+> to reproduce and inspect the Fall 2025 V2 output locally. The published site
+> is retained as a public archive, but automatic and dashboard-driven
+> publication are retired. Reactivation requires a new owner decision under
+> [`adr/0005-retained-public-archive.md`](adr/0005-retained-public-archive.md).
 
 ## Architecture Summary
 
-### Two-Repository System
+The V2 content factory in this repository transforms the JSON course sources
+into purpose-specific projections, renders HTML with embedded styles, and
+enforces course rules such as avoiding weekend due dates. Its local outputs are
+the ignored `build/` tree and the retained static `site/` tree.
 
-1. **Content Factory** (this repository)
-   - Path: `/home/verlyn13/Projects/jjohnson-47/semester-2025-fall`
-   - Generates all course materials from JSON data
-   - Dashboard: http://localhost:5055
-   - Output: `build/` and `site/` directories
+The public archive may continue to be served at:
 
-2. **Content Delivery** (Cloudflare Pages)
-   - Primary URL: https://courses.jeffsthings.com/
-   - Fallback URL: https://production.jeffsthings-courses.pages.dev/
-   - Auto-deploys on push to main branch
-   - Serves content with iframe support for Blackboard
+- <https://courses.jeffsthings.com/>
+- <https://production.jeffsthings-courses.pages.dev/>
 
-## Deployment Methods
+Those URLs describe retained delivery surfaces. A repository push does not
+publish a new build.
 
-### Method 1: Dashboard One-Click Deploy (Recommended)
+## Supported V2 Build Process
 
-The dashboard provides a fully integrated deployment pipeline:
-
-1. **Start Dashboard with V2 Mode**
-   ```bash
-   BUILD_MODE=v2 make dash
-   ```
-
-2. **Navigate to Dashboard**
-   - Open http://localhost:5055
-   - Login if required
-
-3. **Deploy via UI**
-   - Click **Deploy** button in navigation
-   - Select **Deploy to Production**
-   - Monitor progress in real-time
-
-4. **Automatic Pipeline**
-   The dashboard executes:
-   - `BUILD_MODE=v2 make build-site` - Generate static site
-   - Sync to deployment repository
-   - Deploy to Cloudflare Workers
-   - Verify iframe headers and URLs
-   - Report success/failure
-
-### Method 2: Command Line Deployment
-
-For automated or scripted deployments:
+Always use `BUILD_MODE=v2` and UV-backed repository commands:
 
 ```bash
-# 1. Build with V2 architecture
-BUILD_MODE=v2 make build-site
+# Validate source data first
+BUILD_MODE=v2 make validate
 
-# 2. Verify build
-ls -la site/
+# Build all local course output
+BUILD_MODE=v2 make all
 
-# 3. Commit changes
-git add -A
-git commit -m "Deploy: Update course materials"
+# Build individual components
+BUILD_MODE=v2 make syllabi
+BUILD_MODE=v2 make schedules
 
-# 4. Push to trigger deployment
-git push origin main
+# Rebuild retained static archive output locally
+BUILD_MODE=v2 make build-site ENV=preview
 ```
-
-### Method 3: GitHub Actions (CI/CD)
-
-Automatic deployment on push to main:
-
-```yaml
-# .github/workflows/deploy.yml
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build V2 Site
-        run: BUILD_MODE=v2 make build-site
-      
-      - name: Deploy to Cloudflare
-        run: pnpm deploy
-```
-
-## V2 Build Process
 
 ### Key Components
 
 1. **Projection System** (`scripts/services/projection_adapter.py`)
-   - Transforms JSON data into view-specific projections
-   - Enforces business rules (no weekend due dates)
-   - Provides consistent data structure
+   - Transforms JSON data into view-specific projections.
+   - Applies centralized business rules.
+   - Preserves consistent rendering inputs.
 
 2. **Style System** (`scripts/utils/style_system.py`)
-   - Embeds CSS directly in HTML for standalone viewing
-   - Course-specific themes:
-     - MATH221: Blue (#0066cc)
-     - MATH251: Green (#006600)
-     - STAT253: Orange (#cc6600)
+   - Embeds CSS for standalone and LMS-compatible viewing.
+   - Applies course-specific themes.
 
 3. **Template System** (`templates/`)
-   - Jinja2 templates with V2 support
-   - `includes/styles.html.j2` - Centralized style management
-   - Context-aware rendering (embedded vs linked CSS)
+   - Uses Jinja2 templates and V2 projection data.
+   - Separates source content from presentation.
 
-### Build Commands
+4. **Site Builder** (`scripts/site_build.py`)
+   - Generates a deliberately limited public tree.
+   - Uses explicit include/exclude controls for course documents.
+   - Writes the archive manifest and security headers.
 
-```bash
-# Full build with V2
-BUILD_MODE=v2 make all
+## Local Verification
 
-# Individual components
-BUILD_MODE=v2 make syllabi    # Generate syllabi
-BUILD_MODE=v2 make schedules   # Generate schedules
-BUILD_MODE=v2 make pipeline    # Run full pipeline
-BUILD_MODE=v2 make test        # Test rule enforcement
-
-# Site generation
-BUILD_MODE=v2 make build-site  # Generate site/ directory
-```
-
-## Verification Process
-
-### Pre-Deployment Checks
-
-1. **Validate JSON Data**
-   ```bash
-   make validate
-   ```
-
-2. **Test Rule Enforcement**
-   ```bash
-   BUILD_MODE=v2 make test
-   ```
-
-3. **Preview Locally**
-   ```bash
-   python -m http.server 8001 -d build/
-   ```
-
-### Post-Deployment Verification
-
-1. **Check Production Site**
-   - Visit https://courses.jeffsthings.com/
-   - Verify all courses load
-   - Test navigation links
-
-2. **Verify Iframe Embedding**
-   ```bash
-   # Test CSP headers
-   curl -I https://courses.jeffsthings.com/embed/syllabus/MATH221
-   ```
-
-3. **Test Blackboard Integration**
-   - Embed test URL in Blackboard
-   - Verify content displays correctly
-   - Check for console errors
-
-## Security Configuration
-
-### CSP Headers (Cloudflare Worker)
-
-```javascript
-// Allows embedding in Blackboard
-'Content-Security-Policy': 
-  "frame-ancestors 'self' https://*.blackboard.com https://ku.blackboard.com;"
-```
-
-### CORS Settings
-
-```javascript
-'Access-Control-Allow-Origin': '*',
-'Access-Control-Allow-Methods': 'GET, OPTIONS',
-'X-Frame-Options': 'SAMEORIGIN'
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Build Failures**
-   - Ensure `BUILD_MODE=v2` is set
-   - Run `make clean` before rebuild
-   - Check `scripts/logs/` for errors
-
-2. **Deployment Failures**
-   - Verify GitHub Actions secrets
-   - Check Cloudflare API tokens
-   - Review deployment logs
-
-3. **Iframe Not Loading**
-   - Check CSP headers
-   - Verify embed URLs
-   - Test in different browsers
-
-### Debug Commands
+Run validation before generation, then verify the expected archive files:
 
 ```bash
-# Check V2 mode
-echo $BUILD_MODE
-
-# Verify projections
-BUILD_MODE=v2 python -c "
-from scripts.services.course_service import CourseService
-s = CourseService(content_dir=Path('content'))
-print('CourseService V2 ready')
-"
-
-# Test style system
-python -c "
-from scripts.utils.style_system import StyleSystem
-s = StyleSystem()
-print('StyleSystem ready')
-"
+BUILD_MODE=v2 make validate
+BUILD_MODE=v2 make test
+BUILD_MODE=v2 make build-site ENV=preview
+test -f site/manifest.json
+test -f site/_headers
 ```
 
-## Migration from Legacy
+For an isolated preview that does not publish anything:
 
-### Deprecation Timeline
+```bash
+BUILD_MODE=v2 make serve-site
+```
 
-- **Phase 1** (Current): V2 available via BUILD_MODE flag
-- **Phase 2** (Next Release): V2 becomes default
-- **Phase 3** (Future): Legacy code removed
+The current archive build keeps its public-data boundary: dashboard routes,
+task state, administrative APIs, credentials, and student private information
+must not enter `site/`.
 
-### Migration Checklist
+## Historical Publication Design
 
-- [ ] Update all build commands to use `BUILD_MODE=v2`
-- [ ] Verify dashboard uses V2 mode
-- [ ] Update CI/CD pipelines
-- [ ] Test all deployment methods
-- [ ] Document any custom workflows
+During the Fall 2025 semester, this document described three publication paths:
+a dashboard one-click action, a command-line push, and a GitHub Actions job.
+The intended pipeline built the V2 site, uploaded it to Cloudflare Pages, and
+verified URLs and iframe headers. The repository also carried deployment API
+and orchestration-state tests for that operating period.
 
-## Best Practices
+Those publication paths are no longer active:
 
-1. **Always use V2 mode** for production builds
-2. **Test locally** before deploying
-3. **Validate JSON** before building
-4. **Monitor deployment** logs
-5. **Verify production** after deploy
-6. **Keep documentation** updated
+- the Pages pull-request/main workflow is removed;
+- the dashboard deployment API and client control are removed;
+- scheduled semester maintenance is removed; and
+- historical orchestration-state tests are removed.
 
-## Support
+The V2 projection, rules, templates, local builder, static archive, and isolated
+tests remain. Historical reports may still name the retired surfaces; they are
+evidence of completed work, not current operating authority.
 
-- Check `dashboard/logs/` for dashboard issues
-- Check `scripts/logs/` for build issues
-- Review GitHub Actions logs for deployment issues
-- See CLAUDE.md for AI agent instructions
-- See README.md for general documentation
+## Troubleshooting Local Builds
 
----
+1. Confirm `BUILD_MODE=v2` is set for repository commands.
+2. Run `BUILD_MODE=v2 make validate` before generation.
+3. Use `BUILD_MODE=v2 make clean` to clear generated local artifacts when a
+   rebuild is necessary.
+4. Run Python entry points with `uv run`, never bare `python`, `pip`, or a
+   hand-managed virtual environment.
+5. Treat a green local build as reproducibility evidence only, not deployment
+   evidence.
 
-**Remember: V2 is the future. Legacy mode is deprecated and will be removed.**
+## Reactivation
+
+Do not create, retrieve, rotate, or install deployment credentials for routine
+archive maintenance. Do not re-add a push- or pull-request-triggered deployment
+workflow. Publication may be re-enabled only through a new owner decision and
+the complete reactivation gate in ADR 0005.
+
+The dedicated historical Cloudflare record is in
+[`CLOUDFLARE_DEPLOYMENT.md`](CLOUDFLARE_DEPLOYMENT.md), and current local builder
+details are in [`SITE_BUILDER.md`](SITE_BUILDER.md).

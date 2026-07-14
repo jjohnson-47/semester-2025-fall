@@ -1363,8 +1363,8 @@ def embed_generator() -> str:
                 </ol>
                 <div class="mt-2">
                     <strong>Public URL:</strong> <code>{base_url}</code><br>
-                    <small class="text-muted">iframes will load content from your production Cloudflare Pages deployment.</small>
-                    <br><small class="text-warning"><i class="bi bi-exclamation-triangle"></i> Ensure content is deployed to production before using these codes!</small>
+                    <small class="text-muted">These iframe codes reference the retained Fall 2025 public archive.</small>
+                    <br><small class="text-warning"><i class="bi bi-exclamation-triangle"></i> Local rebuilds do not publish changes to those URLs.</small>
                 </div>
             </div>
     """

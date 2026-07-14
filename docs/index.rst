@@ -160,14 +160,13 @@ Development Workflow
 
 5. **Create pull request**
 
-Deployment
-----------
+Retained Archive Operations
+---------------------------
 
-The dashboard can be deployed using:
-
-- **Development**: ``make dash`` (Flask development server)
-- **Production**: Gunicorn + nginx (see deployment guide)
-- **Docker**: ``docker-compose up`` (containerized deployment)
+The supported dashboard surface is local only: ``BUILD_MODE=v2 make dash``.
+The Fall 2025 public site is retained as an archive, but dashboard and Pages
+publication controls are retired. Rebuilding ``site/`` does not publish it.
+See ``docs/adr/0005-retained-public-archive.md`` before any reactivation work.
 
 License
 -------

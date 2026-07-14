@@ -11,6 +11,13 @@ YELLOW='\033[0;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+if [ "${ARCHIVE_REACTIVATION_APPROVED:-}" != "1" ]; then
+    echo -e "${RED}Archive publication is retired.${NC}"
+    echo "A new owner decision is required before Cloudflare credentials are prepared."
+    echo "After that decision, rerun with ARCHIVE_REACTIVATION_APPROVED=1."
+    exit 1
+fi
+
 # Project configuration
 PROJECT_NAME="semester-2025-fall"
 TOKEN_NAME="${PROJECT_NAME}-pages"
@@ -104,26 +111,23 @@ else
     echo -e "\n${YELLOW}Skipping verification (cf-go not installed)${NC}"
 fi
 
-# Step 8: GitHub configuration instructions
-echo -e "\n${BLUE}Step 6: Configure GitHub Secrets${NC}"
+# Step 8: Recovery credential instructions
+echo -e "\n${BLUE}Step 6: Recovery credentials prepared${NC}"
 echo "=================================================="
-echo "Add these secrets to your GitHub repository:"
-echo "(Settings → Secrets and variables → Actions)"
+echo "The former GitHub Actions deployment workflow is retired."
+echo "Do not add repository secrets unless a newly reviewed workflow requires them."
+echo "For an owner-approved manual recovery, load credentials from gopass:"
 echo ""
-echo "1. CLOUDFLARE_API_TOKEN:"
+echo "CLOUDFLARE_API_TOKEN:"
 echo "   gopass show -o ${GOPASS_TOKEN_PATH}"
 echo ""
-echo "2. CLOUDFLARE_ACCOUNT_ID:"
+echo "CLOUDFLARE_ACCOUNT_ID:"
 echo "   gopass show -o ${GOPASS_ACCOUNT_PATH}"
-echo ""
-echo "3. Add repository variable CF_PROJECT:"
-echo "   Value: jeffsthings-courses"
 echo ""
 echo -e "${GREEN}✓ Setup complete!${NC}"
 echo ""
-echo "Test deployment with:"
+echo "Verify the local archive build with:"
 echo "  make build-site ENV=preview"
-echo "  # Then trigger GitHub Actions workflow manually"
 
 # Optional: Export for immediate use
 echo -e "\n${BLUE}Environment variables exported for this session:${NC}"

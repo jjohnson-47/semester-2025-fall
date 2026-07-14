@@ -11,6 +11,13 @@ YELLOW='\033[0;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+if [ "${ARCHIVE_REACTIVATION_APPROVED:-}" != "1" ]; then
+    echo -e "${RED}Archive publication is retired.${NC}"
+    echo "A new owner decision is required before Cloudflare resources may be changed."
+    echo "After that decision, rerun with ARCHIVE_REACTIVATION_APPROVED=1."
+    exit 1
+fi
+
 # Load project context
 if [ ! -f ".cloudflare" ]; then
     echo -e "${RED}Error: .cloudflare file not found${NC}"
@@ -166,19 +173,12 @@ else
 fi
 echo ""
 
-# Step 8: Deployment instructions
-echo -e "${BLUE}Step 8: Deployment${NC}"
+# Step 8: Recovery publication instructions
+echo -e "${BLUE}Step 8: Owner-approved recovery publication${NC}"
 echo "════════════════════════════════════════════════"
 echo ""
-echo "Option 1: Deploy with wrangler (immediate):"
-echo "  wrangler pages deploy site --project-name ${PAGES_PROJECT}"
-echo ""
-echo "Option 2: Deploy via GitHub Actions:"
-echo "  1. Push to GitHub"
-echo "  2. Go to Actions → 'Cloudflare Pages Deploy'"
-echo "  3. Run workflow with environment selection"
-echo ""
-echo "Option 3: Deploy with cf-go (manual trigger):"
+echo "The former GitHub Actions deployment workflow is retired."
+echo "Use the repository's guarded manual trigger only if it is part of the reviewed recovery:"
 echo "  make pages-deploy PROJECT=${PAGES_PROJECT} BRANCH=main"
 echo ""
 
@@ -192,6 +192,6 @@ echo "Pages URL: https://${SUBDOMAIN}.pages.dev"
 echo "Custom Domain: https://${PAGES_CUSTOM_DOMAIN}"
 echo ""
 echo "Next steps:"
-echo "1. Configure GitHub secrets (see docs/CLOUDFLARE_DEPLOYMENT.md)"
-echo "2. Deploy the site using one of the options above"
+echo "1. Record the new owner decision and reviewed recovery method"
+echo "2. Publish only through that approved method"
 echo "3. Verify at https://${PAGES_CUSTOM_DOMAIN}"

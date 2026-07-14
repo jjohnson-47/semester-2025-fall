@@ -1,13 +1,20 @@
 # Project: Fall 2025 Course Management System
 ## Kenai Peninsula College Academic Content Platform
 
+> **Current posture (2026-07-14): Retained public archive.** The Fall 2025
+> teaching period is complete. Automatic Pages deployment, scheduled
+> maintenance, and dashboard deployment controls are retired. Local V2
+> validation and archive builds remain supported. Publication reactivation
+> requires a new explicit owner decision and
+> `docs/adr/0005-retained-public-archive.md`.
+
 ## 🎯 Architecture Overview
 - **Core**: Python 3.13 with UV package manager (no venv/pip)
 - **Build System**: GNU Make with V2 projection-based architecture
 - **Template Engine**: Jinja2 with custom projection adapters
 - **Dashboard**: Flask web application on port 5055
 - **Database**: JSON-based content storage in `content/courses/`
-- **Deployment**: GitHub Actions → Cloudflare Pages (https://courses.jeffsthings.com)
+- **Publication**: Retained public archive at <https://courses.jeffsthings.com>; automation retired
 - **Testing**: Pytest with property-based tests via Hypothesis
 
 ## 📂 Project Structure
@@ -24,7 +31,7 @@
 │   └── builders/           # Projection adapters for rendering
 ├── dashboard/              # Flask management dashboard
 │   ├── agents/             # Specialized automation agents
-│   ├── api/                # RESTful deployment endpoints
+│   ├── api/                # RESTful task and status endpoints
 │   ├── db/                 # SQLite tracking database
 │   └── templates/          # Dashboard UI templates
 ├── templates/              # Jinja2 templates for content
@@ -37,7 +44,7 @@
 │   ├── syllabi/            # Generated syllabus HTML
 │   ├── schedules/          # Generated schedule HTML
 │   └── blackboard/         # DOCX exports for Blackboard
-└── site/                   # Static site for deployment
+└── site/                   # Static archive output
 ```
 
 ## 🚀 Development Commands
@@ -60,9 +67,10 @@ DASH_PORT=5055 BUILD_MODE=v2 make dash         # Start dashboard
 BUILD_MODE=v2 make dash-gen                    # Generate tasks
 BUILD_MODE=v2 make dash-prioritize             # Prioritize tasks
 
-# Deployment
-BUILD_MODE=v2 make build-site   # Prepare for deployment
-BUILD_MODE=v2 make deploy        # Deploy to production
+# Retained archive verification (local only)
+BUILD_MODE=v2 make build-site   # Rebuild static archive output
+test -f site/manifest.json
+test -f site/_headers
 ```
 
 ### Python Script Commands
@@ -86,7 +94,7 @@ uv run pytest tests/property/ -v --hypothesis-show-statistics
 ```bash
 # Access dashboard at http://localhost:5055
 # Features:
-# - One-click deployment to Cloudflare
+# - Local archive inspection (publication controls are retired)
 # - DOCX export for Blackboard
 # - Task management and tracking
 # - Build statistics monitoring
@@ -118,10 +126,10 @@ uv run pytest tests/property/ -v --hypothesis-show-statistics
 - **No Classes**: Labor Day (Sep 1), Thanksgiving (Nov 27-28)
 
 ## 🔧 Current Focus & Tasks
-- Maintaining V2 projection-based architecture
+- Preserving the completed Fall 2025 V2 course archive
 - Ensuring no weekend due dates via rules engine
-- Supporting iframe embedding for Blackboard
-- Dashboard API for automated deployments
+- Retaining historical iframe-compatible output for Blackboard
+- Keeping local validation and archive reconstruction reproducible
 - Property-based testing for data validation
 
 ## 🏗️ System Conventions
@@ -144,8 +152,8 @@ uv run pytest tests/property/ -v --hypothesis-show-statistics
 - Branch naming: `feat/`, `fix/`, `docs/`, `refactor/`
 - Conventional commits format
 - Never commit to main directly
-- PR reviews required for production changes
-- GitHub Actions for CI/CD
+- PR reviews required for archive changes
+- GitHub Actions for validation; publication automation is retired
 
 ## 🔒 Security Requirements
 - No hardcoded credentials (use .env files)
@@ -177,14 +185,16 @@ When encountering complex multi-step tasks, use the Task tool:
 - `orchestrator`: Master coordinator for workflows
 - `qa-validator`: JSON validation and compliance
 - `course-content`: Syllabus/schedule generation
-- `deploy-manager`: Site building and deployment
 - `calendar-sync`: Date management and consistency
+
+Historical records may refer to a `deploy-manager`, but it is not an authorized
+current publication path.
 
 ### Critical Rules
 1. **ALWAYS use BUILD_MODE=v2** - Legacy mode is deprecated
 2. **Never create weekend due dates** - Rules engine enforces this
 3. **Validate before building** - Run validation checks first
-4. **Test before deploying** - Full test suite must pass
+4. **Do not publish** - Reactivation requires a new explicit owner decision and ADR 0005
 5. **Use UV for Python** - Never use pip or venv directly
 6. **Embed CSS in HTML** - For standalone file viewing
 
@@ -204,20 +214,20 @@ When encountering complex multi-step tasks, use the Task tool:
 - Follows global security practices
 
 ### With GitHub Actions
-- CI/CD pipeline in `.github/workflows/`
-- Automated deployment on main branch push
-- Test validation before deployment
-- Cloudflare Pages integration
+- Validation workflows remain in `.github/workflows/`
+- Pushing to `main` does not deploy the archive
+- The former Pages PR gate and scheduled maintenance workflow are retired
 
 ### With Cloudflare Pages
-- Production URL: https://courses.jeffsthings.com
-- Automatic deployments from GitHub
-- Custom domain configuration
-- Edge caching for performance
+- Retained public archive: <https://courses.jeffsthings.com>
+- Existing custom domain and Pages output are preserved
+- Repository-driven publication is retired
+- Any reactivation requires a new owner decision and `docs/adr/0005-retained-public-archive.md`
 
 ## 📚 Key Documentation
 - `README.md` - Project overview and setup
 - `CLAUDE.md` - Claude Code specific instructions
+- `docs/adr/0005-retained-public-archive.md` - Current publication decision and reactivation gate
 - `docs/IMPLEMENTATION_STATUS.md` - V2 progress tracking
 - `docs/adr/` - Architecture decision records
 - `dashboard/API_DOCUMENTATION.md` - Dashboard API reference
@@ -248,7 +258,7 @@ BUILD_MODE=v2 make all       # Rebuild everything
 
 ---
 
-**Project Status**: Active Development
+**Project Status**: Retained Public Archive
 **Architecture**: V2 Projection-based with Rules Engine
-**Last Updated**: September 2025
+**Last Updated**: July 2026
 **Python**: 3.13+ | UV: 0.8.14+ | Make: 4.4.1+

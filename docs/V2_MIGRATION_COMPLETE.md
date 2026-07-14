@@ -1,5 +1,10 @@
 # V2 Architecture Migration Complete
 
+> **Historical migration report.** V2 local builds remain supported, but the
+> repository is a retained public archive and publication automation was
+> retired on 2026-07-14. See `README.md` and
+> [`adr/0005-retained-public-archive.md`](adr/0005-retained-public-archive.md).
+
 ## Migration Status: ✅ COMPLETE
 
 The semester-2025-fall repository has been fully migrated to the V2 architecture as the default mode.
